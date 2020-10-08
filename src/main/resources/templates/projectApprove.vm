@@ -1,0 +1,1255 @@
+<!-- 
+Written by Veniture
+Berk Karabacak
+-->
+
+$webResourceManager.requireResource("com.veniture.PortfolioManagement:PortfolioManagement-resources")
+
+<html>
+
+<head>
+    <title>Proje Onay</title>
+
+    <link href="https://nightly.datatables.net/css/jquery.dataTables.css" rel="stylesheet" type="text/css" />
+    <script src="https://nightly.datatables.net/js/jquery.dataTables.js"></script>
+    <link href="https://nightly.datatables.net/select/css/select.dataTables.css?_=9a6592f8d74f8f520ff7b22342fa1183.css" rel="stylesheet" type="text/css" />
+    <script src="https://nightly.datatables.net/select/js/dataTables.select.js?_=9a6592f8d74f8f520ff7b22342fa1183"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdn.datatables.net/fixedcolumns/3.3.0/js/dataTables.fixedColumns.min.js"></script>
+    <link href="https://cdn.datatables.net/fixedcolumns/3.3.0/css/fixedColumns.dataTables.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-colorschemes"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.2.2/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.html5.min.js"></script>
+
+
+    <style id="css">
+        .aui-group {
+             margin: 1px !important;
+        }
+
+        a { cursor: pointer; }
+        span { cursor: pointer !important; }
+
+
+         table > tbody > tr > td {
+            text-overflow: ellipsis !important;
+            overflow : hidden !important;
+            white-space: nowrap !important;
+            max-width: 400px !important;
+            min-width: 20px !important;
+            vertical-align: middle;
+            horizontal-align: left;
+            word-break: break-all !important;
+        }
+
+         .borderli {
+             border-radius: 12px;
+             border: 1px solid #00ad9a;
+             padding: 20px;
+         }
+
+         table > tbody > tr > td:hover {
+            text-overflow: clip !important;
+            white-space: normal !important;
+            word-break: break-all !important;
+            max-width: 400px !important;
+            min-width: 20px !important;
+        }
+
+        table.dataTable th {
+            white-space: nowrap;
+            max-width: 400px !important;
+            min-width: 20px !important;
+            text-overflow: clip !important;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked + .slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+
+        /* Rounded sliders */
+        .slider.round {
+            border-radius: 34px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+    </style>
+    <script>
+
+        //Constants
+        var ProjeYiliCfId = "customfield_11800";
+        var selectBoxColumnIndex = 1;
+        var issueKeyColumnIndex = 2;
+        var onaylıStatusName = "Onaylı";
+        var isSavedOrder = 28;
+        var statusOrder = 29;
+        var workdayInaYear = 252;
+        var showOnlyTheseColumns = [selectBoxColumnIndex, issueKeyColumnIndex, 3, 10, 11, 12, 13, 14,statusOrder];
+
+        AJS.$(document).ready(function() {
+            Swal.showLoading();
+
+            var table;
+            var departmanSelectedTable;
+            table=AJS.$("#projectsTable").DataTable( {
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'excel',
+                        text: 'Save as Excel',
+                        exportOptions: {
+                            columns: ':visible',
+                            modifier: {
+                                page: 'current',
+                                selected: true
+                            }
+                        }
+                    }
+                ],
+                //"stateSave": true,
+                "scrollX"   : true,
+                "scrollY":        "400px",
+                "scrollCollapse": true,
+                "paging":         false,
+                "order": [[ issueKeyColumnIndex, "asc" ]],
+                "pageLength": 19,
+                "select"    :  {
+                    style:    'select',
+                    // STATIC VARIABLE !!!!
+                    selector: 'td:nth-child(1)'
+                },
+                fixedColumns: {
+                    leftColumns: selectBoxColumnIndex
+                },
+                columnDefs: [{
+                    orderable: false,
+                    className: 'select-checkbox',
+                    // STATIC VARIABLE !!!!
+                    targets:   selectBoxColumnIndex
+                },
+                    {"width": "6px", 'targets': selectBoxColumnIndex},
+                    { targets: showOnlyTheseColumns, visible: true},
+                    { targets: '_all', visible: false }
+                ],
+                footerCallback: function (row, data, start, end, display) {
+                    displayFooter();
+                }
+            });
+            AJS.$("#departmanSelectedTable").DataTable( {
+                "paging":         false,
+                "order": [[ 1, "desc" ]],
+                "searching": false
+            });
+
+            function displayFooter() {
+                table = AJS.$('#projectsTable').DataTable();
+
+                // Total over all pages
+                var intVal = function (i) {
+                    return typeof i === 'undefined' ? 0 : i * 1;
+                };
+
+                var totalize_selected = function (col) {
+                    var data = table.cells('.selected', col).data();
+                    if (typeof data != 'undefined') {
+                        return data
+                            .reduce(function (a, b) {
+                                    if (b === "-") {
+                                        b = "0"
+                                    }
+                                    return intVal(a) + intVal(b);
+                                },
+                                0);
+                    } else {
+                        return 0;
+                    }
+                };
+
+                var totalize_all = function (row) {
+                    var data = table.cells(row, 'th[class*="program"]').data();
+                    if (typeof data != 'undefined') {
+                        return data
+                            .reduce(function (a, b) {
+                                    if (b === "-") {
+                                        b = "0"
+                                    }
+                                    return intVal(a) + intVal(b);
+                                },
+                                0);
+                    } else {
+                        return 0;
+                    }
+                };
+                var apply_footer = function (capacity, col) {
+
+                    let selectedTotal = roundToTwo(totalize_selected(col));
+                    let difference = capacity - selectedTotal;
+                    let innerHtml=' ' + (selectedTotal)
+
+                    AJS.$(table.column(col).footer()).html(innerHtml);
+                    AJS.$("#capacityTable tbody > tr:nth-child(3) > td:nth-child("+ (col-2) +")").text(roundToTwo(selectedTotal));
+
+                    if (difference < 0) {
+                        AJS.$("#capacityTable tbody > tr:nth-child(4) > td:nth-child("+ (col-2) +")").html('<aui-badge style="background: #c51000; color: #ffffff;">' +roundToTwo(difference) + '</aui-badge>');
+                        AJS.$("#capacityTable tbody > tr:nth-child(5) > td:nth-child("+ (col-2) +")").html('<aui-badge style="background: #c51000; color: #ffffff;">' +roundToTwo(difference/workdayInaYear) + '</aui-badge>');
+                    } else {
+                        AJS.$("#capacityTable tbody > tr:nth-child(4) > td:nth-child("+ (col-2) +")").text(roundToTwo(difference));
+                        AJS.$("#capacityTable tbody > tr:nth-child(5) > td:nth-child("+ (col-2) +")").text(roundToTwo(difference/ workdayInaYear));
+                    }
+                };
+
+                table.columns('th[class*="inFooter"]').indexes().each(function (e) {
+                    apply_footer(table.column(e).header().getAttribute('remainingTime'), e);
+                });
+            };
+
+            function roundToTwo(num) {
+                return +(Math.round(num + "e+1")  + "e-1");
+            }
+
+            table.on( 'select', function ( e, dt, type, indexes ) {
+                let scrollTop = AJS.$(".dataTables_scrollBody").scrollTop();
+
+                var table=AJS.$("#projectsTable").DataTable();
+                table.search('');
+                if ( type === 'row' ) {
+                    for (var i = 0; i < indexes.length; i++) {
+                        table.cell(indexes[i],0).data("YYYY");
+                    }
+                }
+
+                var departmanSelectedTable=AJS.$("#departmanSelectedTable").DataTable();
+
+                departmanSelectedTable
+                        .order( [ 1, 'desc' ] )
+                        .draw();
+
+                table.draw();
+                createOrUpdateCharts();
+                AJS.$(".dataTables_scrollBody").scrollTop(scrollTop);
+            });
+
+            table.on( 'deselect', function ( e, dt, type, indexes ) {
+                let scrollTop = AJS.$(".dataTables_scrollBody").scrollTop();
+                var table=AJS.$("#projectsTable").DataTable();
+
+                table.search( '' );
+                if ( type === 'row' ) {
+                    for (var i = 0; i < indexes.length; i++) {
+                        table.cell(indexes[i],0).data("--");
+                    }
+                }
+
+                var departmanSelectedTable=AJS.$("#departmanSelectedTable").DataTable();
+
+                departmanSelectedTable
+                        .order( [ 1, 'desc' ] )
+                        .draw();
+
+                table.draw();
+
+                createOrUpdateCharts();
+                AJS.$(".dataTables_scrollBody").scrollTop(scrollTop);
+            } );
+
+            AJS.$("#customFieldList-select2").auiSelect2();
+
+            #foreach($cfw in $CfFilters)
+                #set ($customField=$cfw.getCustomField())
+                AJS.$("#$customField.getId()-select2").auiSelect2({
+                    placeholder: "$customField.getName()"
+                });
+
+                AJS.$("#$customField.getId()-select2").on('select2-selecting', function (e) {
+                    let search = e.val ;
+
+                    #if($customField.getId().contains("11501") || $customField.getId().contains("11903"))
+                        table.columns('th[customFieldId="$customField.getId()"]').search('^' +search+ '$' +
+                                '', true, false).draw();
+                    #else
+                        table.columns('th[customFieldId="$customField.getId()"]').search(search, false, true).draw();
+                    #end
+
+                });
+
+                AJS.$("#$customField.getId()-clear").click(function(e) {
+                    e.preventDefault();
+                    table.search('').columns().search('');
+
+                    AJS.$("#$customField.getId()-select2").select2("val", "").trigger('change');
+                    #foreach($cfw in $CfFilters)
+                        #set ($customField=$cfw.getCustomField())
+                        table.columns('th[customFieldId="$customField.getId()"]').search( AJS.$("#$customField.getId()-select2").val());
+                    #end
+                    onlyShowSelectedOnesToFalse();
+                    table.draw();
+                });
+            #end
+
+            //Set Current Year In Year Cf
+            AJS.$("#" + ProjeYiliCfId + "-select2").select2("val", new Date().getFullYear());
+
+            var toggle = AJS.$("#onlyShowSelectedOnes");
+            toggle.bootstrapToggle();
+
+            toggle.bootstrapToggle('off');
+            AJS.$(".toggle-group").click(function(e) {
+                onlyShowSelectedOnesToggle();
+            });
+
+            function onlyShowSelectedOnesToggle() {
+                var isChecked = toggle.prop('checked');
+                if (isChecked === false) {
+                    table.search('')
+                            .columns('th:contains("isSelected")').search('YYYY')
+                            .draw();
+                } else {
+                    table.search('').columns().search('');
+                    #foreach($cfw in $CfFilters)
+                        #set ($customField=$cfw.getCustomField())
+                        table.columns('th[customFieldId="$customField.getId()"]').search(AJS.$("#$customField.getId()-select2").val());
+                    #end
+                    table.draw();
+                }
+            }
+            function onlyShowSelectedOnesToFalse() {
+                toggle.bootstrapToggle('off');
+                table.search('').columns().search('');
+                #foreach($cfw in $CfFilters)
+                    #set ($customField=$cfw.getCustomField())
+                    table.columns('th[customFieldId="$customField.getId()"]').search(AJS.$("#$customField.getId()-select2").val());
+                #end
+                table.draw();
+            }
+
+            AJS.$("#select-all").click(function(e) {
+                table.rows( {order:'index', search:'applied'} ).select();
+            });
+
+            AJS.$("#deselect-all").click(function(e) {
+                table.rows( {order:'index', search:'applied'} ).deselect();
+            });
+
+            AJS.$("#customFieldList-select2").on('select2-selecting', function (e) {
+                var column = table.column( 'th[customfieldid="'+e.val+'"]') ;
+                column.visible( ! column.visible() );
+            });
+
+            AJS.$("#customFieldList-select2").on("select2-removing", function(e) {
+                // Get the column API object
+                var column = table.column( 'th[customfieldid="'+e.val+'"]') ;
+                // Toggle the visibility
+                //column.visible( true  );
+                column.visible( ! column.visible() );
+            });
+
+            window.onbeforeunload = null;
+
+            AJS.$('#ApproveButton').off().on("click", function () {
+
+                console.log("Entering Approve State");
+
+                // var URL = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
+                // Constant
+                var selected = table.cells('.selected', issueKeyColumnIndex).data().toArray();
+                var notSelected = table.cells(':not(.selected)', issueKeyColumnIndex).data().toArray();
+
+                createOrUpdateCharts();
+
+                    jQuery.ajax({
+                        url: AJS.params.baseURL + "/rest/florestservice/1.2/rest/transitionissues",
+                        type: 'POST',
+                        timeout:300000,
+                        data: {
+                            selected: selected,
+                            notSelected: notSelected,
+                            action: "approve"
+                        },
+                        async: true,
+                        beforeSend: function () {
+                            Swal.showLoading()
+                        },
+                        complete: function (response) {
+                            Swal.hideLoading()
+                        },
+                        error: function (response) {
+                            Swal.fire({
+                                type: 'error',
+                                title: 'Oops...',
+                                text: 'Something went wrong!',
+                                footer: '<a href="mailto:berk.karabacak@veniture.com.tr ?Subject=Error%20at%20ProjectApprove" target="_top">Send Mail</a>'
+                            })
+                        },
+                        success: function (response, status, jqXHR) {
+
+                            //AJS.$('.selected:not(.onayli)').addClass("onayli")
+
+                            Swal.fire(
+                                    'Başarılı!',
+                                    'Projeler Onaylandı!',
+                                    'success'
+                            )
+                        }
+                    });
+            });
+
+            AJS.$('#DeclineButton').off().on("click", function () {
+
+                console.log("Entering Decline State");
+
+                var selected = table.cells('.selected', issueKeyColumnIndex).data().toArray();
+
+                createOrUpdateCharts();
+
+                jQuery.ajax({
+                    url: AJS.params.baseURL + "/rest/florestservice/1.2/rest/transitionissues",
+                    type: 'POST',
+                    timeout:300000,
+                    data: {
+                        selected: selected,
+                        action: "decline"
+                    },
+                    async: true,
+                    beforeSend: function () {
+                        Swal.showLoading()
+                    },
+                    complete: function (response) {
+                        Swal.hideLoading()
+                    },
+                    error: function (response) {
+                        Swal.fire({
+                            type: 'error',
+                            title: 'Oops...',
+                            text: 'Something went wrong!',
+                            footer: '<a href="mailto:berk.karabacak@veniture.com.tr ?Subject=Error%20at%20ProjectApprove" target="_top">Send Mail</a>'
+                        })
+                    },
+                    success: function (response, status, jqXHR) {
+
+                        table.rows('.selected').remove()
+                                .draw();
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Reddedildi',
+                            text: 'Projeler reddedildi!'})
+                    }
+                });
+            });
+
+            AJS.$('#SepetiKaydet').off().on("click", function () {
+
+                // var URL = location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
+                var selectedCellsArray = table.cells('.selected', issueKeyColumnIndex).data().toArray();
+                var notselectedCellsArray = table.cells(':not(.selected)', issueKeyColumnIndex).data().toArray();
+
+                jQuery.ajax({
+                    url: AJS.params.baseURL + "/rest/florestservice/1.2/rest/sepetikaydet",
+                    type: 'POST',
+                    timeout:300000,
+                    data: {
+                        issues: selectedCellsArray,
+                        issuesNotSelected: notselectedCellsArray
+                    },
+                    async: true,
+                    beforeSend: function () {
+                        Swal.showLoading()
+                    },
+                    complete: function (response) {
+                        Swal.hideLoading()
+                    },
+                    error: function (response) {
+                        Swal.fire({
+                            type: 'error',
+                            title: 'Oops...',
+                            text: 'Something went wrong!',
+                            footer: '<a href="mailto:berk.karabacak@veniture.com.tr ?Subject=Error%20at%20ProjectApprove" target="_top">Send Mail</a>'
+                        })
+                    },
+                    success: function (response, status, jqXHR) {
+                        Swal.fire(
+                                'Başarılı!',
+                                'Sepet Kaydedildi!',
+                                'success'
+                        )
+                    }
+                });
+            });
+
+            loadData();
+            function loadData() {
+                jQuery.ajax({
+                    type: 'POST',
+                    url: AJS.params.baseURL + "/rest/florestservice/1.2/rest/getProjectIssues",
+                    contentType: "text/plain",
+                    timeout:500000,
+                    dataType: 'json',
+                    success: function (data) {
+                        myJsonData = data;
+                        populateDataTable(myJsonData);
+                        let valuesSet = table.column(getColumnIndex("customfield_11405")) //Departman
+                                .data()
+                                .unique();
+                        createOrUpdateCharts();
+                    },
+                    error: function (e) {
+                        console.log("There was an error with your request...");
+                        console.log("error: " + JSON.stringify(e));
+                    }
+                });
+            }
+
+            // populate the data table with JSON data
+            function populateDataTable(data) {
+                console.log("populating data table...");
+                var table = AJS.$("#projectsTable").DataTable();
+                Object.keys(data).forEach(function(key){
+                    var issueKey = Object.values(data[key])[issueKeyColumnIndex];
+                    data[key]["issue"]='<a href="$baseUrl/browse/'+ issueKey+'" target="_blank">'+issueKey+'</a>';
+                    //console.log(Object.values(data[key]));
+                    // console.log(Object.values(data[key])[27]);
+                    // console.log(Object.values(data[key])[28]);
+                    // console.log(Object.values(data[key])[29]);
+                    var rowNode = table.row.add(Object.values(data[key])).draw( false ).node();
+
+                    if(Object.values(data[key])[isSavedOrder]=="true"){
+                        AJS.$(rowNode).addClass("selected");
+                    }
+
+                    if(Object.values(data[key])[statusOrder]==onaylıStatusName){
+                        AJS.$(rowNode).addClass("selected");
+                        AJS.$(rowNode).addClass("onayli");
+                    }
+                    // else {
+                    //     AJS.$(rowNode).addClass("onaysiz");
+                    // }
+                });
+
+                table.rows(".selected" ).select();
+
+                //tableTest.find('td').addClass('might-overflow');
+
+                // for(var i = 1; i < length+1; i++) {
+                //     var customer = data.customers['customer'+i];
+                //
+                //     tableTest.row.add( [
+                //         customer.first_name,
+                //         customer.last_name,
+                //         customer.occupation,
+                //         customer.email_address
+                //     ] ).draw( false );
+                // }
+                Swal.hideLoading();
+                Swal.close();
+            }
+
+            function getColumnIndex(customfieldIdAsString){
+                //return table.columns('th:contains("'+headerName+ '")').indexes()[0]
+                var table = AJS.$("#projectsTable").DataTable();
+                return table.column('th[customFieldId="'+customfieldIdAsString + '"]').index()
+            }
+
+            var table = AJS.$("#projectsTable").DataTable();
+            //var columnIndex= getColumnIndex(customfieldIdAsString)
+
+            var departmanChart ;
+            var departmanEforChart ;
+            var projeEtiketleriChart ;
+            var projeEtiketleriEforChart ;
+            var ToplamEforCfId = "customfield_11905";
+            var DepartmanCfID = "customfield_11405";
+            var projeEtiketleriCfId = "customfield_11306";
+
+            function createOrUpdateCharts() {
+
+                var departmansUnique = table
+                        .column(getColumnIndex(DepartmanCfID)) //Departman
+                        .data()
+                        .unique();
+
+
+                var departmanChartData = {
+                    labels: [],
+                    datasets: [
+                        {
+                            data: []
+                        }
+                    ]
+                };
+                var departmanEforChartData = {
+                    labels: [],
+                    datasets: [
+                        {
+                            data: []
+                        }
+                    ]
+                };
+                var projeEtiketChartData = {
+                    labels: [],
+                    datasets: [
+                        {
+                            data: []
+                        }
+                    ]
+                };
+
+                var projeEtiketEforData = {
+                    labels: [],
+                    datasets: [
+                        {
+                            data: []
+                        }
+                    ]
+                };
+
+                var i;
+                if(departmanChart!=null){
+                    departmanChart.destroy();
+                }
+
+                if(departmanEforChart!=null){
+                    departmanEforChart.destroy();
+                }
+                if(projeEtiketleriChart!=null){
+                    projeEtiketleriChart.destroy();
+                }
+
+                if(projeEtiketleriEforChart!=null){
+                    projeEtiketleriEforChart.destroy();
+                }
+
+                var projeEtiketleriSet = createProjeEtiketleriSet(table.column(getColumnIndex(projeEtiketleriCfId)).data());
+                const projeEtiketleriIterator = projeEtiketleriSet.values();
+                for(i = 0; i < projeEtiketleriSet.size; i++){
+
+                    let selectedProjeEtiketleri = table.cells('.selected', getColumnIndex(projeEtiketleriCfId)).data();
+                    let selectedEfors = table.cells('.selected', getColumnIndex(ToplamEforCfId)).data();
+
+                    if (selectedProjeEtiketleri.length==0) {
+                        selectedProjeEtiketleri = table.cells('', getColumnIndex(projeEtiketleriCfId)).data();
+                        selectedEfors =  table.cells('', getColumnIndex(ToplamEforCfId)).data();
+                    }
+
+                    var count=0;
+                    let eforToplam = 0;
+                    let projeEtiketi=projeEtiketleriIterator.next().value;
+                    for (x = 0; x < selectedProjeEtiketleri.length; x++) {
+                        if (selectedProjeEtiketleri[x].includes(projeEtiketi)){
+                            if (selectedEfors[x]!=" "){
+                                eforToplam+=parseInt(selectedEfors[x],10);
+                            }
+                            count++;
+                        }
+                    }
+
+                    projeEtiketChartData.labels.push(projeEtiketi);
+                    projeEtiketChartData.datasets[0].data.push(count);
+
+                    projeEtiketEforData.labels.push(projeEtiketi);
+                    projeEtiketEforData.datasets[0].data.push(eforToplam);
+                }
+
+                for(i = 0; i < departmansUnique.length; i++){
+                    //var count=table.columns('th:contains("Sponsor")').search( va[i] ).draw().rows( {order:'index', search:'applied'} ).count();
+                    //var valueCount=table.columns('th[customFieldId="'+customfieldIdAsString + '"]').search(valuesSet[i]).page.info().recordsDisplay;
+                    let selectedDepartmans  = table.cells('.selected', getColumnIndex(DepartmanCfID)).data();
+                    let selectedEfors       = table.cells('.selected', getColumnIndex(ToplamEforCfId)).data();
+
+                    if (selectedDepartmans.length==0) {
+                        //values=table.cells('' , 'th[customFieldId="'+ customfieldIdAsString + '"]').data();
+                        selectedDepartmans = table.cells('' , getColumnIndex(DepartmanCfID)).data();
+                        selectedEfors      = table.cells('' , getColumnIndex(ToplamEforCfId)).data();
+                    }
+
+                    var x;
+                    var valueCount=0;
+                    var eforToplam=0;
+                    for (x = 0; x < selectedDepartmans.length; x++) {
+                        if (selectedDepartmans[x]==departmansUnique[i]){
+                            if (selectedEfors[x]!=" "){
+                                eforToplam+=parseInt(selectedEfors[x],10);
+                            }
+                            valueCount++;
+                        }
+                    }
+
+                    departmanChartData.labels.push(departmansUnique[i]);
+                    departmanChartData.datasets[0].data.push(valueCount);
+
+                    departmanEforChartData.labels.push(departmansUnique[i]);
+                    departmanEforChartData.datasets[0].data.push(eforToplam);
+                }
+
+                let selectedDepartmans2 = table.cells('.selected' , getColumnIndex(DepartmanCfID)).data();
+
+                #foreach($option in $departmanOptions)
+                    var valueCount=0;
+                    for (x = 0; x < selectedDepartmans2.length; x++) {
+                        if (selectedDepartmans2[x].includes("$option.getValue()")){
+                            valueCount++;
+                        }
+                    }
+                    ## AJS.$("#departmanSelectedTable tbody > tr:contains('$option.getValue()') > td:nth-child(2)").text(valueCount);
+                    AJS.$("#departmanSelectedTable").DataTable().cell('tr:contains("$option.getValue()")', 1).data(valueCount);
+                #end
+
+                Chart.defaults.global.plugins.datalabels.display = function(ctx) {
+                    return ctx.dataset.data[ctx.dataIndex] !== 0;
+                };
+
+                var departmanChartHtml = AJS.$("#departmanChartCanvas");
+
+                departmanChart = new Chart(departmanChartHtml, {
+                    type: 'pie',
+                    plugins: {
+                        colorschemes: {
+                            scheme: 'brewer.Paired12'
+                        }
+                    },
+                    data: departmanChartData,
+                    options: {
+                        aspectRatio : 1.4,
+                        barShowStroke : false,
+                        legend: {
+                            display: true,
+                            position: 'right'
+                        },
+                        tooltip: false,
+                        title: {
+                            display: true,
+                            text: 'Departman Dağılımı'
+                        },
+
+                        plugins: {
+                            datalabels: {
+                                color: '#040203',
+                                anchor: 'end',
+                                align: 'start',
+                                offset: 4,
+                                borderWidth: 2,
+                                borderColor: '#fff',
+                                borderRadius: 25,
+                                backgroundColor: (context) => {
+                                    return '#fff';
+                                },
+                                font: {
+                                    weight: 'bold',
+                                    size: '10'
+                                },
+                                formatter: function(value) {
+                                    return value
+                                }
+                            }
+                        }
+                    }
+                });
+
+                var departmanEforChartHtml = AJS.$("#departmanEforChartCanvas");
+
+                departmanEforChart = new Chart(departmanEforChartHtml, {
+                    type: 'pie',
+                    plugins: {
+                        colorschemes: {
+                            scheme: 'brewer.Paired12'
+                        }
+                    },
+                    data: departmanEforChartData,
+                    options: {
+                        aspectRatio : 1.4,
+                        legend: {
+                            display: true,
+                            position: 'right'
+                        },
+                        barShowStroke : false,
+                        tooltip: false,
+                        title: {
+                            display: true,
+                            text: 'Efor Bazlı Departman Dağılımı'
+                        },
+
+                        plugins: {
+                            datalabels: {
+                                color: '#040203',
+                                anchor: 'end',
+                                align: 'start',
+                                offset: 4,
+                                borderWidth: 2,
+                                borderColor: '#fff',
+                                borderRadius: 25,
+                                backgroundColor: (context) => {
+                                    return '#fff';
+                                },
+                                font: {
+                                    weight: 'bold',
+                                    size: '10'
+                                },
+                                formatter: function(value) {
+                                    return value
+                                }
+                            }
+                        }
+                    }
+
+                });
+
+                var projeEtiketChartCanvas = AJS.$("#projeEtiketChartCanvas");
+
+                projeEtiketleriChart = new Chart(projeEtiketChartCanvas, {
+                    type: 'pie',
+                    plugins: {
+                        colorschemes: {
+                            scheme: 'brewer.Paired12'
+                        }
+                    },
+                    data: projeEtiketChartData,
+                    options: {
+                        aspectRatio : 1.4,
+                        legend: {
+                            display: true,
+                            position: 'right'
+                        },
+                        tooltip: false,
+                        title: {
+                            display: true,
+                            text: 'Proje Etiket Bazlı Dağılımı'
+                        },
+
+                        plugins: {
+                            datalabels: {
+                                color: '#040203',
+                                anchor: 'end',
+                                align: 'start',
+                                offset: 4,
+                                borderWidth: 2,
+                                borderColor: '#fff',
+                                borderRadius: 25,
+                                backgroundColor: (context) => {
+                                    return '#fff';
+                                },
+                                font: {
+                                    weight: 'bold',
+                                    size: '10'
+                                },
+                                formatter: function(value) {
+                                    return value
+                                }
+                            }
+                        }
+                    }
+
+                });
+
+                var projeEtiketChartEforCanvas = AJS.$("#projeEtiketChartEforCanvas");
+
+                projeEtiketleriEforChart = new Chart(projeEtiketChartEforCanvas, {
+                    type: 'pie',
+                    plugins: {
+                        colorschemes: {
+                            scheme: 'brewer.Paired12'
+                        }
+                    },
+                    data: projeEtiketEforData,
+                    options: {
+                        aspectRatio : 1.4,
+                        legend: {
+                            display: true,
+                            position: 'right'
+                        },
+                        tooltip: false,
+                        title: {
+                            display: true,
+                            text: 'Efor Bazlı Proje Etiket Dağılımı'
+                        },
+
+                        plugins: {
+                            datalabels: {
+                                color: '#040203',
+                                anchor: 'end',
+                                align: 'start',
+                                offset: 4,
+                                borderWidth: 2,
+                                borderColor: '#fff',
+                                borderRadius: 25,
+                                backgroundColor: (context) => {
+                                    return '#fff';
+                                },
+                                font: {
+                                    weight: 'bold',
+                                    size: '10'
+                                },
+                                formatter: function(value) {
+                                    return value
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // myPieChart.data.datasets.pop();
+                // myPieChart.data.datasets.push(data);
+
+                //var indexToUpdate = Math.round(Math.random() * data.labels.length);
+
+                // Update one of the points in the second dataset
+                //myPieChart.data.datasets[0].data[1] = Math.random() * 100;
+
+                departmanChart.update();
+                departmanEforChart.update();
+                projeEtiketleriChart.update();
+                projeEtiketleriEforChart.update();
+            }
+
+            function createProjeEtiketleriSet(projeEtiketleriList) {
+                var projeEtiketset= new Set();
+                for(i = 0; i < projeEtiketleriList.length; i++){
+                    var etiketLineArray = projeEtiketleriList[i].substring(1, projeEtiketleriList[i].length-1).split(", ")
+                    for(x = 0; x < etiketLineArray.length; x++){
+                        projeEtiketset.add(etiketLineArray[x]);
+                    }
+                }
+                return projeEtiketset;
+            }
+        });
+    </script>
+
+    <meta name="decorator" content="atl.general">
+</head>
+
+<body id="jira">
+    <div class="content-container">
+        <div class="content-body">
+            <div class="aui-group">
+                <header class="aui-page-header">
+                    <div class="aui-page-header-inner">
+                        <div class="aui-page-header-image">
+                                <span class="aui-avatar aui-avatar-large aui-avatar-project">
+                                    <span class="aui-avatar-inner">
+                                        <img alt="FLO project" src="https://www.flo.com.tr/pub/assets/flo/img/logo.svg">
+                                    </span>
+                                </span>
+                        </div>
+                        <div class="aui-page-header-main">
+                            <div class="aui-help aui-help-empty-state">
+                                <div class="aui-help-content">
+                                    <h1>Proje Onaylama</h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+            </div>
+
+            <div class="aui-group">
+            #foreach($cfw in $CfFilters)
+                #set ($customField=$cfw.getCustomField())
+                #set ($options=$cfw.getOptions())
+            #if($customField.getId().contains("501")|| $customField.getId().contains("11903"))
+            </div>
+            <div class="aui-group">
+            #end
+                    <div class="aui-item" id="#$customField.getId()">
+                        <form class="aui">
+                            <select id="$customField.getId()-select2" style="padding-top: 18px; width: 99%">
+                                <option></option>
+                                #if($customField.getId().contains("11501"))
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                    <option>5</option>
+                                    <option>6</option>
+                                    <option>7</option>
+                                #else
+                                    #foreach($option in $options)
+                                        #if($option.getValue()!="-")
+                                            <option value="$option.getValue()">$option.getValue()</option>
+                                        #end
+                                    #end
+                                #end
+                            </select>
+                        </form>
+                        <span id="$customField.getId()-clear" style="float: right; right: 9%; bottom: 24px;" class="aui-icon aui-icon-small aui-iconfont-cross-circle">Clear</span>
+                    </div>
+                #end
+            </div>
+
+            <div class="aui-group">
+                <div class="aui-item" id="#select2-customFields">
+                    <form class="aui">
+                        <select id="customFieldList-select2" data-placeholder="Alanları eklemek için tıklayın." multiple style=" width: 65%; padding-top: 16px;">
+                            <option></option>
+                                #foreach($cf in $customFieldsInProject)
+                                        <option value="$cf.getId()">$cf.getFieldName()</option>
+                                #end
+                        </select>
+                    </form>
+                </div>
+                <div class="aui-item" style="float: right; padding-right: 12px;">
+                    <button class="aui-button" id="deselect-all">Tümünü kaldır</button>
+                    <button class="aui-button  aui-button-primary" id="select-all">Tümünü seç</button>
+                </div>
+            </div>
+
+            <div class="aui-group">
+                <div class="aui-item">
+                    <table id="projectsTable" class="display" cellspacing="0" width="100%" style="width: 100%;border: 2px solid #bfb7b7!important;border-radius: 12px;">
+                        <thead>
+                            <tr>
+                                <th>isSelected</th>
+                                <th></th>
+                                <th>Issue</th>
+                                <th>Summary</th>
+                                <th class="inFooter program"   remainingTime="$AnalizRemaining">Analiz</th>
+                                <th class="inFooter program"   remainingTime="$YazilimGelistirmeRemaining">Yazılım Geliştirme</th>
+                                <th class="inFooter program"   remainingTime="$SAPUygulamaRemaining">SAP Uygulama</th>
+                                <th class="inFooter program"   remainingTime="$SAPAbapRemaining">SAP Abap</th>
+                                <th class="inFooter program"   remainingTime="$IsZekasiveRaporlamaRemaining">İş Zekası ve Raporlama</th>
+                                <th class="inFooter program"   remainingTime="$ProjeYonetimiRemaining">Proje Yönetimi</th>
+                                <th class="inFooter" remainingTime="$totalCapacityOfAllPrograms" customFieldId="customfield_11905">Toplam Efor</th>
+                                <th customFieldId="customfield_11304">Sponsor</th>
+                                <th customFieldId="customfield_11405">Departman</th>
+                                <th customFieldId="customfield_11403">Departman Önceliği</th>
+                                <th customFieldId="customfield_11501">GMY Önceliği</th>
+                                <th customFieldId="customfield_11302">Bir projenin yeni bir fazı ise belirtiniz</th>
+                                <th customFieldId="customfield_11305">Etkilenecek Departmanlar</th>
+                                <th customFieldId="customfield_11306">Proje Etiketleri</th>
+                                <th customFieldId="customfield_11307">Satışa pozitif etkisini nasıl tarif edersiniz?</th>
+                                <th customFieldId="customfield_11308">Satışa pozitif etkisi baremleri (Yıllık / TL)</th>
+                                <th customFieldId="customfield_11309">Maliyeti azaltmasını nasıl tarif edersiniz?</th>
+                                <th customFieldId="customfield_11310">Maliyet tasarrufu baremleri (Yıllık / TL)</th>
+##                              <th customFieldId="customfield_11311">Verimliliğe etkisini nasıl tarif edersiniz?</th>
+##                              <th customFieldId="customfield_11312">Verimlilik etkisi baremleri (Yıllık / Adet)</th>
+                                <th customFieldId="customfield_11313">Şu anda bu süreçler manuel yürütülebiliyor mu?</th>
+                                <th customFieldId="customfield_11314">Manuel Yürütmedeki Zorluklar</th>
+                                <th customFieldId="customfield_11315">Danışmanlık Gerekli mi?</th>
+                                <th customFieldId="customfield_11903">Proje Kategori</th>
+                                <th customFieldId="customfield_11800">Proje Yılı</th>
+                                <th customFieldId="customfield_11801">Ara Proje mi?</th>
+                                <th customFieldId="customfield_12200">is Saved?</th>
+                                <th customFieldId="status">Durumu</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>isSelected</th>
+                                <th></th>
+                                <th>Issue</th>
+                                <th>Summary</th>
+                                <th class="inFooter">Analiz</th>
+                                <th class="inFooter">Yazılım Geliştirme</th>
+                                <th class="inFooter">SAP Uygulama</th>
+                                <th class="inFooter">SAP Abap</th>
+                                <th class="inFooter">İş Zekası ve Raporlama</th>
+                                <th class="inFooter">Proje Yönetimi</th>
+                                <th remainingTime="$totalCapacityOfAllPrograms"></th>
+                                <th></th>
+##                                <th></th>
+##                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <div id="bottom-button-div">
+                        <div style="float: left">
+                            <button class="aui-button aui-button-primary" id="SepetiKaydet">Sepeti Kaydet</button>
+                            <button class="aui-button aui-button-primary" id="ApproveButton">Projeleri Onayla</button>
+                            <button class="aui-button" id="DeclineButton">Seçilenleri Reddet</button>
+                        </div>
+                        <div style="float: right">
+                            <aui-label for="onlyShowSelectedOnes" resolved="">
+                                <label for="onlyShowSelectedOnes">Seçilenleri Göster</label>
+                            </aui-label>
+##                            <aui-toggle id="onlyShowSelectedOnes" label="Sepeti Göster"></aui-toggle>
+                            <input id="onlyShowSelectedOnes" type="checkbox" data-toggle="toggle">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="aui-group" style="margin-top: 10px !important; margin-bottom: 10px !important;">
+                <div class="borderli aui-item">
+                    <table id="capacityTable" class="aui">
+                        <thead>
+                        <tr>
+                            <th id="basic-number"   ></th>
+                            <th id="basic-username" >Analiz</th>
+                            <th id="basic-username" >Yazılım Geliştirme</th>
+                            <th id="basic-username" >SAP Uygulama</th>
+                            <th id="basic-lname"    >SAP Abap</th>
+                            <th id="basic-username" >İş Zekası ve Raporlama</th>
+                            <th id="basic-fname"    >Proje Yönetimi</th>
+                            <th id="basic-username" >Total</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td headers="basic-number">Toplam adam-gün</td>
+                            <td headers="basic-lname">$AnalizTotal</td>
+                            <td headers="basic-lname">$YazilimGelistirmeTotal</td>
+                            <td headers="basic-lname">$SAPUygulamaTotal</td>
+                            <td headers="basic-lname">$SAPAbapTotal</td>
+                            <td headers="basic-lname">$IsZekasiveRaporlamaTotal</td>
+                            <td headers="basic-lname">$ProjeYonetimiTotal</td>
+                            <td headers="basic-lname">$totalCapacityOfAllPrograms</td>
+                        </tr>
+                        <tr>
+                            <td headers="basic-fname">Müsait adam-gün</td>
+                            <td headers="basic-lname">$AnalizRemaining</td>
+                            <td headers="basic-lname">$YazilimGelistirmeRemaining</td>
+                            <td headers="basic-lname">$SAPUygulamaRemaining</td>
+                            <td headers="basic-lname">$SAPAbapRemaining</td>
+                            <td headers="basic-lname">$IsZekasiveRaporlamaRemaining</td>
+                            <td headers="basic-lname">$ProjeYonetimiRemaining</td>
+                            <td headers="basic-lname">$TotalRemainingCapacity</td>
+                        </tr>
+                        <tr>
+                            <td headers="basic-lname">Seçilenler için gerekli adam-gün</td>
+                            <td headers="basic-lname"></td>
+                            <td headers="basic-lname"></td>
+                            <td headers="basic-lname"></td>
+                            <td headers="basic-lname"></td>
+                            <td headers="basic-lname"></td>
+                            <td headers="basic-lname"></td>
+                            <td headers="basic-lname"></td>
+                        </tr>
+                        <tr>
+                            <td headers="basic-fname">Adam-gün Fark</td>
+                            <td headers="basic-lname">0</td>
+                            <td headers="basic-lname">0</td>
+                            <td headers="basic-lname">0</td>
+                            <td headers="basic-lname">0</td>
+                            <td headers="basic-lname">0</td>
+                            <td headers="basic-lname">0</td>
+                            <td headers="basic-lname">0</td>
+                        </tr>
+                        <tr>
+                            <td headers="basic-fname">Adam Fark</td>
+                            <td headers="basic-lname">0</td>
+                            <td headers="basic-lname">0</td>
+                            <td headers="basic-lname">0</td>
+                            <td headers="basic-lname">0</td>
+                            <td headers="basic-lname">0</td>
+                            <td headers="basic-lname">0</td>
+                            <td headers="basic-lname">0</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+           <div class="aui-group">
+                <div class="aui-item" >
+                    <canvas class="borderli" id="departmanChartCanvas"></canvas>
+                </div>
+               <div class="aui-item" >
+                   <canvas class="borderli" id="departmanEforChartCanvas"></canvas>
+               </div>
+           </div>
+           <div class="aui-group" style="margin-top: 10px !important; margin-bottom: 10px !important;">
+               <div class="aui-item" >
+                   <canvas class="borderli" id="projeEtiketChartCanvas"></canvas>
+               </div>
+               <div class="aui-item" >
+                   <canvas class="borderli" id="projeEtiketChartEforCanvas"></canvas>
+               </div>
+           </div>
+            <div class="aui-group" style="margin-top: 10px !important; margin-bottom: 10px !important;">
+                <div class="aui-item borderli" >
+                    <table id="departmanSelectedTable">
+                        <thead>
+                        <tr>
+                            <th>Departman</th>
+                            <th>Seçilen Proje Sayısı</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            #foreach($option in $departmanOptions)
+                                ##set ($customField=$cfw.getCustomField())
+                            <tr>
+                                <td>$option.getValue()</td>
+                                <td>0</td>
+                            </tr>
+                            #end
+                        </tbody>
+                    </table>
+                </div>
+                <div class="aui-item"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

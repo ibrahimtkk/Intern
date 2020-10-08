@@ -1,0 +1,89 @@
+<style>
+    .property-list .item .value {
+        max-width: max-content;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+#controlHeader ($action $customField.id $customField.name $fieldLayoutItem.required $displayParameters.noHeader)
+
+<div class="aui-group">
+    <div class="aui-item">
+        <select id="first" style="width: 100%"></select>
+    </div>
+</div>
+
+<div class="aui-group">
+    <div class="aui-item">
+        <select id="second" style="width: 100%"></select>
+    </div>
+</div>
+
+<input type="hidden" class="text" id="asdasd" name="$customField.id" type="text" value="$textutils.htmlEncode($!value)" />
+
+#set( $D = '$' )
+
+<script>
+    (function($) {
+        AJS.toInit(function(){
+            AJS.$('#first').select2();
+            AJS.$('#second').select2();
+            AJS.$('#first').on("change", function(e) {
+                console.log(e.added);
+                if (e.added.id.length>0){
+                    AJS.${D}.ajax({
+                        url : 'https://crm.turkishtechnic.com/rest/servicedeskapi/organization/'+e.added.id+'/user',
+                        type: 'get',
+                        headers: { 'X-ExperimentalApi': 'opt-in' },
+                        success: function(data){
+                            console.log(data.values);
+                            $('#second').val(null);
+                            AJS.${D}.each(data.values, function(key, modelName){
+                                console.log(modelName);
+                                var newOption = new Option(modelName.displayName, modelName.id, true, true);
+                                $('#second').append(newOption);
+                            });
+                            $('#second').trigger('change');
+                        }
+                    });
+                }
+            })
+
+            AJS.$('#second').on("change", function(e) {
+                console.log("eee= " + e.added);
+                console.log("e1= " + e);
+                AJS.$("#asdasd").val(e.added);
+            })
+
+            // AJS.$('#first').on("select2:selecting", function(e) {
+            //      console.log("asd");
+            // })
+            //
+            // AJS.$('#first').on("select2:select", function(e) {
+            //      console.log("asd2");
+            // })
+        });
+
+    })(AJS.$);
+
+    AJS.${D}.ajax({
+        url : 'https://crm.turkishtechnic.com/rest/florestservice/1.2/rest/get',
+        type: 'get',
+        headers: { 'X-ExperimentalApi': 'opt-in' },
+        success: function(data){
+            //console.log("girdii");
+            console.log(data);
+            console.log(JSON.parse(data).values);
+            AJS.${D}.each(JSON.parse(data).values, function(key, modelName){
+                var newOption = new Option(modelName.name, modelName.id, true, true);
+                $('#first').append(newOption);
+                console.log(modelName.name);
+                console.log(modelName.id);
+            });
+            $('#first').trigger('change');
+        }
+    });
+</script>
+
+#controlFooter ($action $fieldLayoutItem.fieldDescription $displayParameters.noHeader)
