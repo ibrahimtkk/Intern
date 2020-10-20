@@ -3,12 +3,19 @@ package com.veniture.servlet;
 import com.atlassian.crowd.embedded.impl.ImmutableUser;
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.component.ComponentAccessor;
+import com.atlassian.jira.component.pico.ComponentManager;
+import com.atlassian.jira.favourites.FavouritesManager;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.search.SearchException;
+import com.atlassian.jira.issue.search.SearchRequest;
+import com.atlassian.jira.issue.search.SearchRequestManager;
 import com.atlassian.jira.issue.search.SearchResults;
 import com.atlassian.jira.jql.parser.JqlParseException;
 import com.atlassian.jira.jql.parser.JqlQueryParser;
+import com.atlassian.jira.portal.PortalPage;
+import com.atlassian.jira.project.Project;
+import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.user.ApplicationUser;
@@ -16,6 +23,8 @@ import com.atlassian.jira.user.ApplicationUsers;
 import com.atlassian.jira.user.DelegatingApplicationUser;
 import com.atlassian.jira.user.UserUtils;
 import com.atlassian.jira.user.util.UserManager;
+import com.atlassian.jira.web.action.ProjectActionSupport;
+import com.atlassian.jira.web.action.filter.ManageFilters;
 import com.atlassian.jira.web.bean.PagerFilter;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.JiraImport;
@@ -23,6 +32,7 @@ import com.atlassian.query.Query;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.veniture.constants.Constants;
 import com.veniture.util.GetCustomFieldsInExcel;
+import org.apache.batik.css.engine.value.svg.FilterManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +60,7 @@ public class Priority extends HttpServlet {
     @JiraImport
     private  JiraAuthenticationContext authenticationContext;
     private final Logger logger = LoggerFactory.getLogger(Priority.class);// The transition ID
+    private List favouriteFilters = new ArrayList();
 
     private static final String PRIORITIZATION_SCREEN_TEMPLATE = "/templates/prioritization.vm";
 
@@ -100,6 +111,18 @@ public class Priority extends HttpServlet {
                 conditionQuery = jqlQueryParser.parseQuery(Constants.DEMO_JQL);
             }
 
+            ApplicationUser applicationUser = authenticationContext.getLoggedInUser();
+            ComponentManager componentManager = ComponentManager.getInstance();
+            FavouritesManager favouritesManager = (FavouritesManager) componentManager.getComponentInstanceOfType(FavouritesManager.class);
+            Collection<Long> favourites = favouritesManager.getFavouriteIds(applicationUser, SearchRequest.ENTITY_TYPE);
+
+            SearchRequestManager searchRequestManager = componentManager.getComponentInstanceOfType(SearchRequestManager.class);
+            favourites.forEach(favourite -> {
+                SearchRequest filter = searchRequestManager.getSharedEntity(favourite);
+                String getQueryString = filter.getQuery().getQueryString();
+                favouriteFilters.add(getQueryString);
+            });
+
 //            conditionQuery = jqlQueryParser.parseQuery(Constants.AS_JQL);
 
             SearchResults results = null;
@@ -123,6 +146,7 @@ public class Priority extends HttpServlet {
             context.put("customFieldsInProject", customFieldsInProject);
             context.put("birimOncelikCF", ComponentAccessor.getCustomFieldManager().getCustomFieldObject(Constants.BIRIM_ONCELIK_ID_STRING));
             context.put("gmyOncelikCF", ComponentAccessor.getCustomFieldManager().getCustomFieldObject(Constants.GMY_ONCELIK_STRING));
+            context.put("favouriteFilters", favouriteFilters);
 
             resp.setContentType("text/html;charset=utf-8");
             templateRenderer.render(PRIORITIZATION_SCREEN_TEMPLATE, context, resp.getWriter());

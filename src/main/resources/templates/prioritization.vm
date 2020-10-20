@@ -86,6 +86,9 @@ Released under the MIT license: http://jsbin.mit-license.org
             window.onbeforeunload = null;
             showPriority();
             console.log("11111")
+            #foreach($favFilter in $favouriteFilters)
+                console.log("favFilter: ", "$favFilter")
+            #end
 
 
             #foreach($issue in $issueList)

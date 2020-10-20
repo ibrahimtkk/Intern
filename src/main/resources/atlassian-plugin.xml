@@ -53,21 +53,21 @@
       <link linkId="prioritization-item-link">/plugins/servlet/prioritization?restriction=gmy</link>
     </web-item>
 
-  <web-item key="guncel-doviz-kuru-webitem" name="Dolar Kuru" section="system.top.navigation.bar" weight="200">
-    <description key="guncel-doviz-kuru-item-desc">Dolar Kuru</description>
-    <label key="Dolar Kuru"/>
-    <!-- Dolar Kuru'na basinca gidecegi URL -->
-    <link linkId="doviz-kuru-link">/plugins/servlet/doviz?restriction=dolar</link>
-<!--    <link linkId="doviz-kuru-link">/plugins/servlet/prioritization?restriction=gmy</link>-->
-  </web-item>
+<!--  <web-item key="guncel-doviz-kuru-webitem" name="Dolar Kuru" section="system.top.navigation.bar" weight="200">-->
+<!--    <description key="guncel-doviz-kuru-item-desc">Dolar Kuru</description>-->
+<!--    <label key="Dolar Kuru"/>-->
+<!--    &lt;!&ndash; Dolar Kuru'na basinca gidecegi URL &ndash;&gt;-->
+<!--    <link linkId="doviz-kuru-link">/plugins/servlet/doviz?restriction=dolar</link>-->
+<!--&lt;!&ndash;    <link linkId="doviz-kuru-link">/plugins/servlet/prioritization?restriction=gmy</link>&ndash;&gt;-->
+<!--  </web-item>-->
 
-  <web-item key="guncel-doviz-kuru-webitem1" name="Dolar Kuru1" section="system.top.navigation.bar" weight="200">
-    <description key="guncel-doviz-kuru1-item-desc">Dolar Kuru1</description>
-    <label key="Dolar Kuru1"/>
-    <!-- Dolar Kuru'na basinca gidecegi URL -->
-    <link linkId="doviz-kuru-link">/plugins/servlet/doviz?restriction=dolar1</link>
-    <!--    <link linkId="doviz-kuru-link">/plugins/servlet/prioritization?restriction=gmy</link>-->
-  </web-item>
+<!--  <web-item key="guncel-doviz-kuru-webitem1" name="Dolar Kuru1" section="system.top.navigation.bar" weight="200">-->
+<!--    <description key="guncel-doviz-kuru1-item-desc">Dolar Kuru1</description>-->
+<!--    <label key="Dolar Kuru1"/>-->
+<!--    &lt;!&ndash; Dolar Kuru'na basinca gidecegi URL &ndash;&gt;-->
+<!--    <link linkId="doviz-kuru-link">/plugins/servlet/doviz?restriction=dolar1</link>-->
+<!--    &lt;!&ndash;    <link linkId="doviz-kuru-link">/plugins/servlet/prioritization?restriction=gmy</link>&ndash;&gt;-->
+<!--  </web-item>-->
   <!--  <web-item key="prioritization-dp-webitem" name="Dp �ncelik" section="system.top.navigation.bar" weight="200">-->
   <!--    <description key="prioritization-dp-item-desc">DP �nceliklendirme</description>-->
   <!--    <label key="�nceliklendirme DP"/>-->
