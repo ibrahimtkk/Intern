@@ -42,18 +42,17 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.veniture.servlet.ProjectApprove.getIssueSearchResults;
 import static com.veniture.util.functions.*;
 
-@Path("/rest")
-public class rest {
+@Path("/dovizRest")
+public class dovizRest {
     @JiraImport
     private RequestFactory requestFactory;
-//    private ApplicationProperties applicationProperties;
+    //    private ApplicationProperties applicationProperties;
     @JiraImport
     private SearchService searchService;
     @JiraImport
@@ -65,11 +64,11 @@ public class rest {
     @JiraImport
     OrganizationService organizationService;
     private static final Logger logger = LoggerFactory.getLogger(rest.class);// The transition ID
-//    private static final Gson GSON = new Gson();
+    //    private static final Gson GSON = new Gson();
     private static final IssueService ISSUE_SERVICE = ComponentAccessor.getIssueService();
     private static final ApplicationUser CURRENT_USER = ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
 
-    public rest(RequestFactory requestFactory, SearchService searchService, JiraAuthenticationContext authenticationContext){
+    public dovizRest(RequestFactory requestFactory, SearchService searchService, JiraAuthenticationContext authenticationContext){
         this.requestFactory = requestFactory;
         this.issueManager= ComponentAccessor.getIssueManager();
         this.searchService = searchService;
@@ -279,7 +278,7 @@ public class rest {
         } catch (UnirestException e) {
             System.out.println("error" + e.getMessage());
             e.printStackTrace();
-        return null;
+            return null;
 
         }
 //        System.out.println(response.getBody());
@@ -330,22 +329,13 @@ public class rest {
             throw new Exception();
         }
 
-        if(gmyOrBirim.equalsIgnoreCase("gmy")){
-            if (jsonObj.getString("$cf.getId()")==null){
+        if(gmyOrBirim.equalsIgnoreCase("dolar")){
+            if (jsonObj.getString("GM")==null){
                 logger.error("GM priority is null");
                 throw new Exception();
             }
-            try{
-//                updateCustomFieldValue(issue, Constants.GMY_ONCELIK_ID,Double.valueOf(jsonObj.getString("$cf.getId()")),CURRENT_USER);
-                updateCustomFieldValue(issue, Constants.PriorityNumber, Double.valueOf(i+1), CURRENT_USER);
-//                updateCfValueForSelectList(issue,Constants.genelOnceliklendirildiMiId, Constants.GENEL_TRUE_OPTION_ID_CanliVeniture,CURRENT_USER);
-            }
-            catch (Exception e){
-                logger.info("1234");
-            }
-
-
-            logger.info("123");
+            updateCustomFieldValue(issue, Constants.GMY_ONCELIK_ID,Double.valueOf(jsonObj.getString("GM")),CURRENT_USER);
+            updateCfValueForSelectList(issue,Constants.genelOnceliklendirildiMiId, Constants.GENEL_TRUE_OPTION_ID_CanliVeniture,CURRENT_USER);
         }
         else if (gmyOrBirim.equalsIgnoreCase("dp")){
             if (jsonObj.getString("DP")==null){
@@ -358,7 +348,6 @@ public class rest {
         else {
             logger.error("Neither gmy nor dp restriction has been set");
         }
-        logger.info("123");
     }
 
 //    @GET

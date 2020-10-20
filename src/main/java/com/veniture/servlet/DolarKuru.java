@@ -3,7 +3,6 @@ package com.veniture.servlet;
 import com.atlassian.crowd.embedded.impl.ImmutableUser;
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.component.ComponentAccessor;
-import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.search.SearchException;
 import com.atlassian.jira.issue.search.SearchResults;
@@ -21,21 +20,36 @@ import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.JiraImport;
 import com.atlassian.query.Query;
 import com.atlassian.templaterenderer.TemplateRenderer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.tunyk.currencyconverter.BankUaCom;
+import com.tunyk.currencyconverter.api.CurrencyConverter;
+import com.tunyk.currencyconverter.api.CurrencyConverterException;
 import com.veniture.constants.Constants;
 import com.veniture.util.GetCustomFieldsInExcel;
+import org.javamoney.moneta.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.money.MonetaryAmount;
+import javax.money.convert.CurrencyConversion;
+import javax.money.convert.ExchangeRateProvider;
+import javax.money.convert.MonetaryConversions;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.*;
 
 @Scanned
-public class Priority extends HttpServlet {
+public class DolarKuru extends HttpServlet {
 
-//    @JiraImport
+    //    @JiraImport
 //    private IssueService issueService;
 //    @JiraImport
 //    private ProjectService projectService;
@@ -49,11 +63,12 @@ public class Priority extends HttpServlet {
     private TemplateRenderer templateRenderer;
     @JiraImport
     private  JiraAuthenticationContext authenticationContext;
-    private final Logger logger = LoggerFactory.getLogger(Priority.class);// The transition ID
 
-    private static final String PRIORITIZATION_SCREEN_TEMPLATE = "/templates/prioritization.vm";
+    private final Logger logger = LoggerFactory.getLogger(DolarKuru.class);// The transition ID
 
-    public Priority(   SearchService searchService,
+    private static final String PRIORITIZATION_SCREEN_TEMPLATE = "/templates/doviz.vm";
+
+    public DolarKuru(   SearchService searchService,
                        TemplateRenderer templateRenderer,
                        JiraAuthenticationContext authenticationContext) {
         this.searchService = searchService;
@@ -61,8 +76,38 @@ public class Priority extends HttpServlet {
         this.authenticationContext = authenticationContext;
     }
 
+    public String givenAmount_whenConversion_thenNotNull() throws CurrencyConverterException, IOException {
+        URL url = new URL("https://api.currencyfreaks.com/latest?apikey=d9b286cad7984661ab465673edd9683b");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer content = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+            content.append(inputLine);
+        }
+        JsonObject jsonObject = new JsonParser().parse(String.valueOf(content)).getAsJsonObject();
+        JsonElement rates = jsonObject.get("rates");
+        JsonObject jsonRates = rates.getAsJsonObject();
+        JsonElement jj = jsonRates.get("TRY");
+
+        in.close();
+        con.disconnect();
+
+        return String.valueOf(jj);
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
+        String dolarKuru = null;
+        try {
+            dolarKuru = this.givenAmount_whenConversion_thenNotNull();
+        } catch (CurrencyConverterException e) {
+            e.printStackTrace();
+        }
 
 /*        UserManager userManager = ComponentAccessor.getUserManager();
         //UserUtils.getUsersByEmail("berkkarabacak2@gmail.com").get(0);
@@ -83,15 +128,10 @@ public class Priority extends HttpServlet {
         Map<String, Object> context = new HashMap<String, Object>();
         String restriction = Optional.ofNullable(req.getParameter("restriction")).orElse("");
         JqlQueryParser jqlQueryParser = ComponentAccessor.getComponent(JqlQueryParser.class);
-        Query conditionQuery = null;
+        Query conditionQuery;
         try {
-            if (restriction.equals("gmy")) {
-                try{
-                    conditionQuery = jqlQueryParser.parseQuery(Constants.arcelikJQL);
-                }
-                catch (Exception e){
-                    logger.info("JQP PARSE ERROR");
-                }
+            if (restriction.equals("dolar")) {
+                conditionQuery = jqlQueryParser.parseQuery(Constants.gmyJQL);
                 //conditionQuery = jqlQueryParser.parseQuery(Constants.DEMO_JQL);
             } else if (restriction.equals("dp")) {
                 conditionQuery = jqlQueryParser.parseQuery(Constants.departmanJQL);
@@ -100,29 +140,19 @@ public class Priority extends HttpServlet {
                 conditionQuery = jqlQueryParser.parseQuery(Constants.DEMO_JQL);
             }
 
-//            conditionQuery = jqlQueryParser.parseQuery(Constants.AS_JQL);
+            conditionQuery = jqlQueryParser.parseQuery(Constants.AS_JQL);
 
-            SearchResults results = null;
-            try{
-                results = searchService.search(authenticationContext.getLoggedInUser(), conditionQuery, PagerFilter.getUnlimitedFilter());
-            }
-            catch (Exception e){
-                logger.error("JQL error");
-            }
+            SearchResults results = searchService.search(authenticationContext.getLoggedInUser(), conditionQuery, PagerFilter.getUnlimitedFilter());
 
-            results.getResults().forEach(issue -> {
-                Issue issue1 = (Issue) issue;
-                String description = ((Issue) issue).getDescription();
-            });
             List<CustomField> customFieldsInProject = new GetCustomFieldsInExcel().invoke();
+            logger.info("...: {}", results.getPages());
             context.put("issues", results.getResults());
-            context.put("issueList", results.getResults());
             context.put("restriction", restriction);
             context.put("baseUrl", ComponentAccessor.getApplicationProperties().getString("jira.baseurl"));
-            context.put("Oncelik", customFieldsInProject.get(0));
             context.put("customFieldsInProject", customFieldsInProject);
             context.put("birimOncelikCF", ComponentAccessor.getCustomFieldManager().getCustomFieldObject(Constants.BIRIM_ONCELIK_ID_STRING));
             context.put("gmyOncelikCF", ComponentAccessor.getCustomFieldManager().getCustomFieldObject(Constants.GMY_ONCELIK_STRING));
+            context.put("dolarKuru", dolarKuru);
 
             resp.setContentType("text/html;charset=utf-8");
             templateRenderer.render(PRIORITIZATION_SCREEN_TEMPLATE, context, resp.getWriter());

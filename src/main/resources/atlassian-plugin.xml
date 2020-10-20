@@ -36,36 +36,58 @@
 
     <context>atl.general</context> 
   </web-resource>  
-  <!--  <web-item key="projectapprove-webitem" name="Proje Onay" section="system.top.navigation.bar" weight="200">-->  
-  <!--    <description key="projectapprove-item-desc">Proje Onay</description>-->  
-  <!--    <label key="Proje Onay"/>-->  
-  <!--    <link linkId="projectapprove-item-link">/plugins/servlet/projectapprove</link>-->  
-  <!--    <condition class="com.veniture.condition.projectApprove"/>-->  
-  <!--&lt;!&ndash;    <conditions type="AND">&ndash;&gt;-->  
-  <!--&lt;!&ndash;      <condition class="com.veniture.condition.gmy"/>&ndash;&gt;-->  
-  <!--&lt;!&ndash;      <condition class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition">&ndash;&gt;-->  
-  <!--&lt;!&ndash;    </condition>&ndash;&gt;-->  
-  <!--&lt;!&ndash;  </conditions>�&ndash;&gt;-->  
-  <!--  </web-item>-->  
+  <!--  <web-item key="projectapprove-webitem" name="Proje Onay" section="system.top.navigation.bar" weight="200">-->
+  <!--    <description key="projectapprove-item-desc">Proje Onay</description>-->
+  <!--    <label key="Proje Onay"/>-->
+  <!--    <link linkId="projectapprove-item-link">/plugins/servlet/projectapprove</link>-->
+  <!--    <condition class="com.veniture.condition.projectApprove"/>-->
+  <!--&lt;!&ndash;    <conditions type="AND">&ndash;&gt;-->
+  <!--&lt;!&ndash;      <condition class="com.veniture.condition.gmy"/>&ndash;&gt;-->
+  <!--&lt;!&ndash;      <condition class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition">&ndash;&gt;-->
+  <!--&lt;!&ndash;    </condition>&ndash;&gt;-->
+  <!--&lt;!&ndash;  </conditions>�&ndash;&gt;-->
+  <!--  </web-item>-->
     <web-item key="prioritization-gmy-webitem" name="Gmy �ncelik" section="system.top.navigation.bar" weight="200">
       <description key="prioritization-gmy-item-desc">Gmy �nceliklendirme</description>
       <label key="�nceliklendirme GMY"/>
       <link linkId="prioritization-item-link">/plugins/servlet/prioritization?restriction=gmy</link>
     </web-item>
-  <!--  <web-item key="prioritization-dp-webitem" name="Dp �ncelik" section="system.top.navigation.bar" weight="200">-->  
-  <!--    <description key="prioritization-dp-item-desc">DP �nceliklendirme</description>-->  
-  <!--    <label key="�nceliklendirme DP"/>-->  
-  <!--    <link linkId="prioritization-item-link">/plugins/servlet/prioritization?restriction=dp</link>-->  
-  <!--    <condition class="com.veniture.condition.department"/>-->  
-  <!--  </web-item>-->  
-  <!--  <servlet name="Project Approve Servlet" key="projectapprove" class="com.veniture.servlet.ProjectApprove">-->  
-  <!--    <description>projectapprove</description>-->  
-  <!--    <url-pattern>/projectapprove</url-pattern>-->  
-  <!--  </servlet>-->  
+
+  <web-item key="guncel-doviz-kuru-webitem" name="Dolar Kuru" section="system.top.navigation.bar" weight="200">
+    <description key="guncel-doviz-kuru-item-desc">Dolar Kuru</description>
+    <label key="Dolar Kuru"/>
+    <!-- Dolar Kuru'na basinca gidecegi URL -->
+    <link linkId="doviz-kuru-link">/plugins/servlet/doviz?restriction=dolar</link>
+<!--    <link linkId="doviz-kuru-link">/plugins/servlet/prioritization?restriction=gmy</link>-->
+  </web-item>
+
+  <web-item key="guncel-doviz-kuru-webitem1" name="Dolar Kuru1" section="system.top.navigation.bar" weight="200">
+    <description key="guncel-doviz-kuru1-item-desc">Dolar Kuru1</description>
+    <label key="Dolar Kuru1"/>
+    <!-- Dolar Kuru'na basinca gidecegi URL -->
+    <link linkId="doviz-kuru-link">/plugins/servlet/doviz?restriction=dolar1</link>
+    <!--    <link linkId="doviz-kuru-link">/plugins/servlet/prioritization?restriction=gmy</link>-->
+  </web-item>
+  <!--  <web-item key="prioritization-dp-webitem" name="Dp �ncelik" section="system.top.navigation.bar" weight="200">-->
+  <!--    <description key="prioritization-dp-item-desc">DP �nceliklendirme</description>-->
+  <!--    <label key="�nceliklendirme DP"/>-->
+  <!--    <link linkId="prioritization-item-link">/plugins/servlet/prioritization?restriction=dp</link>-->
+  <!--    <condition class="com.veniture.condition.department"/>-->
+  <!--  </web-item>-->
+  <!--  <servlet name="Project Approve Servlet" key="projectapprove" class="com.veniture.servlet.ProjectApprove">-->
+  <!--    <description>projectapprove</description>-->
+  <!--    <url-pattern>/projectapprove</url-pattern>-->
+  <!--  </servlet>-->
+
    <servlet name="Priority Servlet" key="prioritization" class="com.veniture.servlet.Priority">
     <description>prioritization</description>
       <url-pattern>/prioritization</url-pattern>
-    </servlet>
+   </servlet>
+  <servlet name="Doviz Kuru Servlet" key="dovizKuru" class="com.veniture.servlet.DolarKuru">
+    <description>doviz</description>
+    <url-pattern>/doviz</url-pattern>
+  </servlet>
+
   <rest name="FLO Rest Service" key="florestservice" path="florestservice" version="1.2">
     <description key="florestservice">The rest service for FLO</description>
   </rest>

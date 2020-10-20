@@ -19,10 +19,10 @@ Released under the MIT license: http://jsbin.mit-license.org
 <head>
 <!-- Latest compiled and minified CSS-->
 
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" />
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/table-to-json@0.13.0/lib/jquery.tabletojson.min.js" integrity="sha256-AqDz23QC5g2yyhRaZcEGhMMZwQnp8fC6sCZpf+e7pnw=" crossorigin="anonymous"></script>
-<script src="https://raw.githack.com/SortableJS/Sortable/master/Sortable.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/table-to-json@0.13.0/lib/jquery.tabletojson.min.js" integrity="sha256-AqDz23QC5g2yyhRaZcEGhMMZwQnp8fC6sCZpf+e7pnw=" crossorigin="anonymous"></script>
+    <script src="https://raw.githack.com/SortableJS/Sortable/master/Sortable.js"></script><script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
     <meta charset="utf-8">
     <title>Proje Önceliklendirme</title>
@@ -35,7 +35,6 @@ Released under the MIT license: http://jsbin.mit-license.org
 
         #tableBody>tr {
             cursor: move;
-            cursor: -webkit-grabbing;
         }
 
         #loading-spinner {
@@ -82,8 +81,18 @@ Released under the MIT license: http://jsbin.mit-license.org
     </style>
 
     <script>
+        // create
         AJS.$(document).ready(function () {
-             window.onbeforeunload = null;
+            window.onbeforeunload = null;
+            showPriority();
+            console.log("11111")
+
+
+            #foreach($issue in $issueList)
+                #foreach($cf in $customFieldsInProject)
+                    console.log("cf.getId()): ", "$cf.getId()")
+                #end
+            #end
              // List with handle
              Sortable.create(tableBody, {
                  scroll: true,
@@ -125,7 +134,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                  //         })
              });
              AJS.$("#loading-spinner").hide();
-             AJS.$("#customFieldList-select2").on('select2-selecting', function (e) {
+             AJS.$("#customFieldList-select2").on('select2-selecting', function (er) {
 
                  //Header'ı göster
                  AJS.$('#auiTable > thead  th[data-override*="'+e.val+'"]').show();
@@ -154,7 +163,32 @@ Released under the MIT license: http://jsbin.mit-license.org
                  AJS.$('#auiTable > tbody  tr td[class*="'+e.val+'"]').hide();
              });
 
+             function showPriority(){
+                 //Header'ı göster
+                 AJS.$('#auiTable > thead  th[data-override*="customfield_10400"]').show();
+
+                 //custom Field td'leri çeker bu
+                 var issueCFsectionInTable = AJS.$('#auiTable > tbody  tr td[class*="customfield_10400"]');
+
+                 var issueKeys =[];
+                 issueCFsectionInTable.each(function () {
+
+                     //td'ın parent'ı tr'a gidio sonra tr'ın ilk sütunu yani issue key sütünunu çekio
+                     var issueKey=AJS.$(this).parent().children().first().children().first().prop( "innerHTML" );
+                     issueKeys.push(issueKey);
+                     AJS.$(this).show();
+                 });
+
+                 var cfValues=bulkGetCfValuesFromIssue(issueKeys.join(","),"customfield_10400");
+                 //Burada kritik nokta cfValues length ile Table'daki row sayısı mutlaka aynı olmalı !!!
+                 var array=cfValues.split(",,,");
+                 for(var i = 0; i < array.length; i++) {
+                     issueCFsectionInTable[i].innerHTML=array[i];
+                 }
+             }
+
              function bulkGetCfValuesFromIssue(issueKeys, customfieldId){
+                 // swal({});
                  var value="-";
                  jQuery.ajax({
                      url: AJS.params.baseURL + "/rest/florestservice/1.2/rest/bulkGetCfValueFromIssue",
@@ -166,16 +200,17 @@ Released under the MIT license: http://jsbin.mit-license.org
                      async: false,
                      beforeSend: function () {
                          //Swal.showLoading();
-
+                         console.log("178 beforeSend")
                      },
                      error : function (response) {
                          //Swal.hideLoading();
-                         Swal.fire({
-                             type: 'error',
-                             title: 'Oops...',
-                             text: 'Something went wrong!',
-                             footer: '<a href="mailto:berk.karabacak@veniture.com.tr ?Subject=Error%20at%20ProjectApprove" target="_top">Send Mail</a>'
-                         });
+                         // Swal.fire({
+                         //     type: 'error',
+                         //     title: 'Oops...',
+                         //     text: 'Something went wrong!',
+                         //     footer: '<a href="mailto:berk.karabacak@veniture.com.tr ?Subject=Error%20at%20ProjectApprove" target="_top">Send Mail</a>'
+                         // });
+                         console.log("178 error")
                          value= "-";
                      },
                      success: function (response, status, jqXHR) {
@@ -207,11 +242,13 @@ Released under the MIT license: http://jsbin.mit-license.org
                  console.log("Priorities are updated (Not in JIRA DB))");
              }
              function updatePrioritiesInJIRA(gmyOrBirim) {
-                 var table = AJS.$('#auiTable').tableToJSON({
+                 var table = $('#auiTable').tableToJSON({
                      ignoreEmptyRows : true,
                      onlyColumns: [0,3,4]
                      //Bu sıralama önemli
                  }); // Convert the table into a javascript object
+
+                 console.log("table: ", JSON.stringify(table));
 
                  jQuery.ajax({
                      url: AJS.params.baseURL + "/rest/florestservice/1.2/rest/setPriorityCfValuesInJira",
@@ -222,29 +259,29 @@ Released under the MIT license: http://jsbin.mit-license.org
                      },
                      async: true,
                      beforeSend: function () {
-                         Swal.showLoading()
+                         console.log("234 beforeSend")
                      },
                      complete: function (response) {
-                         Swal.hideLoading()
+                         console.log("234 complete")
                      },
                      error: function (response) {
-                         Swal.fire({
-                             type: 'error',
-                             title: 'Oops...',
-                             text: 'Something went wrong!',
-                             footer: '<a href="mailto:berk.karabacak@veniture.com.tr ?Subject=Error%20at%20ProjectApprove" target="_top">Send Mail</a>'
-                         })
+                         // swal.fire({
+                         //     type: 'error',
+                         //     title: 'Oops...',
+                         //     text: 'Something went wrong!',
+                         //     footer: '<a href="mailto:berk.karabacak@veniture.com.tr ?Subject=Error%20at%20ProjectApprove" target="_top">Send Mail</a>'
+                         // })
                          console.log("setPriorityCfValuesInJira has finished with ERROR !!!");
                      },
                      success: function (response, status, jqXHR) {
                          console.log("setPriorityCfValuesInJira is successful");
-                         Swal.fire({
-                             position: 'center',
-                             type: 'success',
-                             title: 'Önceliklendirme Tamamlandı!',
-                             showConfirmButton: false,
-                             timer: 1900
-                         })
+                         // swal.fire({
+                         //     position: 'center',
+                         //     type: 'success',
+                         //     title: 'Önceliklendirme Tamamlandı!',
+                         //     showConfirmButton: false,
+                         //     timer: 1900
+                         // })
                          window.location.reload();
                      }
                  });
@@ -278,7 +315,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                 <select id="customFieldList-select2" data-placeholder="Alan eklemek için tıklayın." multiple style="width: 40%">
                     <option></option>
                     #foreach($cf in $customFieldsInProject)
-                        <option value="$cf.getId()">$cf.getFieldName()</option>
+                        <option value="$cf.getId()">$cf.getId()</option>
                     #end
                 </select>
             </form>
@@ -305,8 +342,9 @@ Released under the MIT license: http://jsbin.mit-license.org
                 <th class="aui-table-column-issue-key" data-override="key">Issue key</th>
                 <th data-override="Summary">Özet</th>
                 <th class="aui-table-column-unsortable" data-override="Description">Açıklama</th>
-                <th data-override="GM">Grup/GMY Önceliği</th>
-                <th data-override="DP">Departman Önceliği</th>
+##                <th data-override="GM">Grup/GMY Önceliği</th>
+##                <th data-override="DP">Departman Önceliği</th>
+##                <th data-override="$Oncelik.getId()">Öncelik</th>
                 #foreach($cf in $customFieldsInProject)
                     <th style="display:none;" data-override="$cf.getId()">$cf.getName()</th>
                 #end
@@ -314,15 +352,17 @@ Released under the MIT license: http://jsbin.mit-license.org
             </thead>
 
             <tbody id="tableBody">
-                #foreach( $issue in $issues )
+                #foreach( $issue in $issueList )
                 <tr>
                     <td><a href="$baseUrl/browse/$issue.getKey()" class="issueKey">$issue.getKey()</a></td>
                     <td style="font-weight:bold">$issue.getSummary()</td>
                     <td class="might-overflow">$issue.getDescription()</td>
-                    <td><aui-badge class="gmyPriority">#if(  $issue.getCustomFieldValue($gmyOncelikCF  ))$issue.getCustomFieldValue($gmyOncelikCF  ).intValue()#else - #end</aui-badge></td>
-                    <td><aui-badge class="birimOncelik">#if( $issue.getCustomFieldValue($birimOncelikCF))$issue.getCustomFieldValue($birimOncelikCF).intValue()#else - #end</aui-badge></td>
+##                    <td class="$Oncelik.getId()">$Oncelik.getId()</td>
+##                    <td><aui-badge class="gmyPriority">#if(  $issue.getCustomFieldValue($gmyOncelikCF  ))$issue.getCustomFieldValue($gmyOncelikCF  ).intValue()#else - #end</aui-badge></td>
+##                    <td><aui-badge class="birimOncelik">#if( $issue.getCustomFieldValue($birimOncelikCF))$issue.getCustomFieldValue($birimOncelikCF).intValue()#else - #end</aui-badge></td>
                     #foreach($cf in $customFieldsInProject)
                         <td style="display:none;" class="$cf.getId()">-</td>
+##                        <td style="display:none;" class="$cf.getId()">-</td>
                     #end
                 </tr>
                 #end
