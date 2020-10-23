@@ -17,7 +17,7 @@ Released under the MIT license: http://jsbin.mit-license.org
 -->
 <html>
 <head>
-<!-- Latest compiled and minified CSS-->
+    <!-- Latest compiled and minified CSS-->
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -25,7 +25,7 @@ Released under the MIT license: http://jsbin.mit-license.org
     <script src="https://raw.githack.com/SortableJS/Sortable/master/Sortable.js"></script><script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 
-    <link rel="stylesheet" href="aui/aui-prototyping.css" media="all"> - in the head of your HTML document
+    <link rel="stylesheet" href="aui/aui-prototyping.css" media="all">
     <script src="aui/aui-prototyping.js"></script>
 
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
@@ -35,53 +35,6 @@ Released under the MIT license: http://jsbin.mit-license.org
     <title>Proje Önceliklendirme</title>
 
     <meta name="decorator" content="atl.general">
-    <style id="css">
-        #content {
-            margin: 12px;
-        }
-
-        #tableBody>tr {
-            cursor: move;
-        }
-
-        #loading-spinner {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .might-overflow {
-            text-overflow: ellipsis;
-            overflow : hidden;
-            white-space: nowrap;
-        }
-
-        .might-overflow:hover {
-            text-overflow: clip;
-            white-space: normal;
-            word-break: break-all;
-        }
-
-        #loading-spinner aui-spinner {
-            margin: 1em;
-        }
-
-        .custom-card-style {
-            border-radius: 3px;
-            box-shadow:
-                    0 1px 1px rgba(9, 30, 66, 0.25),
-                    0 0 1px 0 rgba(9, 30, 66, 0.31);
-            margin: 0 auto;
-            padding: 10px;
-            width: 20em;
-        }
-
-        td {
-            min-width:15px;
-            max-width:550px;
-        }
-    </style>
 
     <script>
         // create
@@ -94,63 +47,63 @@ Released under the MIT license: http://jsbin.mit-license.org
                 scrollSpeed: 28,
                 handle: 'tr',
                 animation: 150,
-            onUpdate: function (evt) {
-                updatePriorities("$restriction");
-            }
+                onUpdate: function (evt) {
+                    updatePriorities("$restriction");
+                }
             });
 
-             updatePriorities("$restriction");
+            updatePriorities("$restriction");
 
-             AJS.$("#customFieldList-select2").auiSelect2();
-             AJS.$("#favFilter-select2").auiSelect2();
+            AJS.$("#customFieldList-select2").auiSelect2();
+            AJS.$("#favFilter-select2").auiSelect2();
 
 
-             // Priority sutununu ve degerlerini giriyoruz
-             var index = -1;
+            // Priority sutununu ve degerlerini giriyoruz
+            var index = -1;
             $("#auiTable tr").each(function () {
                 var issuePriority = $(this).find("td").eq(3);
                 issuePriority.text(index);
                 index += 1;
             })
 
-             AJS.$('#kaydetButton').off().on("click", function (e) {
-                 var params = new window.URLSearchParams(window.location.search);
-                 console.log("restriction = "+ params.get('restriction'));
-                 updatePrioritiesInJIRA(params.get('restriction'));
-                 e.preventDefault();
-             });
-             AJS.$("#loading-spinner").hide();
-             AJS.$("#customFieldList-select2").on('select2-selecting', function (e) {
-                 //Header'ı göster
-                 AJS.$('#auiTable > thead  th[data-override*="'+e.val+'"]').show();
+            AJS.$('#kaydetButton').off().on("click", function (e) {
+                var params = new window.URLSearchParams(window.location.search);
+                console.log("restriction = "+ params.get('restriction'));
+                updatePrioritiesInJIRA(params.get('restriction'));
+                e.preventDefault();
+            });
+            AJS.$("#loading-spinner").hide();
+            AJS.$("#customFieldList-select2").on('select2-selecting', function (e) {
+                //Header'ı göster
+                AJS.$('#auiTable > thead  th[data-override*="'+e.val+'"]').show();
 
-                 //custom Field td'leri çeker bu
-                 var issueCFsectionInTable = AJS.$('#auiTable > tbody  tr td[class*="'+e.val+'"]');
+                //custom Field td'leri çeker bu
+                var issueCFsectionInTable = AJS.$('#auiTable > tbody  tr td[class*="'+e.val+'"]');
 
-                 var issueKeys =[];
-                 issueCFsectionInTable.each(function () {
+                var issueKeys =[];
+                issueCFsectionInTable.each(function () {
 
-                     //td'ın parent'ı tr'a gidio sonra tr'ın ilk sütunu yani issue key sütünunu çekio
-                     var issueKey=AJS.$(this).parent().children().first().children().first().prop( "innerHTML" );
-                     issueKeys.push(issueKey);
-                     AJS.$(this).show();
-                 });
+                    //td'ın parent'ı tr'a gidio sonra tr'ın ilk sütunu yani issue key sütünunu çekio
+                    var issueKey=AJS.$(this).parent().children().first().children().first().prop( "innerHTML" );
+                    issueKeys.push(issueKey);
+                    AJS.$(this).show();
+                });
 
-                 var cfValues=bulkGetCfValuesFromIssue(issueKeys.join(","), e.val);
-                 console.log("cfValues: ", cfValues);
-                 console.log("issueKeys: ", issueKeys)
-                 console.log("e: ", e)
-                 //Burada kritik nokta cfValues length ile Table'daki row sayısı mutlaka aynı olmalı !!!
-                 var array=cfValues.split(",,,");
-                 for(var i = 0; i < array.length; i++) {
-                     issueCFsectionInTable[i].innerHTML=array[i];
-                 }
-             });
-             AJS.$("#customFieldList-select2").on("select2-removing", function(e) {
-                 console.log("customField closed")
-                 AJS.$('#auiTable > thead  th[data-override*="'+e.val+'"]').hide();
-                 AJS.$('#auiTable > tbody  tr td[class*="'+e.val+'"]').hide();
-             });
+                var cfValues=bulkGetCfValuesFromIssue(issueKeys.join(","), e.val);
+                console.log("cfValues: ", cfValues);
+                console.log("issueKeys: ", issueKeys)
+                console.log("e: ", e)
+                //Burada kritik nokta cfValues length ile Table'daki row sayısı mutlaka aynı olmalı !!!
+                var array=cfValues.split(",,,");
+                for(var i = 0; i < array.length; i++) {
+                    issueCFsectionInTable[i].innerHTML=array[i];
+                }
+            });
+            AJS.$("#customFieldList-select2").on("select2-removing", function(e) {
+                console.log("customField closed")
+                AJS.$('#auiTable > thead  th[data-override*="'+e.val+'"]').hide();
+                AJS.$('#auiTable > tbody  tr td[class*="'+e.val+'"]').hide();
+            });
             AJS.$("#favFilter-select2").on('select2-selecting', function (e) {
                 var data = e.object.text;
                 console.log(data);
@@ -177,12 +130,12 @@ Released under the MIT license: http://jsbin.mit-license.org
                             var issueKey = $(this).find("td .issueKey")
                             for (j=0; j<response.length; j++){
                                 console.log("sss: ", response[j] + " " + issueKey.text())
-                              if (response[j] === issueKey.text()){}
-                              else {
-                                  cell.fadeOut(function() {
-                                      cell.remove();
-                                  });
-                              }
+                                if (response[j] === issueKey.text()){}
+                                else {
+                                    cell.fadeOut(function() {
+                                        cell.remove();
+                                    });
+                                }
                             }
                         })
                     },
@@ -228,152 +181,205 @@ Released under the MIT license: http://jsbin.mit-license.org
                 });
             }
 
-             function bulkGetCfValuesFromIssue(issueKeys, customfieldId){
-                 var value="-";
-                 jQuery.ajax({
-                     url: AJS.params.baseURL + "/rest/florestservice/1.2/rest/bulkGetCfValueFromIssue",
-                     type: 'POST',
-                     data: {
-                         issueKey: issueKeys,
-                         customFieldId: customfieldId
-                     },
-                     async: false,
-                     beforeSend: function () {
-                         console.log("178 beforeSend")
-                     },
-                     error : function (response) {
-                         value= "-";
-                     },
-                     success: function (response, status, jqXHR) {
-                         console.log("getCfValueFromIssue complete");
-                         window.scrollTo({
-                             left: 20000,top: 300,
-                             behavior: 'smooth',
-                         });
-                         value= response;
-                     }
-                 });
-                 return value;
-             }
-             function updatePriorities(restriction) {
-                 var i = 0;
-                 var tableBody = AJS.$('#tableBody > tr');
-                 tableBody.each(function () {
-                     if (restriction === "gmy") {
-                         AJS.$(this).find(".gmyPriority").text(i + 1);
-                     } else if (restriction === "dp") {
-                         AJS.$(this).find(".birimOncelik").text(i + 1);
-                     }else {
-                         AJS.$(this).find(".birimOncelik").text(i + 1);
-                         AJS.$(this).find(".gmyPriority").text(i + 1);
-                     }
-                     i++;
-                 });
-                 console.log("Priorities are updated (Not in JIRA DB))");
-             }
+            function bulkGetCfValuesFromIssue(issueKeys, customfieldId){
+                var value="-";
+                jQuery.ajax({
+                    url: AJS.params.baseURL + "/rest/florestservice/1.2/rest/bulkGetCfValueFromIssue",
+                    type: 'POST',
+                    data: {
+                        issueKey: issueKeys,
+                        customFieldId: customfieldId
+                    },
+                    async: false,
+                    beforeSend: function () {
+                        console.log("178 beforeSend")
+                    },
+                    error : function (response) {
+                        value= "-";
+                    },
+                    success: function (response, status, jqXHR) {
+                        console.log("getCfValueFromIssue complete");
+                        window.scrollTo({
+                            left: 20000,top: 300,
+                            behavior: 'smooth',
+                        });
+                        value= response;
+                    }
+                });
+                return value;
+            }
+            function updatePriorities(restriction) {
+                var i = 0;
+                var tableBody = AJS.$('#tableBody > tr');
+                tableBody.each(function () {
+                    if (restriction === "gmy") {
+                        AJS.$(this).find(".gmyPriority").text(i + 1);
+                    } else if (restriction === "dp") {
+                        AJS.$(this).find(".birimOncelik").text(i + 1);
+                    }else {
+                        AJS.$(this).find(".birimOncelik").text(i + 1);
+                        AJS.$(this).find(".gmyPriority").text(i + 1);
+                    }
+                    i++;
+                });
+                console.log("Priorities are updated (Not in JIRA DB))");
+            }
         });
     </script>
+
+    <style>
+        #content {
+            margin: 12px;
+        }
+
+        #tableBody>tr {
+            cursor: move;
+        }
+
+        #loading-spinner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .might-overflow {
+            text-overflow: ellipsis;
+            overflow : hidden;
+            white-space: nowrap;
+        }
+
+        .might-overflow:hover {
+            text-overflow: clip;
+            white-space: normal;
+            word-break: break-all;
+        }
+
+        #loading-spinner aui-spinner {
+            margin: 1em;
+        }
+
+        .custom-card-style {
+            border-radius: 3px;
+            box-shadow:
+                    0 1px 1px rgba(9, 30, 66, 0.25),
+                    0 0 1px 0 rgba(9, 30, 66, 0.31);
+            margin: 0 auto;
+            padding: 10px;
+            width: 20em;
+        }
+
+        td {
+            min-width:15px;
+            max-width:100px;
+            padding: 8px;
+        }
+
+        #shadow:hover {background-color: #f5f5f5;}
+
+
+    </style>
 </head>
-    <body>
-        #if( $issues.isEmpty() )
-            <div class="aui-group">
-                <div class="aui-help aui-help-empty-state">
-                    <div class="aui-help-content">
-                        <h1>Proje Önceliklendirme</h1>
-                        <p>Önceliklendirme yapılacak proje bulunamadı.</p>
-                    </div>
-                </div>
+<body>
+    #if( $issues.isEmpty() )
+    <div class="aui-group">
+        <div class="aui-help aui-help-empty-state">
+            <div class="aui-help-content">
+                <h1>Proje Önceliklendirme</h1>
+                <p>Önceliklendirme yapılacak proje bulunamadı.</p>
             </div>
-        #else
-            <div class="aui-group">
-                <div class="aui-help aui-help-empty-state">
-                    <div class="aui-help-content">
-                        <h1>Proje Önceliklendirme</h1>
-                        <p>Projeleri sürekle-bırak yöntemi ile istediğiniz sıraya taşıyınız. Önceliklendirme bittikten sonra kaydet tuşuna basınız.</p>
-                    </div>
-                </div>
+        </div>
+    </div>
+    #else
+    <div class="aui-group">
+        <div class="aui-help aui-help-empty-state">
+            <div class="aui-help-content">
+                <h1>Proje Önceliklendirme</h1>
+                <p>Projeleri sürekle-bırak yöntemi ile istediğiniz sıraya taşıyınız. Önceliklendirme bittikten sonra kaydet tuşuna basınız.</p>
             </div>
+        </div>
+    </div>
 
-            <br><br><br>
-            <div>
-                <div class="row">
-                    <div class="col-xs-6 col-md-4">
-                        <div class="aui-group">
-                            <div class="aui-item" id="#select2-customFields">
-                                <form class="aui">
-                                    <select id="customFieldList-select2" data-placeholder="Alan eklemek için tıklayın." multiple>
-                                        <option></option>
-                                        #foreach($cf in $customFieldsInProject)
-                                            <option value="$cf.getId()">$cf.getName()</option>
-                                        #end
-                                    </select>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xs-6 col-md-4">
-                        <div class="aui-group">
-                            <div class="aui-item" id="#select2-favFilters">
-                                <form class="aui">
-                                    <select id="favFilter-select2" data-placeholder="Kaydedilen Filtreler" multiple >
-                                        <option></option>
-                                        #foreach($favFilter in $favouriteFilters)
-                                            <option value="$favFilter">$favFilter</option>
-                                        #end
-                                    </select>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="aui-group">
-                <div id="loading-spinner" class="custom-card-style">
-                    <p>Loading results...</p>
-                    <aui-spinner size="large"></aui-spinner>
-                </div>
-            </div>
-
-            <div class="aui-group list-group" id="tableDiv">
-                <table class="aui" id="auiTable">
-                    <thead>
-                    <tr>
-                        <th class="aui-table-column-issue-key" data-override="key" style="font-weight:bold;">Issue key</th>
-                        <th data-override="Summary" style="font-weight:bold;">Özet</th>
-                        <th class="aui-table-column-unsortable" data-override="Description" style="font-weight:bold;">Açıklama</th>
-                        <th class="aui-table-column-unsortable" data-override="Priority" style="font-weight:bold";>Priority</th>
-                        #foreach($cf in $customFieldsInProject)
-                            <th style="display:none; font-weight: bold;" data-override="$cf.getId()">$cf.getName()</th>
-                        #end
-                    <tr>
-                    </thead>
-
-                    <tbody id="tableBody">
-                        #foreach( $issue in $issueList )
-                        <tr>
-                            <td id="issueKey" name="issueKey"><a href="$baseUrl/browse/$issue.getKey()" class="issueKey">$issue.getKey()</a></td>
-                            <td id="issueSummary" name="issueSummary">$issue.getSummary()</td>
-                            <td id="issueDescription" name="issueDescription" class="might-overflow">
-                                #if ( !$issue.getDescription() )
-                                    -
-                                #else
-                                    $issue.getDescription()
+    <br><br><br>
+    <div>
+        <div class="row">
+            <div class="col-xs-6 col-md-4">
+                <div class="aui-group">
+                    <div class="aui-item" id="#select2-customFields">
+                        <form class="aui">
+                            <select id="customFieldList-select2" data-placeholder="Alan eklemek için tıklayın." multiple>
+                                <option></option>
+                                #foreach($cf in $customFieldsInProject)
+                                    <option value="$cf.getId()">$cf.getName()</option>
                                 #end
-                            </td>
-##                            <td id="issueDescription" name="issueDescription" class="might-overflow">$issue.getDescription()</td>
-                            <td id="issuePriority" name="issuePriority" class="might-overflow">$issue.getPriority()</td>
-                            #foreach($cf in $customFieldsInProject)
-                                <td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">-</td>
-                            #end
-                        </tr>
+                            </select>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-md-4">
+                <div class="aui-group">
+                    <div class="aui-item" id="#select2-favFilters">
+                        <form class="aui">
+                            <select id="favFilter-select2" data-placeholder="Kaydedilen Filtreler" multiple >
+                                <option></option>
+                                #foreach($favFilter in $favouriteFilters)
+                                    <option value="$favFilter">$favFilter</option>
+                                #end
+                            </select>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="aui-group">
+        <div id="loading-spinner" class="custom-card-style">
+            <p>Loading results...</p>
+            <aui-spinner size="large"></aui-spinner>
+        </div>
+    </div>
+
+    <div class="aui-group list-group" id="tableDiv">
+        <table class="aui" id="auiTable">
+            <thead>
+            <tr>
+                <th class="aui-table-column-issue-key" data-override="key" style="font-weight:bold;">Kayıt Anahtarı</th>
+                <th data-override="Summary" style="font-weight:bold;">Özet</th>
+                <th class="aui-table-column-unsortable" data-override="Description" style="font-weight:bold;">Açıklama</th>
+                <th class="aui-table-column-unsortable" data-override="Priority" style="font-weight:bold";>Öncelik</th>
+                #foreach($cf in $customFieldsInProject)
+                    <th style="display:none; font-weight: bold;" data-override="$cf.getId()">$cf.getName()</th>
+                #end
+            <tr>
+            </thead>
+
+            <tbody id="tableBody">
+                #foreach( $issue in $issueList )
+                <tr id="shadow">
+                    <td id="issueKey" name="issueKey"><a href="$baseUrl/browse/$issue.getKey()" class="issueKey">$issue.getKey()</a></td>
+                    <td id="issueSummary" name="issueSummary">$issue.getSummary()</td>
+                    <td id="issueDescription" name="issueDescription" class="might-overflow">
+                        #if ( !$issue.getDescription() )
+                            -
+                        #else
+                            $issue.getDescription()
                         #end
-                    </tbody>
-                </table>
-            </div>
-            <div class="aui-group" id="buttons">
-                <button class="aui-button aui-button-primary" id="kaydetButton">Kaydet</button>
-            </div>
-        #end
-    </body>
+                    </td>
+                    ##                            <td id="issueDescription" name="issueDescription" class="might-overflow">$issue.getDescription()</td>
+                    <td id="issuePriority" name="issuePriority" class="might-overflow">$issue.getPriority()</td>
+                    #foreach($cf in $customFieldsInProject)
+                        <td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">-</td>
+                    #end
+                </tr>
+                #end
+            </tbody>
+        </table>
+    </div>
+    <div class="aui-group" id="buttons">
+        <button class="aui-button aui-button-primary" id="kaydetButton">Kaydet</button>
+    </div>
+    #end
+</body>
 </html>

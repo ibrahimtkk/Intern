@@ -25,8 +25,8 @@ public class GetCustomFieldsInExcel {
     public List<CustomField> invoke()   {
         ArrayList<CustomField> cfArrayList= new ArrayList<>();
         CustomFieldManager customFieldManager=ComponentAccessor.getCustomFieldManager();
-//        cfArrayList.add(customFieldManager.getCustomFieldObject(10400L));//PriorityNumber
-        cfArrayList.add(customFieldManager.getCustomFieldObject(10500L));//ZriorityNumber
+//        cfArrayList.add(customFieldManager.getCustomFieldObject(10600L));//PriorityNumber
+        cfArrayList.add(customFieldManager.getCustomFieldObject(10800L));//ZriorityNumber
         return cfArrayList;
     }
 

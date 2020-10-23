@@ -11,14 +11,14 @@
   <resource type="i18n" name="i18n" location="PortfolioManagement"/>
   <web-resource key="PortfolioManagement-resources" name="PortfolioManagement Web Resources"> 
     <dependency>com.atlassian.auiplugin:ajs</dependency>
-        <dependency>com.atlassian.auiplugin:aui-select2</dependency>
+    <dependency>com.atlassian.auiplugin:aui-select2</dependency>
 
 
     <context>atl.general</context> 
   </web-resource>
-    <web-item key="prioritization-gmy-webitem" name="Gmy �ncelik" section="system.top.navigation.bar" weight="200">
-      <description key="prioritization-gmy-item-desc">Gmy �nceliklendirme</description>
-      <label key="�nceliklendirme GMY"/>
+    <web-item key="prioritization-gmy-webitem" name="Öncelik" section="system.top.navigation.bar" weight="200">
+      <description key="prioritization-gmy-item-desc">Önceliklendirme</description>
+      <label key="Önceliklendirme"/>
       <link linkId="prioritization-item-link">/plugins/servlet/prioritization?restriction=gmy</link>
     </web-item>
 
