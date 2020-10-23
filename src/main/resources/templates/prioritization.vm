@@ -273,7 +273,7 @@ Released under the MIT license: http://jsbin.mit-license.org
             min-width:15px;
             max-width:100px;
         }
-        #tableHeader{
+        #row1{
             font-weight: bold;
             text-align: center;
             font-size: 20px;
@@ -351,10 +351,10 @@ Released under the MIT license: http://jsbin.mit-license.org
         <table class="aui" id="auiTable">
             <thead>
             <tr id="tableHeader">
-                <th class="aui-table-column-issue-key" data-override="key" style="font-weight:bold;">Kayıt Anahtarı</th>
-                <th data-override="Summary" style="font-weight:bold;">Özet</th>
-                <th class="aui-table-column-unsortable" data-override="Description" style="font-weight:bold;">Açıklama</th>
-                <th class="aui-table-column-unsortable" data-override="Priority" style="font-weight:bold";>Öncelik</th>
+                <th class="aui-table-column-issue-key" data-override="key"  id="row1">Kayıt Anahtarı</th>
+                <th data-override="Summary" style="font-weight:bold;" id="row1">Özet</th>
+                <th class="aui-table-column-unsortable" data-override="Description"  id="row1">Açıklama</th>
+                <th class="aui-table-column-unsortable" data-override="Priority"  id="row1">Öncelik</th>
                 #foreach($cf in $customFieldsInProject)
                     <th style="display:none; font-weight: bold;" data-override="$cf.getId()">$cf.getName()</th>
                 #end
