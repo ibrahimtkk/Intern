@@ -23,38 +23,11 @@ public class GetCustomFieldsInExcel {
     private JiraAuthenticationContext authenticationContext =ComponentAccessor.getJiraAuthenticationContext();
 
     public List<CustomField> invoke()   {
-
         ArrayList<CustomField> cfArrayList= new ArrayList<>();
         CustomFieldManager customFieldManager=ComponentAccessor.getCustomFieldManager();
-        cfArrayList.add(customFieldManager.getCustomFieldObject(10400L));//PriorityNumber
-        cfArrayList.add(customFieldManager.getCustomFieldObject(11905L));//TotalEforCF
-        cfArrayList.add(customFieldManager.getCustomFieldObject(11304l));//sponsor
-        cfArrayList.add(customFieldManager.getCustomFieldObject(departmanCfId));//departman
-        cfArrayList.add(customFieldManager.getCustomFieldObject(11403L));//departmanOnceligi
-        cfArrayList.add(customFieldManager.getCustomFieldObject(11501L));//GMY Önceliği
-        cfArrayList.add(customFieldManager.getCustomFieldObject(11302l));//projeFaz
-        cfArrayList.add(customFieldManager.getCustomFieldObject(11305l));//etkilenecel dep
-        cfArrayList.add(customFieldManager.getCustomFieldObject(projeEtikleriCfId));//proje etiket
-        cfArrayList.add(customFieldManager.getCustomFieldObject(11307l));//satışa pztf etkisini nasıl edersiniz
-        cfArrayList.add(customFieldManager.getCustomFieldObject(satisBaremiCfId));//satış barami
-        cfArrayList.add(customFieldManager.getCustomFieldObject(11309l));//maliyet etkisi tarifi
-        cfArrayList.add(customFieldManager.getCustomFieldObject(maliyetBaremiCfId));//maliyet barami
-//        cfArrayList.add(customFieldManager.getCustomFieldObject(11311l));//verimlilik etkisi tarifi
-//        cfArrayList.add(customFieldManager.getCustomFieldObject(verimlilikBaremiCfId));//verimlilik barami
-        cfArrayList.add(customFieldManager.getCustomFieldObject(SureclerManuelYuruyorMuCF));//süreçler manuel yürütülebilior mu
-        cfArrayList.add(customFieldManager.getCustomFieldObject(11314l));//manuel yürütmedki zorluklar
-        cfArrayList.add(customFieldManager.getCustomFieldObject(11315l));//danışmanlık gereklimi
-        cfArrayList.add(customFieldManager.getCustomFieldObject(11903l));//proje kategori
-        cfArrayList.add(customFieldManager.getCustomFieldObject(projeYiliCf));//proje yili
-        cfArrayList.add(customFieldManager.getCustomFieldObject(araProjemiCf));// Ara proje mi
-        //cfArrayList.add(customFieldManager.getCustomFieldObject(isSelectedCf));// isSelected
-
-        //List<String> arrayList= cfArrayList.stream().map(CustomField::getName).collect(Collectors.toList());
+//        cfArrayList.add(customFieldManager.getCustomFieldObject(10400L));//PriorityNumber
+        cfArrayList.add(customFieldManager.getCustomFieldObject(10500L));//ZriorityNumber
         return cfArrayList;
-//            return cfMgr.getCustomFieldObjects(searchContext);
-//            ArrayList<CustomField> list = new ArrayList<>();
-//            list.add(cfMgr.getCustomFieldObject(11501L));
-//            return list;
     }
 
     public List<CustomField> getCfsForProjectApproveCfPicker() throws JqlParseException {

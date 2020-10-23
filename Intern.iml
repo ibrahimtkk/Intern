@@ -84,7 +84,6 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.commons:commons-lang3:3.8" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: commons-io:commons-io:2.6" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: commons-httpclient:commons-httpclient:3.1-atlassian-2" level="project" />
-    <orderEntry type="library" name="Maven: log4j:log4j:1.2.17-atlassian-2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.atlassian.profiling:atlassian-profiling:3.2.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.atlassian.scheduler:atlassian-scheduler-api:3.0.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.atlassian.analytics:analytics-api:5.7.2" level="project" />
@@ -348,6 +347,7 @@
     <orderEntry type="library" name="Maven: javax.annotation:javax.annotation-api:1.3.2" level="project" />
     <orderEntry type="library" name="Maven: com.tunyk.currencyconverter:currency-converter-api:1.0" level="project" />
     <orderEntry type="library" name="Maven: net.sf.ehcache:ehcache-core:2.4.3" level="project" />
+    <orderEntry type="library" name="Maven: log4j:log4j:1.2.17" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.mockito:mockito-all:1.8.5" level="project" />
     <orderEntry type="library" name="Maven: com.atlassian.servicedesk:jira-servicedesk-api:4.2.0" level="project" />
     <orderEntry type="library" name="Maven: com.konghq:unirest-java:3.7.02" level="project" />

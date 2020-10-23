@@ -11,16 +11,22 @@ import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.search.SearchException;
 import com.atlassian.jira.issue.search.SearchResults;
 import com.atlassian.jira.jql.parser.JqlParseException;
+import com.atlassian.jira.jql.parser.JqlQueryParser;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.json.JSONArray;
 import com.atlassian.jira.util.json.JSONException;
 import com.atlassian.jira.util.json.JSONObject;
+import com.atlassian.jira.web.bean.PagerFilter;
 import com.atlassian.jira.workflow.TransitionOptions;
 import com.atlassian.plugin.spring.scanner.annotation.imports.JiraImport;
+import com.atlassian.query.Query;
 import com.atlassian.sal.api.net.RequestFactory;
 import com.atlassian.servicedesk.api.organization.OrganizationService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.google.gson.Gson;
 import com.veniture.constants.Constants;
 import com.veniture.util.GetCustomFieldsInExcel;
 import com.veniture.util.tableRowBuilder;
@@ -31,6 +37,7 @@ import model.TableRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.naming.directory.SearchResult;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -77,65 +84,28 @@ public class rest {
     }
 
     @POST
-    @Path("/transitionissues")
-    public String transitionIssues(@Context HttpServletRequest req, @Context HttpServletResponse resp) {
-        IssueService issueService = ComponentAccessor.getIssueService();
-        String[] SelectedIssueHtml = req.getParameterValues("selected");
-        String[] NotSelectedIssueHtml = req.getParameterValues("notSelected");
-
-        if (SelectedIssueHtml!=null){
-            ArrayList<String> issues = (ArrayList<String>) Arrays.stream(SelectedIssueHtml)
-                    .map(element -> element.substring(element.indexOf(">")+1,element.indexOf("<",7)))
-                    .collect(Collectors.toList());
-
-            String[] action = req.getParameterValues("action");
-            ApplicationUser currentUser = ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
-            if (action[0].equals("approve")){
-                issues.stream()
-                        .forEach(issue->transitionIssue(issueService, currentUser, issueService.getIssue(currentUser, issue).getIssue(), Constants.ApproveWorkflowTransitionId));
-            }
-            else if (action[0].equals("decline")){
-
-                issues.stream()
-                        .forEach(issue->transitionIssue(issueService, currentUser, issueService.getIssue(currentUser, issue).getIssue(), Constants.DeclineWorkflowTransitionId));
-
-                issues.stream()
-                        .forEach(issue->transitionIssue(issueService, currentUser, issueService.getIssue(currentUser, issue).getIssue(), Constants.Onayli2CanceledTransitionId));
-            }
-//            else if (action[0].equals("approved2ceoOnay")){
-//                issues.stream()
-//                        .forEach(issue->transitionIssue(issueService, currentUser, issueService.getIssue(currentUser, issue).getIssue(), Constants.OnayaGeriGöderTransitionId));
-//            }
-        }
-
-        if (NotSelectedIssueHtml!=null){
-            ArrayList<String> notselectedissues = (ArrayList<String>) Arrays.stream(NotSelectedIssueHtml)
-                    .map(element -> element.substring(element.indexOf(">")+1,element.indexOf("<",7)))
-                    .collect(Collectors.toList());
-
-            String[] action = req.getParameterValues("action");
-            ApplicationUser currentUser = ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
-            if (action[0].equals("approve")){
-                notselectedissues.stream()
-                        .forEach(issue->transitionIssue(issueService, currentUser, issueService.getIssue(currentUser, issue).getIssue(), Constants.OnayaGeriGöderTransitionId));
-            }
-//            else if (action[0].equals("ceoOnay2decline")){
-//                issues.stream()
-//                        .forEach(issue->transitionIssue(issueService, currentUser, issueService.getIssue(currentUser, issue).getIssue(), Constants.DeclineWorkflowTransitionId));
-//            }
-//            else if (action[0].equals("approved2ceoOnay")){
-//                issues.stream()
-//                        .forEach(issue->transitionIssue(issueService, currentUser, issueService.getIssue(currentUser, issue).getIssue(), Constants.OnayaGeriGöderTransitionId));
-//            }
-        }
-        return "true";
-    }
-
-    @POST
     @Path("/getCfValueFromIssue")
     public String getCfValueFromIssue(@Context HttpServletRequest req, @Context HttpServletResponse resp) {
         CustomField customField= ComponentAccessor.getCustomFieldManager().getCustomFieldObject(req.getParameterValues("customFieldId")[0]);
         return ISSUE_SERVICE.getIssue(CURRENT_USER,req.getParameterValues("issueKey")[0]).getIssue().getCustomFieldValue(customField).toString();
+    }
+
+    @POST
+    @Path("/favFilterJQL")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<String> getFavFilter(@Context HttpServletRequest req, @Context HttpServletResponse resp) throws JqlParseException, SearchException {
+        List jqlList = new ArrayList();
+        JqlQueryParser jqlQueryParser = ComponentAccessor.getComponent(JqlQueryParser.class);
+        String JQLquery = getQueryFromRequest(req.getParameterValues("jqlQuery")[0]);
+        Query conditionQuery = jqlQueryParser.parseQuery(JQLquery);
+        SearchResults<Issue> results = searchService.search(authenticationContext.getLoggedInUser(), conditionQuery, PagerFilter.getUnlimitedFilter());
+        List<Issue> resultsList =  results.getResults();
+        List<String> issueKeys = new ArrayList<>();
+        resultsList.forEach(issue -> {
+            issue = (Issue) issue;
+            issueKeys.add(issue.getKey());
+        });
+        return issueKeys;
     }
 
     @POST
@@ -156,21 +126,6 @@ public class rest {
         String result = jsonArray.toString();
         return Response.status(201).entity(result).build();
     }
-
-//    private JSONObject addEforCfsToJson(TableRow tableRow, JSONObject value) throws JSONException {
-//        for (CustomField cf:new ProgramEforCfs().berk()) {
-//            String customFieldValueFromIssue;
-//            try {
-//                customFieldValueFromIssue = getCustomFieldValueFromIssue(tableRow.getIssue(), cf.getIdAsLong());
-//            } catch (Exception e) {
-//                customFieldValueFromIssue="";
-//                e.printStackTrace();
-//            }
-//            value.put(cf.getId(), customFieldValueFromIssue);
-//        }
-//
-//        return value;
-//    }
 
     @POST
     @Path("/bulkGetCfValueFromIssue")
@@ -282,40 +237,12 @@ public class rest {
         return null;
 
         }
-//        System.out.println(response.getBody());
-//        System.out.println(response.getStatus());
-//        System.out.println(response.getStatusText());
     }
-
-    @GET
-    @Path("/get")
-    public String asd(@Context HttpServletRequest req, @Context HttpServletResponse resp) {
-
-        //OrganizationsQuery organizationsQuery = organizationService.newOrganizationsQueryBuilder().serviceDeskId().build();
-        // get all the organizations configured for the project
-        return sendReq().getBody();
-
-//        organizationsQuery.pagedRequest().getStart().
-//        //def organizationsToAdd = organizationService.getOrganizations(sdUser, organizationsQuery)?.right()?.get()?.results
-//
-//        String connectionUrl = "jdbc:sqlserver://10.9.103.116:1433;"
-//                        + "database=THYTECHNICPDM;"
-//                        + "user=sa@yourserver;"
-//                        + "password=yourpassword;"
-//                        + "encrypt=true;"
-//                        + "trustServerCertificate=false;"
-//                        + "loginTimeout=30;";
-//
-//        try
-//        (Connection connection = DriverManager.getConnection(connectionUrl); )
-//        {
-//            // Code here.
-//        }
-//        // Handle any errors that may have occurred.
-//        catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//        return "berk";
+    private String getQueryFromRequest(String request){
+        String req = request;
+        String[] strings = req.split("\\(");
+        String ret = strings[1].substring(0, strings[1].length()-1);
+        return ret;
     }
 
 
@@ -331,10 +258,6 @@ public class rest {
         }
 
         if(gmyOrBirim.equalsIgnoreCase("gmy")){
-            if (jsonObj.getString("$cf.getId()")==null){
-                logger.error("GM priority is null");
-                throw new Exception();
-            }
             try{
 //                updateCustomFieldValue(issue, Constants.GMY_ONCELIK_ID,Double.valueOf(jsonObj.getString("$cf.getId()")),CURRENT_USER);
                 updateCustomFieldValue(issue, Constants.PriorityNumber, Double.valueOf(i+1), CURRENT_USER);

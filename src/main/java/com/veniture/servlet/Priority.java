@@ -60,7 +60,6 @@ public class Priority extends HttpServlet {
     @JiraImport
     private  JiraAuthenticationContext authenticationContext;
     private final Logger logger = LoggerFactory.getLogger(Priority.class);// The transition ID
-    private List favouriteFilters = new ArrayList();
 
     private static final String PRIORITIZATION_SCREEN_TEMPLATE = "/templates/prioritization.vm";
 
@@ -103,12 +102,6 @@ public class Priority extends HttpServlet {
                 catch (Exception e){
                     logger.info("JQP PARSE ERROR");
                 }
-                //conditionQuery = jqlQueryParser.parseQuery(Constants.DEMO_JQL);
-            } else if (restriction.equals("dp")) {
-                conditionQuery = jqlQueryParser.parseQuery(Constants.departmanJQL);
-                //conditionQuery = jqlQueryParser.parseQuery(Constants.DEMO_JQL);
-            } else {
-                conditionQuery = jqlQueryParser.parseQuery(Constants.DEMO_JQL);
             }
 
             ApplicationUser applicationUser = authenticationContext.getLoggedInUser();
@@ -117,10 +110,14 @@ public class Priority extends HttpServlet {
             Collection<Long> favourites = favouritesManager.getFavouriteIds(applicationUser, SearchRequest.ENTITY_TYPE);
 
             SearchRequestManager searchRequestManager = componentManager.getComponentInstanceOfType(SearchRequestManager.class);
+            List<String> favouriteFilters = new ArrayList<>();
             favourites.forEach(favourite -> {
                 SearchRequest filter = searchRequestManager.getSharedEntity(favourite);
-                String getQueryString = filter.getQuery().getQueryString();
-                favouriteFilters.add(getQueryString);
+                String queryString = filter.getQuery().getQueryString();
+                String filterName = filter.getName();
+                favouriteFilters.add(filterName + " (" + queryString + ")");
+//                favouriteFilters.add(getQueryString);
+//                favouriteFilterNames.add(getFilterName);
             });
 
 //            conditionQuery = jqlQueryParser.parseQuery(Constants.AS_JQL);
@@ -138,21 +135,30 @@ public class Priority extends HttpServlet {
                 String description = ((Issue) issue).getDescription();
             });
             List<CustomField> customFieldsInProject = new GetCustomFieldsInExcel().invoke();
+
+
             context.put("issues", results.getResults());
             context.put("issueList", results.getResults());
             context.put("restriction", restriction);
             context.put("baseUrl", ComponentAccessor.getApplicationProperties().getString("jira.baseurl"));
-            context.put("Oncelik", customFieldsInProject.get(0));
+            context.put("Priority", customFieldsInProject.get(0));
             context.put("customFieldsInProject", customFieldsInProject);
+            context.put("favouriteFilters", favouriteFilters);
             context.put("birimOncelikCF", ComponentAccessor.getCustomFieldManager().getCustomFieldObject(Constants.BIRIM_ONCELIK_ID_STRING));
             context.put("gmyOncelikCF", ComponentAccessor.getCustomFieldManager().getCustomFieldObject(Constants.GMY_ONCELIK_STRING));
-            context.put("favouriteFilters", favouriteFilters);
+
 
             resp.setContentType("text/html;charset=utf-8");
             templateRenderer.render(PRIORITIZATION_SCREEN_TEMPLATE, context, resp.getWriter());
         } catch (Exception e){
 
         }
+
+    }
+
+    private List<FavouriteFilter> getFavouriteList(){
+        ArrayList<FavouriteFilter> list = new ArrayList<>();
+        return list;
     }
 
 /*
@@ -173,3 +179,28 @@ public class Priority extends HttpServlet {
 */
 }
 
+class FavouriteFilter {
+    private String filterName;
+    private String query;
+
+    public FavouriteFilter(String filterName, String query) {
+        this.filterName = filterName;
+        this.query = query;
+    }
+
+    public String getFilterName() {
+        return filterName;
+    }
+
+    public void setFilterName(String filterName) {
+        this.filterName = filterName;
+    }
+
+    public String getQuery() {
+        return query;
+    }
+
+    public void setQuery(String query) {
+        this.query = query;
+    }
+}
