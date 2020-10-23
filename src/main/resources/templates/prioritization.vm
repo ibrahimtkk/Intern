@@ -275,8 +275,8 @@ Released under the MIT license: http://jsbin.mit-license.org
         }
         #row1{
             font-weight: bold;
-            text-align: center;
-            font-size: 20px;
+            text-align: left;
+            font-size: 15px;
         }
         #shadow:hover {
             background-color: #f5f5f5;
