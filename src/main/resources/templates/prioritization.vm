@@ -272,10 +272,16 @@ Released under the MIT license: http://jsbin.mit-license.org
         td {
             min-width:15px;
             max-width:100px;
-            padding: 8px;
         }
-
-        #shadow:hover {background-color: #f5f5f5;}
+        #tableHeader{
+            font-weight: bold;
+            text-align: center;
+            font-size: 20px;
+        }
+        #shadow:hover {
+            background-color: #f5f5f5;
+            padding: 15px;
+        }
 
 
     </style>
@@ -344,7 +350,7 @@ Released under the MIT license: http://jsbin.mit-license.org
     <div class="aui-group list-group" id="tableDiv">
         <table class="aui" id="auiTable">
             <thead>
-            <tr>
+            <tr id="tableHeader">
                 <th class="aui-table-column-issue-key" data-override="key" style="font-weight:bold;">Kayıt Anahtarı</th>
                 <th data-override="Summary" style="font-weight:bold;">Özet</th>
                 <th class="aui-table-column-unsortable" data-override="Description" style="font-weight:bold;">Açıklama</th>
