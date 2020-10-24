@@ -53,7 +53,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.veniture.servlet.ProjectApprove.getIssueSearchResults;
 import static com.veniture.util.functions.*;
 
 @Path("/rest")
@@ -108,24 +107,24 @@ public class rest {
         return issueKeys;
     }
 
-    @POST
-    @Path("/getProjectIssues")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getProjectIssues(@Context HttpServletRequest req, @Context HttpServletResponse resp) throws SearchException, JqlParseException, JSONException {
-        SearchResults<Issue> IssueResults = getIssueSearchResults(authenticationContext,searchService);
-        List<CustomField> customFieldsInProject = new GetCustomFieldsInExcel().invoke();
-        List<TableRow> tableRows = new tableRowBuilder(ComponentAccessor.getIssueManager(), logger,IssueResults, customFieldsInProject).invoke();
-        JSONArray jsonArray=  new JSONArray();
-
-        for (TableRow tableRow : tableRows){
-            JSONObject tableRowJson = tableRow.toJSON();
-//          tableRowJson = addEforCfsToJson(tableRow, tableRowJson);
-            jsonArray.put(tableRowJson);
-        }
-
-        String result = jsonArray.toString();
-        return Response.status(201).entity(result).build();
-    }
+//    @POST
+//    @Path("/getProjectIssues")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public Response getProjectIssues(@Context HttpServletRequest req, @Context HttpServletResponse resp) throws SearchException, JqlParseException, JSONException {
+//        SearchResults<Issue> IssueResults = getIssueSearchResults(authenticationContext,searchService);
+//        List<CustomField> customFieldsInProject = new GetCustomFieldsInExcel().invoke();
+//        List<TableRow> tableRows = new tableRowBuilder(ComponentAccessor.getIssueManager(), logger,IssueResults, customFieldsInProject).invoke();
+//        JSONArray jsonArray=  new JSONArray();
+//
+//        for (TableRow tableRow : tableRows){
+//            JSONObject tableRowJson = tableRow.toJSON();
+////          tableRowJson = addEforCfsToJson(tableRow, tableRowJson);
+//            jsonArray.put(tableRowJson);
+//        }
+//
+//        String result = jsonArray.toString();
+//        return Response.status(201).entity(result).build();
+//    }
 
     @POST
     @Path("/bulkGetCfValueFromIssue")

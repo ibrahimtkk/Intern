@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Scanned
@@ -130,9 +131,19 @@ public class Priority extends HttpServlet {
                 logger.error("JQL error");
             }
 
+            List dueDateList = new ArrayList();
+            List createdList = new ArrayList();
+
             results.getResults().forEach(issue -> {
                 Issue issue1 = (Issue) issue;
-                String description = ((Issue) issue).getDescription();
+                try{
+                    dueDateList.add(new SimpleDateFormat("YYYY-MM-dd hh:mm:ss").format(issue1.getDueDate()));
+                } catch (Exception e){
+                    dueDateList.add(null);
+                }
+                createdList.add(new SimpleDateFormat("YYYY-MM-dd hh:mm:ss").format(issue1.getCreated()));
+//                dueDateList.add(issue1.getDueDate());
+//                createdList.add(issue1.getCreated());
             });
             List<CustomField> customFieldsInProject = new GetCustomFieldsInExcel().invoke();
 
@@ -146,7 +157,8 @@ public class Priority extends HttpServlet {
             context.put("favouriteFilters", favouriteFilters);
             context.put("birimOncelikCF", ComponentAccessor.getCustomFieldManager().getCustomFieldObject(Constants.BIRIM_ONCELIK_ID_STRING));
             context.put("gmyOncelikCF", ComponentAccessor.getCustomFieldManager().getCustomFieldObject(Constants.GMY_ONCELIK_STRING));
-
+            context.put("dueDateList", dueDateList);
+            context.put("createdList", createdList);
 
             resp.setContentType("text/html;charset=utf-8");
             templateRenderer.render(PRIORITIZATION_SCREEN_TEMPLATE, context, resp.getWriter());

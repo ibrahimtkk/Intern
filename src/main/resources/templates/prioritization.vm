@@ -379,6 +379,8 @@ Released under the MIT license: http://jsbin.mit-license.org
                 <th data-override="Summary" style="font-weight:bold;" id="row1">Özet</th>
                 <th class="aui-table-column-unsortable" data-override="Description"  id="row1">Açıklama</th>
                 <th class="aui-table-column-unsortable" data-override="Priority"  id="row1">Öncelik</th>
+                <th class="aui-table-column-unsortable" data-override="Created" id="row1">Oluşturulma Tarihi</th>
+                <th class="aui-table-column-unsortable" data-override="Due" id="row1">Bitiş Tarihi</th>
                 #foreach($cf in $customFieldsInProject)
                     <th style="display:none; font-weight: bold;" data-override="$cf.getId()">$cf.getName()</th>
                 #end
@@ -397,8 +399,15 @@ Released under the MIT license: http://jsbin.mit-license.org
                             $issue.getDescription()
                         #end
                     </td>
-                    ##                            <td id="issueDescription" name="issueDescription" class="might-overflow">$issue.getDescription()</td>
                     <td id="issuePriority" name="issuePriority" class="might-overflow">$issue.getPriority()</td>
+                    <td id="issueCreated" name="issueCreated" class="might-overflow">$issue.getCreated()</td>
+                    <td id="issueDue" name="issueDue" class="might-overflow">
+                        #if ( !$issue.getDueDate() )
+                            -
+                        #else
+                            $issue.getDueDate()
+                        #end
+                    </td>
                     #foreach($cf in $customFieldsInProject)
                         <td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">-</td>
                     #end
