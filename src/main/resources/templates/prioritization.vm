@@ -24,7 +24,6 @@ Released under the MIT license: http://jsbin.mit-license.org
     <script src="https://cdn.jsdelivr.net/npm/table-to-json@0.13.0/lib/jquery.tabletojson.min.js" integrity="sha256-AqDz23QC5g2yyhRaZcEGhMMZwQnp8fC6sCZpf+e7pnw=" crossorigin="anonymous"></script>
     <script src="https://raw.githack.com/SortableJS/Sortable/master/Sortable.js"></script><script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
-
     <link rel="stylesheet" href="aui/aui-prototyping.css" media="all">
     <script src="aui/aui-prototyping.js"></script>
 
@@ -41,16 +40,59 @@ Released under the MIT license: http://jsbin.mit-license.org
         AJS.$(document).ready(function () {
             window.onbeforeunload = null;
 
-            Sortable.create(tableBody, {
+            var sortable = new Sortable(tableBody, {
                 scroll: true,
                 scrollSensitivity: 130,
                 scrollSpeed: 28,
                 handle: 'tr',
+                sort: true,
                 animation: 150,
+                dataIdAttr: 'data-id',
+                store: {
+                    get: function () {
+                        var list = []
+                        #foreach($pri in $priorityList)
+                            list.push($pri)
+                        #end
+                        return list;
+                    }
+                },
                 onUpdate: function (evt) {
                     updatePriorities("$restriction");
                 }
             });
+
+            console.log("tableBodu: ", tableBody)
+
+            var priorityArray = []
+            var tableIndex = -2;
+            $("#auiTable tr").each(function () {
+                var issuePriority = $(this).find("td").eq(3);
+                var priIndex = 0;
+                #foreach($pri in $priorityList)
+                    if (priIndex == tableIndex) {
+                        issuePriority.text($pri)
+                        var priInt = parseInt($pri);
+                        priorityArray.push(priInt);
+                        $(this).attr("data-id", priInt)
+                    }
+                    priIndex += 1;
+                #end
+                tableIndex += 1
+            })
+
+            var order = sortable.toArray();
+
+            const test = order.sort((a, b) => {
+                return +a - +b;
+            });
+
+            console.log("order: ", test)
+
+            sortable.sort(test)
+
+            // sortable.sortable('toArray', {attribute: 'issuePriority'})
+
 
             updatePriorities("$restriction");
 
@@ -59,12 +101,12 @@ Released under the MIT license: http://jsbin.mit-license.org
 
 
             // Priority sutununu ve degerlerini giriyoruz
-            var index = -1;
-            $("#auiTable tr").each(function () {
-                var issuePriority = $(this).find("td").eq(3);
-                issuePriority.text(index);
-                index += 1;
-            })
+            // var index = -1;
+            // $("#auiTable tr").each(function () {
+            //     var issuePriority = $(this).find("td").eq(3);
+            //     issuePriority.text(index);
+            //     index += 1;
+            // })
 
             AJS.$('#kaydetButton').off().on("click", function (e) {
                 var params = new window.URLSearchParams(window.location.search);
@@ -148,7 +190,7 @@ Released under the MIT license: http://jsbin.mit-license.org
             function updatePrioritiesInJIRA(gmyOrBirim) {
                 var table = $('#auiTable').tableToJSON({
                     ignoreEmptyRows : true,
-                    onlyColumns: [0,3]
+                    onlyColumns: [0,1]
                     //Bu sıralama önemli
                 }); // Convert the table into a javascript object
 
@@ -389,7 +431,7 @@ Released under the MIT license: http://jsbin.mit-license.org
 
             <tbody id="tableBody">
                 #foreach( $issue in $issueList )
-                <tr id="shadow">
+                <tr id="shadow" data-id="$issue.getSummary()">
                     <td id="issueKey" name="issueKey"><a href="$baseUrl/browse/$issue.getKey()" class="issueKey">$issue.getKey()</a></td>
                     <td id="issueSummary" name="issueSummary">$issue.getSummary()</td>
                     <td id="issueDescription" name="issueDescription" class="might-overflow">
@@ -399,7 +441,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                             $issue.getDescription()
                         #end
                     </td>
-                    <td id="issuePriority" name="issuePriority" class="might-overflow">$issue.getPriority()</td>
+                    <td data-id="issuePriority" id="issuePriority" name="issuePriority" class="might-overflow">-</td>
                     <td id="issueCreated" name="issueCreated" class="might-overflow">$issue.getCreated()</td>
                     <td id="issueDue" name="issueDue" class="might-overflow">
                         #if ( !$issue.getDueDate() )

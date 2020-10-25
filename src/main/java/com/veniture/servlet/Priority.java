@@ -5,6 +5,7 @@ import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.component.pico.ComponentManager;
 import com.atlassian.jira.favourites.FavouritesManager;
+import com.atlassian.jira.issue.CustomFieldManager;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.search.SearchException;
@@ -133,6 +134,8 @@ public class Priority extends HttpServlet {
 
             List dueDateList = new ArrayList();
             List createdList = new ArrayList();
+            List priorityList = new ArrayList();
+            CustomFieldManager customFieldManager=ComponentAccessor.getCustomFieldManager();
 
             results.getResults().forEach(issue -> {
                 Issue issue1 = (Issue) issue;
@@ -142,8 +145,11 @@ public class Priority extends HttpServlet {
                     dueDateList.add(null);
                 }
                 createdList.add(new SimpleDateFormat("YYYY-MM-dd hh:mm:ss").format(issue1.getCreated()));
-//                dueDateList.add(issue1.getDueDate());
-//                createdList.add(issue1.getCreated());
+
+                CustomField customField = customFieldManager.getCustomFieldObject(10400L);
+                Double priorityNumber = (Double) customField.getValue(issue1);
+                int intPriorityNumber = priorityNumber.intValue();
+                priorityList.add(intPriorityNumber);
             });
             List<CustomField> customFieldsInProject = new GetCustomFieldsInExcel().invoke();
 
@@ -159,6 +165,7 @@ public class Priority extends HttpServlet {
             context.put("gmyOncelikCF", ComponentAccessor.getCustomFieldManager().getCustomFieldObject(Constants.GMY_ONCELIK_STRING));
             context.put("dueDateList", dueDateList);
             context.put("createdList", createdList);
+            context.put("priorityList", priorityList);
 
             resp.setContentType("text/html;charset=utf-8");
             templateRenderer.render(PRIORITIZATION_SCREEN_TEMPLATE, context, resp.getWriter());
