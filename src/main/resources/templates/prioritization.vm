@@ -152,14 +152,19 @@ Released under the MIT license: http://jsbin.mit-license.org
                         tableBody.each(function () {
                             var cell = $(this)
                             var issueKey = $(this).find("td .issueKey")
+                            var deleteBoolean = true;
                             for (j=0; j<response.length; j++){
                                 console.log("sss: ", response[j] + " " + issueKey.text())
-                                if (response[j] === issueKey.text()){}
-                                else {
-                                    cell.fadeOut(function() {
-                                        cell.remove();
-                                    });
+                                if (response[j] === issueKey.text()){
+                                    deleteBoolean = false;
                                 }
+                                else {
+                                }
+                            }
+                            if (deleteBoolean){
+                                cell.fadeOut(function() {
+                                    cell.remove();
+                                });
                             }
                         })
                     },
