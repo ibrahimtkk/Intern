@@ -64,17 +64,14 @@ Released under the MIT license: http://jsbin.mit-license.org
 
             console.log("tableBodu: ", tableBody)
 
-            var priorityArray = []
             var tableIndex = -2;
             $("#auiTable tr").each(function () {
                 var issuePriority = $(this).find("td").eq(3);
                 var priIndex = 0;
                 #foreach($pri in $priorityList)
                     if (priIndex == tableIndex) {
-                        issuePriority.text($pri)
-                        var priInt = parseInt($pri);
-                        priorityArray.push(priInt);
-                        $(this).attr("data-id", priInt)
+                        issuePriority.text("$pri")
+                        $(this).attr("data-id", "$pri")
                     }
                     priIndex += 1;
                 #end
@@ -82,31 +79,16 @@ Released under the MIT license: http://jsbin.mit-license.org
             })
 
             var order = sortable.toArray();
-
-            const test = order.sort((a, b) => {
+            const newOrder = order.sort((a, b) => {
                 return +a - +b;
             });
 
-            console.log("order: ", test)
-
-            sortable.sort(test)
-
-            // sortable.sortable('toArray', {attribute: 'issuePriority'})
-
+            sortable.sort(newOrder)
 
             updatePriorities("$restriction");
 
             AJS.$("#customFieldList-select2").auiSelect2();
             AJS.$("#favFilter-select2").auiSelect2();
-
-
-            // Priority sutununu ve degerlerini giriyoruz
-            // var index = -1;
-            // $("#auiTable tr").each(function () {
-            //     var issuePriority = $(this).find("td").eq(3);
-            //     issuePriority.text(index);
-            //     index += 1;
-            // })
 
             AJS.$('#kaydetButton').off().on("click", function (e) {
                 var params = new window.URLSearchParams(window.location.search);
