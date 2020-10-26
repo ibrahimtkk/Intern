@@ -78,17 +78,17 @@ Released under the MIT license: http://jsbin.mit-license.org
                 #foreach($pri in $priorityList)
                     if (priIndex == tableIndex) {
                         var priInt = parseInt("$pri")
-                        // issuePriority.text(priInt)
                         issuePriority.html(priInt)
                         ## $(this).attr("data-id", "$pri")
                     }
                     priIndex += 1;
                 #end
                 tableIndex += 1
-                console.log("this: ", $(this))
             })
 
-            var dataTable = $("#auiTable").DataTable();
+            var dataTable = $("#auiTable").DataTable({
+                "order": [[ 3, "asc" ]]
+            });
 
             var order = sortable.toArray();
             // const newOrder = order.sort((a, b) => {
