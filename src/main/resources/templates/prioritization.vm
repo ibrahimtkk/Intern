@@ -20,15 +20,19 @@ Released under the MIT license: http://jsbin.mit-license.org
     <!-- Latest compiled and minified CSS-->
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/table-to-json@0.13.0/lib/jquery.tabletojson.min.js" integrity="sha256-AqDz23QC5g2yyhRaZcEGhMMZwQnp8fC6sCZpf+e7pnw=" crossorigin="anonymous"></script>
     <script src="https://raw.githack.com/SortableJS/Sortable/master/Sortable.js"></script><script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
-    <link rel="stylesheet" href="aui/aui-prototyping.css" media="all">
+    <link rel="stylesheet" href="aui/aui-prototyping.css" media="all"/>
     <script src="aui/aui-prototyping.js"></script>
 
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.22/datatables.min.css"/>
+
+    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.22/datatables.min.js"></script>
 
     <meta charset="utf-8">
     <title>Proje Önceliklendirme</title>
@@ -40,6 +44,11 @@ Released under the MIT license: http://jsbin.mit-license.org
         AJS.$(document).ready(function () {
             window.onbeforeunload = null;
 
+
+            // console.log("beforeDataTable")
+            // var dataTable = $("#auiTable").DataTable();
+            // console.log("dataTable: ", dataTable);
+
             var sortable = new Sortable(tableBody, {
                 scroll: true,
                 scrollSensitivity: 130,
@@ -47,7 +56,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                 handle: 'tr',
                 sort: true,
                 animation: 150,
-                dataIdAttr: 'data-id',
+                // dataIdAttr: 'data-id',
                 store: {
                     get: function () {
                         var list = []
@@ -62,26 +71,31 @@ Released under the MIT license: http://jsbin.mit-license.org
                 }
             });
 
-            var tableIndex = -2;
+            var tableIndex = -1;
             $("#auiTable tr").each(function () {
                 var issuePriority = $(this).find("td").eq(3);
                 var priIndex = 0;
                 #foreach($pri in $priorityList)
                     if (priIndex == tableIndex) {
-                        issuePriority.text("$pri")
-                        $(this).attr("data-id", "$pri")
+                        var priInt = parseInt("$pri")
+                        // issuePriority.text(priInt)
+                        issuePriority.html(priInt)
+                        ## $(this).attr("data-id", "$pri")
                     }
                     priIndex += 1;
                 #end
                 tableIndex += 1
+                console.log("this: ", $(this))
             })
 
-            var order = sortable.toArray();
-            const newOrder = order.sort((a, b) => {
-                return +a - +b;
-            });
+            var dataTable = $("#auiTable").DataTable();
 
-            sortable.sort(newOrder)
+            var order = sortable.toArray();
+            // const newOrder = order.sort((a, b) => {
+            //     return +a - +b;
+            // });
+            //
+            // sortable.sort(newOrder)
 
             updatePriorities("$restriction");
 
@@ -253,6 +267,7 @@ Released under the MIT license: http://jsbin.mit-license.org
     </script>
 
     <style>
+
         #content {
             margin: 12px;
         }
@@ -399,17 +414,17 @@ Released under the MIT license: http://jsbin.mit-license.org
     <div class="aui-group list-group" id="tableDiv">
         <table class="aui aui-table-list" id="auiTable" >
             <thead>
-            <tr id="tableHeader">
-                <th class="aui-table-column-issue-key" data-override="key"  id="row1">Kayıt Anahtarı</th>
-                <th data-override="Summary" style="font-weight:bold;" id="row1">Özet</th>
-                <th class="aui-table-column-unsortable" data-override="Description"  id="row1">Açıklama</th>
-                <th class="aui-table-column-unsortable" data-override="Priority"  id="row1">Öncelik</th>
-                <th class="aui-table-column-unsortable" data-override="Created" id="row1">Oluşturulma Tarihi</th>
-                <th class="aui-table-column-unsortable" data-override="Due" id="row1">Bitiş Tarihi</th>
-                #foreach($cf in $customFieldsInProject)
-                    <th style="display:none; font-weight: bold;" data-override="$cf.getId()">$cf.getName()</th>
-                #end
-            <tr>
+                <tr id="tableHeader">
+                    <th class="aui-table-column-issue-key" data-override="key"  id="row1">Kayıt Anahtarı</th>
+                    <th data-override="Summary" style="font-weight:bold;" id="row1">Özet</th>
+                    <th class="aui-table-column-unsortable" data-override="Description"  id="row1">Açıklama</th>
+                    <th class="aui-table-column-priority" data-override="Priority"  id="row1">Öncelik</th>
+                    <th class="aui-table-column-unsortable" data-override="Created" id="row1">Oluşturulma Tarihi</th>
+                    <th class="aui-table-column-unsortable" data-override="Due" id="row1">Bitiş Tarihi</th>
+                    #foreach($cf in $customFieldsInProject)
+                        <th style="display:none; font-weight: bold;" data-override="$cf.getId()">$cf.getName()</th>
+                    #end
+                </tr>
             </thead>
 
             <tbody id="tableBody">
@@ -424,7 +439,8 @@ Released under the MIT license: http://jsbin.mit-license.org
                             $issue.getDescription()
                         #end
                     </td>
-                    <td data-id="issuePriority" id="issuePriority" name="issuePriority" class="might-overflow">-</td>
+##                    <td data-id="issuePriority" id="issuePriority" name="issuePriority" class="might-overflow">-</td>
+                    <td id="issuePriority" name="issuePriority" class="might-overflow">-</td>
                     <td id="issueCreated" name="issueCreated" class="might-overflow">$issue.getCreated()</td>
                     <td id="issueDue" name="issueDue" class="might-overflow">
                         #if ( !$issue.getDueDate() )
@@ -441,6 +457,37 @@ Released under the MIT license: http://jsbin.mit-license.org
             </tbody>
         </table>
     </div>
+
+    <table id="example" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Position</th>
+                <th>Office</th>
+                <th>Age</th>
+                <th>Start date</th>
+                <th>Salary</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Tiger Nixon</td>
+                <td>System Architect</td>
+                <td>Edinburgh</td>
+                <td>61</td>
+                <td>2011/04/25</td>
+                <td>$320,800</td>
+            </tr>
+            <tr>
+                <td>Garrett Winters</td>
+                <td>Accountant</td>
+                <td>Tokyo</td>
+                <td>63</td>
+                <td>2011/07/25</td>
+                <td>$170,750</td>
+            </tr>
+        </tbody>
+    </table>
 
     #end
 </body>

@@ -139,7 +139,6 @@ public class Priority extends HttpServlet {
             });
             List<CustomField> customFieldsInProject = new GetCustomFieldsInExcel().invoke();
 
-
             context.put("issues", results.getResults());
             context.put("issueList", results.getResults());
             context.put("restriction", restriction);
