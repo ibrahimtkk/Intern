@@ -76,22 +76,6 @@ public class Priority extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-/*        UserManager userManager = ComponentAccessor.getUserManager();
-        //UserUtils.getUsersByEmail("berkkarabacak2@gmail.com").get(0);
-        //ApplicationUser appUser = userManager.getUserByKey("906914");
-
-        StringBuilder stringBuilder;
-        GroupManager groupManager = ComponentAccessor.getGroupManager();
-        for (ApplicationUser user: userManager.getAllUsers()){
-            if (groupManager.getGroupNamesForUser(user).contains("okta")){
-                continue;
-            }
-        }
-
-        for (String i : userss.keySet()) {
-            rename(userManager,i,userss.get(i));
-        }*/
-
         Map<String, Object> context = new HashMap<String, Object>();
         String restriction = Optional.ofNullable(req.getParameter("restriction")).orElse("");
         JqlQueryParser jqlQueryParser = ComponentAccessor.getComponent(JqlQueryParser.class);
@@ -111,6 +95,7 @@ public class Priority extends HttpServlet {
             FavouritesManager favouritesManager = (FavouritesManager) componentManager.getComponentInstanceOfType(FavouritesManager.class);
             Collection<Long> favourites = favouritesManager.getFavouriteIds(applicationUser, SearchRequest.ENTITY_TYPE);
 
+
             SearchRequestManager searchRequestManager = componentManager.getComponentInstanceOfType(SearchRequestManager.class);
             List<String> favouriteFilters = new ArrayList<>();
             favourites.forEach(favourite -> {
@@ -118,11 +103,7 @@ public class Priority extends HttpServlet {
                 String queryString = filter.getQuery().getQueryString();
                 String filterName = filter.getName();
                 favouriteFilters.add(filterName + " (" + queryString + ")");
-//                favouriteFilters.add(getQueryString);
-//                favouriteFilterNames.add(getFilterName);
             });
-
-//            conditionQuery = jqlQueryParser.parseQuery(Constants.AS_JQL);
 
             SearchResults results = null;
             try{
@@ -135,21 +116,26 @@ public class Priority extends HttpServlet {
             List dueDateList = new ArrayList();
             List createdList = new ArrayList();
             List priorityList = new ArrayList();
+            List projectLeadList = new ArrayList();
             CustomFieldManager customFieldManager=ComponentAccessor.getCustomFieldManager();
 
-            results.getResults().forEach(issue -> {
-                Issue issue1 = (Issue) issue;
+            results.getResults().forEach(issue1 -> {
+                Issue issue = (Issue) issue1;
                 try{
-                    dueDateList.add(new SimpleDateFormat("YYYY-MM-dd hh:mm:ss").format(issue1.getDueDate()));
+                    dueDateList.add(new SimpleDateFormat("YYYY-MM-dd hh:mm:ss").format(issue.getDueDate()));
                 } catch (Exception e){
                     dueDateList.add(null);
                 }
-                createdList.add(new SimpleDateFormat("YYYY-MM-dd hh:mm:ss").format(issue1.getCreated()));
+                createdList.add(new SimpleDateFormat("YYYY-MM-dd hh:mm:ss").format(issue.getCreated()));
 
                 CustomField customField = customFieldManager.getCustomFieldObject(10400L);
-                Double priorityNumber = (Double) customField.getValue(issue1);
+                Double priorityNumber = (Double) customField.getValue(issue);
                 int intPriorityNumber = priorityNumber.intValue();
                 priorityList.add(intPriorityNumber);
+
+                Project project = issue.getProjectObject();
+                ApplicationUser projectLead = project.getProjectLead();
+                projectLeadList.add(projectLead);
             });
             List<CustomField> customFieldsInProject = new GetCustomFieldsInExcel().invoke();
 
@@ -166,6 +152,7 @@ public class Priority extends HttpServlet {
             context.put("dueDateList", dueDateList);
             context.put("createdList", createdList);
             context.put("priorityList", priorityList);
+            context.put("projectLeadList", projectLeadList);
 
             resp.setContentType("text/html;charset=utf-8");
             templateRenderer.render(PRIORITIZATION_SCREEN_TEMPLATE, context, resp.getWriter());

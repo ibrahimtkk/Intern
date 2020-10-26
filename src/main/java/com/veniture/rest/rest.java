@@ -239,9 +239,13 @@ public class rest {
     }
     private String getQueryFromRequest(String request){
         String req = request;
-        String[] strings = req.split("\\(");
-        String ret = strings[1].substring(0, strings[1].length()-1);
-        return ret;
+//        String[] strings = req.split("\\(");
+        int firstIndex = req.indexOf("(");
+        int lastIndex = req.lastIndexOf(")");
+        String query = req.substring(firstIndex+1, lastIndex);
+//        String[] s = strings[1].split("\\)");
+//        String ret = s[0];
+        return query;
     }
 
 

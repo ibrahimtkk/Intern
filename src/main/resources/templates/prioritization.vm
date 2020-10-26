@@ -62,8 +62,6 @@ Released under the MIT license: http://jsbin.mit-license.org
                 }
             });
 
-            console.log("tableBodu: ", tableBody)
-
             var tableIndex = -2;
             $("#auiTable tr").each(function () {
                 var issuePriority = $(this).find("td").eq(3);
@@ -106,7 +104,6 @@ Released under the MIT license: http://jsbin.mit-license.org
 
                 var issueKeys =[];
                 issueCFsectionInTable.each(function () {
-
                     //td'ın parent'ı tr'a gidio sonra tr'ın ilk sütunu yani issue key sütünunu çekio
                     var issueKey=AJS.$(this).parent().children().first().children().first().prop( "innerHTML" );
                     issueKeys.push(issueKey);
@@ -154,7 +151,6 @@ Released under the MIT license: http://jsbin.mit-license.org
                             var issueKey = $(this).find("td .issueKey")
                             var deleteBoolean = true;
                             for (j=0; j<response.length; j++){
-                                console.log("sss: ", response[j] + " " + issueKey.text())
                                 if (response[j] === issueKey.text()){
                                     deleteBoolean = false;
                                 }
