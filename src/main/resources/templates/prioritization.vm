@@ -34,6 +34,8 @@ Released under the MIT license: http://jsbin.mit-license.org
 
     <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.22/datatables.min.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/table-to-json@1.0.0/lib/jquery.tabletojson.min.js" integrity="sha256-H8xrCe0tZFi/C2CgxkmiGksqVaxhW0PFcUKZJZo1yNU=" crossorigin="anonymous"></script>
+
     <meta charset="utf-8">
     <title>Proje Önceliklendirme</title>
 
@@ -44,10 +46,7 @@ Released under the MIT license: http://jsbin.mit-license.org
         AJS.$(document).ready(function () {
             window.onbeforeunload = null;
 
-
-            // console.log("beforeDataTable")
-            // var dataTable = $("#auiTable").DataTable();
-            // console.log("dataTable: ", dataTable);
+            var filterAndIssueKeys = [];
 
             var sortable = new Sortable(tableBody, {
                 scroll: true,
@@ -56,7 +55,6 @@ Released under the MIT license: http://jsbin.mit-license.org
                 handle: 'tr',
                 sort: true,
                 animation: 150,
-                // dataIdAttr: 'data-id',
                 store: {
                     get: function () {
                         var list = []
@@ -79,23 +77,19 @@ Released under the MIT license: http://jsbin.mit-license.org
                     if (priIndex == tableIndex) {
                         var priInt = parseInt("$pri")
                         issuePriority.html(priInt)
-                        ## $(this).attr("data-id", "$pri")
                     }
                     priIndex += 1;
                 #end
                 tableIndex += 1
             })
 
+            /* def of DataTable */
             var dataTable = $("#auiTable").DataTable({
                 "order": [[ 3, "asc" ]]
             });
 
-            var order = sortable.toArray();
-            // const newOrder = order.sort((a, b) => {
-            //     return +a - +b;
-            // });
-            //
-            // sortable.sort(newOrder)
+
+            var tempDataTable = $('#auiTable').tableToJSON();
 
             updatePriorities("$restriction");
 
@@ -139,6 +133,38 @@ Released under the MIT license: http://jsbin.mit-license.org
                 AJS.$('#auiTable > thead  th[data-override*="'+e.val+'"]').hide();
                 AJS.$('#auiTable > tbody  tr td[class*="'+e.val+'"]').hide();
             });
+
+            var k;
+            AJS.$("#favFilter-select2").on("select2-removing", function(e) {
+                filterAndIssueKeys.forEach(filterAndIssueKey => {
+                    console.log("filter: ", filterAndIssueKey)
+                    if (filterAndIssueKey.filterName ===  e.choice.text ){
+                        // console.log("temp: ", tempDataTable)
+                        tempDataTable.forEach(data => {
+                            if (!filterAndIssueKey.issueKeys.includes(data.key)) {
+                                var rowArray = []
+                                // var data = this.data();
+                                // var initIndex = data[0].indexOf("issueKey") + 10
+                                // var sonrasi = data[0].substring(initIndex, data[0].length)
+                                // var lastIndex = sonrasi.indexOf("<")
+                                // var subString = sonrasi.substring(0, lastIndex)
+                                // console.log("---: ", filterAndIssueKey.issueKeys, subString)
+                                rowArray.push('<a href="$baseUrl/browse/' + data.key + '" ' + 'class="issueKey">' + data.key + '</a>');
+                                rowArray.push(data.Summary)
+                                rowArray.push(data.Description)
+                                rowArray.push(data.Priority)
+                                rowArray.push(data.Created)
+                                rowArray.push(data.Due)
+                                rowArray.push(data.customfield_10500)
+
+                                console.log("rowArray: ", rowArray)
+                                dataTable.row.add(rowArray).draw(true)
+
+                            }
+                        } );
+                    }
+                })
+            });
             AJS.$("#favFilter-select2").on('select2-selecting', function (e) {
                 var data = e.object.text;
                 console.log(data);
@@ -151,14 +177,12 @@ Released under the MIT license: http://jsbin.mit-license.org
                     },
                     async: false,
                     success: function (response, status, jqXHR){
-                        // response.forEach(res => {
-                        //     console.log("res: ", res.getId())
-                        // })
+                        filterAndIssueKeys.push({
+                            "filterName": data,
+                            "issueKeys": response
+                        })
+                        console.log("filterand: ", filterAndIssueKeys)
                         var j;
-
-                        // console.log("...: ", document.getElementById("tableBody").rows[0].cells.namedItem("issueKey").innerText);
-                        //
-                        // var text = document.getElementById("tableBody").rows[0].cells.namedItem("issueKey").innerText;
                         var tableBody = $('#tableBody tr');
                         tableBody.each(function () {
                             var cell = $(this)
@@ -172,9 +196,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                                 }
                             }
                             if (deleteBoolean){
-                                cell.fadeOut(function() {
-                                    cell.remove();
-                                });
+                                dataTable.row(cell).remove().draw();
                             }
                         })
                     },
