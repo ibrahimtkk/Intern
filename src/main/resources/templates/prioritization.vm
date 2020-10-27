@@ -90,9 +90,6 @@ Released under the MIT license: http://jsbin.mit-license.org
                 hiddenColumns.push(i);
             }
 
-            console.log("costomSize: ", "$customFieldsInProject.size()")
-            console.log("hiddenColumns: ", hiddenColumns)
-
             /* def of DataTable */
             var dataTable = $("#auiTable").DataTable({
                 "order": [[ 3, "asc" ]],
@@ -106,9 +103,18 @@ Released under the MIT license: http://jsbin.mit-license.org
                 ]
             });
 
-
             var tempDataTable = $('#auiTable').tableToJSON();
             var jsonDataTable = $('#auiTable').tableToJSON();
+
+
+            console.log("projectLeadList: ", "$projectLeadList")
+            #foreach($cf in $customFieldsInProject)
+                console.log("cf: ", "$cf.getId()")
+            #end
+            var option = new Option("option text", "value");
+            /// jquerify the DOM object 'o' so we can use the html method
+            $(option).html("option text");
+            $("#customFieldList-select2").append(option);
 
             updatePriorities("$restriction");
 
@@ -403,7 +409,7 @@ Released under the MIT license: http://jsbin.mit-license.org
             margin-left: auto;
             margin-right: auto;
             position: center;
-            margin-bottom: auto;
+            margin-bottom: 130px;
             border-collapse: separate;
             border-spacing: 0 10px;
             width: 100%;
