@@ -397,7 +397,6 @@ Released under the MIT license: http://jsbin.mit-license.org
         #buttons{
             text-align: center;
             margin-left:auto;
-            margin-right: auto;
 
         }
         #auiTable{
@@ -432,6 +431,13 @@ Released under the MIT license: http://jsbin.mit-license.org
 
         .dataTables_wrapper .dataTables_filter {
             float: left;
+        }
+        .dataTables_wrapper .dataTables_filter input {
+            font-weight: normal;
+        }
+
+        label {
+            color: #6b778c;
         }
 
 
