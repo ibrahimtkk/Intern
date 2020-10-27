@@ -48,6 +48,7 @@ Released under the MIT license: http://jsbin.mit-license.org
             window.onbeforeunload = null;
 
             var filterAndIssueKeys = [];
+            var defaultIssueList = [];
 
             var sortable = new Sortable(tableBody, {
                 scroll: true,
@@ -69,6 +70,10 @@ Released under the MIT license: http://jsbin.mit-license.org
                     updatePriorities("$restriction");
                 }
             });
+
+            #foreach($issue in $issueList)
+                defaultIssueList.push("$issue.getKey()")
+            #end
 
             var tableIndex = -1;
             $("#auiTable tr").each(function () {
@@ -135,17 +140,9 @@ Released under the MIT license: http://jsbin.mit-license.org
                 var issueKeys =[];
                 jsonDataTable.forEach(cell => {
                     issueKeys.push(cell.key)
+                    console.log("cellkey: ", cell.key)
                 })
-
                 var cfValues=bulkGetCfValuesFromIssue(issueKeys.join(","), e.val);
-                console.log("cfValues: ", cfValues);
-                console.log("issueKeys: ", issueKeys)
-                console.log("e: ", e)
-
-                var columns = dataTable.settings().init().columns;
-                dataTable.columns().every(function (index) {
-                    console.log(this);
-                });
 
                 var index;
                 dataTable.columns()[0].forEach(innerIndex => {
@@ -153,20 +150,18 @@ Released under the MIT license: http://jsbin.mit-license.org
                         index = innerIndex
                     }
                 })
-
                 var array=cfValues.split(",,,");
+
                 dataTable.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
                     var rowData = this.data();
-                    rowData[index] = array[rowIdx]
+                    rowData[index] = array[rowLoop]
                     dataTable.row(rowIdx).data(rowData)
-                    console.log("rowData: ", rowData)
                     this.invalidate()
                 } );
                 dataTable.draw()
                 jsonDataTable = $('#auiTable').tableToJSON();
 
                 dataTable.column( index ).visible( true )
-                // dataTable.column( index ).header().visible( true)
                 dataTable.columns.adjust().draw( true );
             });
             AJS.$("#customFieldList-select2").on("select2-removing", function(e) {
