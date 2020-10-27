@@ -27,7 +27,7 @@ public class Constants {
 
     public static final String departmanJQL ="project ="+ProjectId+" and cf[11507] =currentUser() and status=\"Departman Önceliklendirmesi\" ORDER BY \"Departman Önceliği\"";
     public static final String gmyJQL ="project ="+ProjectId+" and cf[11406]=currentUser() and status = \"Grup/GMY Önceliklendirmesi\" ORDER BY \"Departman Önceliği\"";
-    public static final String arcelikJQL = "";
+    public static final String arcelikJQL = "project = "+ ProjectId;
 
     //public static final String ProjectApproveJQL = "project = "+ProjectId+" AND status=\"CEO Onayı Bekleniyor\" ORDER BY \"Grup / GMY Önceliği\"";
     public static final String ProjectApproveJQL = "project = "+ProjectId+" AND status in (\"CEO Onayı Bekleniyor\",\"Onaylı\") ORDER BY \"Onaylı\"";
@@ -42,8 +42,8 @@ public class Constants {
     public static final String BIRIM_ONCELIK_ID_STRING = "customfield_11403";
     public static final long GMY_ONCELIK_ID = 11501L;
     public static final String GMY_ONCELIK_STRING = "customfield_11501";
-    public static final long PriorityNumber = 10400L;
-    public static final String PriorityNumberString = "customfield_10400";
+    public static final long PriorityNumber = 10600L;
+    public static final String PriorityNumberString = "customfield_10600";
     public static final long ZriorityNumber = 10800L;
     public static final String ZriorityNumberString = "customfield_10800";
 
