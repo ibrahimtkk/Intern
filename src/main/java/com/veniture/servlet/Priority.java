@@ -128,7 +128,7 @@ public class Priority extends HttpServlet {
                 }
                 createdList.add(new SimpleDateFormat("YYYY-MM-dd hh:mm:ss").format(issue.getCreated()));
 
-                CustomField customField = customFieldManager.getCustomFieldObject(10400L);
+                CustomField customField = customFieldManager.getCustomFieldObject(10600L);
                 Double priorityNumber = (Double) customField.getValue(issue);
                 int intPriorityNumber = priorityNumber.intValue();
                 priorityList.add(intPriorityNumber);

@@ -36,6 +36,7 @@ Released under the MIT license: http://jsbin.mit-license.org
 
     <script src="https://cdn.jsdelivr.net/npm/table-to-json@1.0.0/lib/jquery.tabletojson.min.js" integrity="sha256-H8xrCe0tZFi/C2CgxkmiGksqVaxhW0PFcUKZJZo1yNU=" crossorigin="anonymous"></script>
 
+
     <meta charset="utf-8">
     <title>Proje Önceliklendirme</title>
 
@@ -310,12 +311,16 @@ Released under the MIT license: http://jsbin.mit-license.org
 
     <style>
 
+
         #content {
             margin: 12px;
         }
 
         #tableBody>tr {
-            cursor: move;
+            cursor: grab;
+        }
+        #tableBody>tr :active {
+            cursor: grabbing;
         }
 
         #loading-spinner {
@@ -382,6 +387,29 @@ Released under the MIT license: http://jsbin.mit-license.org
             margin-right: auto;
             position: center;
             margin-bottom: 130px;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+            width: 100%;
+        }
+        #auiTable td, #auiTable tr{
+            border: 1px solid #ddd;
+        }
+        #auiTable tr:nth-child(even){background-color: #f2f2f2;}
+
+        #auiTable tr:hover {background-color: #ddd;}
+
+        #auiTable th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #0747a6;
+            color: #deebff;
+        }
+        table.dataTable.no-footer {
+            border-bottom: none;
+        }
+        table.dataTable thead th, table.dataTable thead td {
+            border-bottom: none;
         }
 
 
@@ -499,37 +527,6 @@ Released under the MIT license: http://jsbin.mit-license.org
             </tbody>
         </table>
     </div>
-
-    <table id="example" class="display" style="width:100%">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Position</th>
-                <th>Office</th>
-                <th>Age</th>
-                <th>Start date</th>
-                <th>Salary</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Tiger Nixon</td>
-                <td>System Architect</td>
-                <td>Edinburgh</td>
-                <td>61</td>
-                <td>2011/04/25</td>
-                <td>$320,800</td>
-            </tr>
-            <tr>
-                <td>Garrett Winters</td>
-                <td>Accountant</td>
-                <td>Tokyo</td>
-                <td>63</td>
-                <td>2011/07/25</td>
-                <td>$170,750</td>
-            </tr>
-        </tbody>
-    </table>
 
     #end
 </body>
