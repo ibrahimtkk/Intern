@@ -83,13 +83,31 @@ Released under the MIT license: http://jsbin.mit-license.org
                 tableIndex += 1
             })
 
+            var hiddenColumns = []
+            var i;
+            for (i=6; i<6+parseInt("$customFieldsInProject.size()"); i++){
+                hiddenColumns.push(i);
+            }
+
+            console.log("costomSize: ", "$customFieldsInProject.size()")
+            console.log("hiddenColumns: ", hiddenColumns)
+
             /* def of DataTable */
             var dataTable = $("#auiTable").DataTable({
-                "order": [[ 3, "asc" ]]
+                "order": [[ 3, "asc" ]],
+                "bLengthChange": false,
+                "pageLength": parseInt($issueList.size()),
+                "columnDefs": [
+                    {
+                        "targets": hiddenColumns,
+                        "visible": false
+                    }
+                ]
             });
 
 
             var tempDataTable = $('#auiTable').tableToJSON();
+            var jsonDataTable = $('#auiTable').tableToJSON();
 
             updatePriorities("$restriction");
 
@@ -111,17 +129,21 @@ Released under the MIT license: http://jsbin.mit-license.org
                 var issueCFsectionInTable = AJS.$('#auiTable > tbody  tr td[class*="'+e.val+'"]');
 
                 var issueKeys =[];
-                issueCFsectionInTable.each(function () {
-                    //td'ın parent'ı tr'a gidio sonra tr'ın ilk sütunu yani issue key sütünunu çekio
-                    var issueKey=AJS.$(this).parent().children().first().children().first().prop( "innerHTML" );
-                    issueKeys.push(issueKey);
-                    AJS.$(this).show();
-                });
+                jsonDataTable.forEach(cell => {
+                    issueKeys.push(cell.key)
+                })
+                // issueCFsectionInTable.each(function () {
+                //     //td'ın parent'ı tr'a gidio sonra tr'ın ilk sütunu yani issue key sütünunu çekio
+                //     var issueKey=AJS.$(this).parent().children().first().children().first().prop( "innerHTML" );
+                //     issueKeys.push(issueKey);
+                //     AJS.$(this).show();
+                // });
 
                 var cfValues=bulkGetCfValuesFromIssue(issueKeys.join(","), e.val);
                 console.log("cfValues: ", cfValues);
                 console.log("issueKeys: ", issueKeys)
                 console.log("e: ", e)
+                console.log("issueCFsectionInTable: ", issueCFsectionInTable)
                 //Burada kritik nokta cfValues length ile Table'daki row sayısı mutlaka aynı olmalı !!!
                 var array=cfValues.split(",,,");
                 for(var i = 0; i < array.length; i++) {
@@ -143,22 +165,20 @@ Released under the MIT license: http://jsbin.mit-license.org
                         tempDataTable.forEach(data => {
                             if (!filterAndIssueKey.issueKeys.includes(data.key)) {
                                 var rowArray = []
-                                // var data = this.data();
-                                // var initIndex = data[0].indexOf("issueKey") + 10
-                                // var sonrasi = data[0].substring(initIndex, data[0].length)
-                                // var lastIndex = sonrasi.indexOf("<")
-                                // var subString = sonrasi.substring(0, lastIndex)
-                                // console.log("---: ", filterAndIssueKey.issueKeys, subString)
                                 rowArray.push('<a href="$baseUrl/browse/' + data.key + '" ' + 'class="issueKey">' + data.key + '</a>');
                                 rowArray.push(data.Summary)
                                 rowArray.push(data.Description)
                                 rowArray.push(data.Priority)
                                 rowArray.push(data.Created)
                                 rowArray.push(data.Due)
-                                rowArray.push(data.customfield_10500)
+                                #foreach($cf in $customFieldsInProject)
+                                    rowArray.push('<td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">-</td>')
+                                #end
+
 
                                 console.log("rowArray: ", rowArray)
                                 dataTable.row.add(rowArray).draw(true)
+                                jsonDataTable = $('#auiTable').tableToJSON();
 
                             }
                         } );
