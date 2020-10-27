@@ -164,9 +164,15 @@ Released under the MIT license: http://jsbin.mit-license.org
                 dataTable.columns.adjust().draw( true );
             });
             AJS.$("#customFieldList-select2").on("select2-removing", function(e) {
-                console.log("customField closed")
-                AJS.$('#auiTable > thead  th[data-override*="'+e.val+'"]').hide();
-                AJS.$('#auiTable > tbody  tr td[class*="'+e.val+'"]').hide();
+                console.log("remove e: ", e)
+                var index;
+                dataTable.columns()[0].forEach(innerIndex => {
+                    if (dataTable.column(innerIndex).header().textContent === e.choice.text){
+                        index = innerIndex
+                    }
+                })
+
+                dataTable.column(index).visible(false)
             });
 
             var k;
