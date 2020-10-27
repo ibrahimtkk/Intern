@@ -366,7 +366,7 @@ Released under the MIT license: http://jsbin.mit-license.org
             margin-left: auto;
             margin-right: auto;
             position: center;
-            margin-bottom: 130px;
+            margin-bottom: auto;
             border-collapse: separate;
             border-spacing: 0 10px;
             width: 100%;
