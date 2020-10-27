@@ -430,6 +430,10 @@ Released under the MIT license: http://jsbin.mit-license.org
             border-bottom: none;
         }
 
+        .dataTables_wrapper .dataTables_filter {
+            float: left;
+        }
+
 
     </style>
 </head>
