@@ -126,30 +126,42 @@ Released under the MIT license: http://jsbin.mit-license.org
                 //Header'ı göster
                 AJS.$('#auiTable > thead  th[data-override*="'+e.val+'"]').show();
 
-                //custom Field td'leri çeker bu
-                var issueCFsectionInTable = AJS.$('#auiTable > tbody  tr td[class*="'+e.val+'"]');
-
                 var issueKeys =[];
                 jsonDataTable.forEach(cell => {
                     issueKeys.push(cell.key)
                 })
-                // issueCFsectionInTable.each(function () {
-                //     //td'ın parent'ı tr'a gidio sonra tr'ın ilk sütunu yani issue key sütünunu çekio
-                //     var issueKey=AJS.$(this).parent().children().first().children().first().prop( "innerHTML" );
-                //     issueKeys.push(issueKey);
-                //     AJS.$(this).show();
-                // });
 
                 var cfValues=bulkGetCfValuesFromIssue(issueKeys.join(","), e.val);
                 console.log("cfValues: ", cfValues);
                 console.log("issueKeys: ", issueKeys)
                 console.log("e: ", e)
-                console.log("issueCFsectionInTable: ", issueCFsectionInTable)
-                //Burada kritik nokta cfValues length ile Table'daki row sayısı mutlaka aynı olmalı !!!
+
+                var columns = dataTable.settings().init().columns;
+                dataTable.columns().every(function (index) {
+                    console.log(this);
+                });
+
+                var index;
+                dataTable.columns()[0].forEach(innerIndex => {
+                    if (dataTable.column(innerIndex).header().textContent === e.object.text){
+                        index = innerIndex
+                    }
+                })
+
                 var array=cfValues.split(",,,");
-                for(var i = 0; i < array.length; i++) {
-                    issueCFsectionInTable[i].innerHTML=array[i];
-                }
+                dataTable.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                    var rowData = this.data();
+                    rowData[index] = array[rowIdx]
+                    dataTable.row(rowIdx).data(rowData)
+                    console.log("rowData: ", rowData)
+                    this.invalidate()
+                } );
+                dataTable.draw()
+                jsonDataTable = $('#auiTable').tableToJSON();
+
+                dataTable.column( index ).visible( true )
+                // dataTable.column( index ).header().visible( true)
+                dataTable.columns.adjust().draw( true );
             });
             AJS.$("#customFieldList-select2").on("select2-removing", function(e) {
                 console.log("customField closed")
@@ -492,7 +504,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                     <th class="aui-table-column-unsortable" data-override="Created" id="row1">Oluşturulma Tarihi</th>
                     <th class="aui-table-column-unsortable" data-override="Due" id="row1">Bitiş Tarihi</th>
                     #foreach($cf in $customFieldsInProject)
-                        <th style="display:none; font-weight: bold;" data-override="$cf.getId()">$cf.getName()</th>
+                        <th style="font-weight: bold;" data-override="$cf.getId()">$cf.getName()</th>
                     #end
                 </tr>
             </thead>
@@ -520,7 +532,8 @@ Released under the MIT license: http://jsbin.mit-license.org
                         #end
                     </td>
                     #foreach($cf in $customFieldsInProject)
-                        <td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">-</td>
+##                        <td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">-</td>
+                        <td id="$cf.getId()" name="$cf.getId()" class="$cf.getId()">-</td>
                     #end
                 </tr>
                 #end
