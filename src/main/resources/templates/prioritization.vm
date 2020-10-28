@@ -386,53 +386,74 @@ Released under the MIT license: http://jsbin.mit-license.org
                     }
                 })
             });
+            var beforeSelectedOption = ""
             AJS.$("#favFilter-select2").on('select2-selecting', function (e) {
                 var data = e.object.text;
-                console.log(data);
+                console.log("before: ", beforeSelectedOption)
 
-                jQuery.ajax({
-                    url: AJS.params.baseURL + "/rest/florestservice/1.2/rest/favFilterJQL",
-                    type: 'POST',
-                    data: {
-                        jqlQuery: e.object.text
-                    },
-                    async: false,
-                    success: function (response, status, jqXHR){
-                        filterAndIssueKeys.push({
-                            "filterName": data,
-                            "issueKeys": response
-                        })
-                        console.log("filterand: ", filterAndIssueKeys)
-                        var j;
-                        var tableBody = $('#tableBody tr');
-                        tableBody.each(function () {
-                            var cell = $(this)
-                            var issueKey = $(this).find("td .issueKey")
-                            var deleteBoolean = true;
-                            for (j=0; j<response.length; j++){
-                                if (response[j] === issueKey.text()){
-                                    deleteBoolean = false;
-                                }
-                                else {
-                                }
-                            }
-                            if (deleteBoolean){
-                                dataTable.row(cell).remove().draw();
+                if (e.object.text === "Bir seçenek seçin"){
+                    console.log("1.if")
+                    if (beforeSelectedOption !== "Bir seçenek seçin") {
+                        console.log("2.if")
+                        filterAndIssueKeys.forEach(filterAndIssueKey => {
+                            if (filterAndIssueKey.filterName === beforeSelectedOption) {
+                                tempDataTable.forEach(data => {
+                                    if (!filterAndIssueKey.issueKeys.includes(data.key)) {
+                                        var rowArray = []
+                                        rowArray.push('<a href="$baseUrl/browse/' + data.key + '" ' + 'class="issueKey">' + data.key + '</a>');
+                                        rowArray.push(data.Summary)
+                                        rowArray.push(data.Description)
+                                        rowArray.push(data.Priority)
+                                        rowArray.push(data.Created)
+                                        rowArray.push(data.Due)
+                                        #foreach($cf in $customFieldsInProject)
+                                            rowArray.push('<td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">-</td>')
+                                        #end
+                                        dataTable.row.add(rowArray).draw(true)
+                                    }
+                                });
                             }
                         })
-                        cells = []
-                        dataTable.rows().data().toArray().forEach(function(row) {
-                            var item = {}
-                            row.forEach(function(content, index) {
-                                item[fieldNames[index]] = content
-                            })
-                            cells.push(item)
-                        })
-                    },
-                    error: function (response) {
-                        console.log("errorjql: ", response)
+                        beforeSelectedOption = "Bir seçenek seçin"
                     }
-                })
+                }
+                else {
+                    beforeSelectedOption = e.object.text
+                    jQuery.ajax({
+                        url: AJS.params.baseURL + "/rest/florestservice/1.2/rest/favFilterJQL",
+                        type: 'POST',
+                        data: {
+                            jqlQuery: e.object.text
+                        },
+                        async: false,
+                        success: function (response, status, jqXHR) {
+                            filterAndIssueKeys.push({
+                                "filterName": data,
+                                "issueKeys": response
+                            })
+                            console.log("filterand: ", filterAndIssueKeys)
+                            var j;
+                            var tableBody = $('#tableBody tr');
+                            tableBody.each(function () {
+                                var cell = $(this)
+                                var issueKey = $(this).find("td .issueKey")
+                                var deleteBoolean = true;
+                                for (j = 0; j < response.length; j++) {
+                                    if (response[j] === issueKey.text()) {
+                                        deleteBoolean = false;
+                                    } else {
+                                    }
+                                }
+                                if (deleteBoolean) {
+                                    dataTable.row(cell).remove().draw();
+                                }
+                            })
+                        },
+                        error: function (response) {
+                            console.log("errorjql: ", response)
+                        }
+                    })
+                }
             });
 
             function updatePrioritiesInJIRA(gmyOrBirim) {
@@ -559,8 +580,8 @@ Released under the MIT license: http://jsbin.mit-license.org
                 <div class="aui-group">
                     <div class="aui-item" id="#select2-favFilters">
                         <form class="aui">
-                            <select id="favFilter-select2" data-placeholder="Filtre eklemek için tıklayın" multiple >
-                                <option></option>
+                            <select id="favFilter-select2" data-placeholder="Filtre eklemek için tıklayın" size="1">
+                                <option>Bir seçenek seçin</option>
                                 #foreach($favFilter in $favouriteFilters)
                                     <option value="$favFilter">$favFilter</option>
                                 #end
