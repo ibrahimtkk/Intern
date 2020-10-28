@@ -43,7 +43,6 @@ Released under the MIT license: http://jsbin.mit-license.org
     <meta name="decorator" content="atl.general">
 
     <style>
-
         #content {
             margin: 12px;
         }
@@ -241,29 +240,36 @@ Released under the MIT license: http://jsbin.mit-license.org
                 $(this).toggleClass('selected');
                 var selectKey = $(this).children().first().children().text();
                 if (!selectedRows.includes(selectKey)) {
-                    console.log("seçti")
+                    console.log("1 if içindeyim")
                     for (var i = 0; i < jsonDataTable.length; i++) {
                         if (jsonDataTable[i]['key'] === selectKey) {
+                            console.log("2 if içindeyim")
                             if (isNaN(parseInt(jsonDataTable[i]['Kaynak']))) {
+                                console.log("3 if içindeyim")
                                 kaynakCount = selectedKaynak
                                 alert("Lütfen Kaynak Alanını ekleyin")
+                                $(this).removeClass('selected');
+
                             } else {
-                                console.log("kaynak seçilmiş")
+                                console.log("1 else")
                                 kaynakCount += parseInt(jsonDataTable[i]['Kaynak'])
                                 selectedKaynak = kaynakCount
                                 selectedRows.push(selectKey)
+
                             }
                         }
                     }
+
                 }
                 else {
-                    console.log("bıraktı")
+                    console.log("2 else")
                     var deselectIndex = selectedRows.indexOf(selectKey);
                     if (deselectIndex > -1) {
                         selectedRows.splice(deselectIndex, 1);
                     }
                     for (var i = 0; i < jsonDataTable.length; i++) {
                         if (jsonDataTable[i]['key'] === selectKey) {
+                            console.log("4 if")
                             kaynakCount -= parseInt(jsonDataTable[i]['Kaynak'])
                             selectedKaynak = kaynakCount
                         }
