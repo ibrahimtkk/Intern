@@ -390,6 +390,8 @@ Released under the MIT license: http://jsbin.mit-license.org
             AJS.$("#favFilter-select2").on('select2-selecting', function (e) {
                 var data = e.object.text;
                 console.log("before: ", beforeSelectedOption)
+                console.log("jsonDataTable: ", jsonDataTable)
+                console.log("tempDataTable: ", tempDataTable)
 
                 if (e.object.text === "Bir seçenek seçin"){
                     console.log("1.if")
@@ -397,6 +399,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                         console.log("2.if")
                         filterAndIssueKeys.forEach(filterAndIssueKey => {
                             if (filterAndIssueKey.filterName === beforeSelectedOption) {
+                                console.log("filterAndIssueKey.filterName: ", filterAndIssueKey.filterName)
                                 tempDataTable.forEach(data => {
                                     if (!filterAndIssueKey.issueKeys.includes(data.key)) {
                                         var rowArray = []
@@ -427,13 +430,67 @@ Released under the MIT license: http://jsbin.mit-license.org
                         },
                         async: false,
                         success: function (response, status, jqXHR) {
-                            filterAndIssueKeys.push({
-                                "filterName": data,
-                                "issueKeys": response
+                            var filterBoolean = false;
+                            filterAndIssueKeys.forEach(filterAndIssueKey => {
+                                if (filterAndIssueKey.filterName === data)
+                                    filterBoolean = true
                             })
+                            if (!filterBoolean) {
+                                filterAndIssueKeys.push({
+                                    "filterName": data,
+                                    "issueKeys": response
+                                })
+                            }
                             console.log("filterand: ", filterAndIssueKeys)
+                            console.log("response: ", response)
                             var j;
                             var tableBody = $('#tableBody tr');
+
+                            var partialKeys = []
+                            dataTable.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                                var rowData = this.data();
+                                var subStringRowData = rowData[0].substring(0, rowData[0].length-1)
+                                var lastIndexSlash = subStringRowData.lastIndexOf(">");
+                                var lastIndexBackSlash = subStringRowData.lastIndexOf("<")
+                                var partialKey = subStringRowData.substring(lastIndexSlash+1, lastIndexBackSlash)
+                                partialKeys.push(partialKey)
+                            } );
+
+                            console.log("beforPpartialKeys: ", partialKeys)
+                            response.forEach(responseKey => {
+                                if (!partialKeys.includes(responseKey)){
+                                    tempDataTable.forEach(data => {
+                                        if (data.key === responseKey){
+                                            var rowArray = []
+                                            rowArray.push('<a href="$baseUrl/browse/' + data.key + '" ' + 'class="issueKey">' + data.key + '</a>');
+                                            rowArray.push(data.Summary)
+                                            rowArray.push(data.Description)
+                                            rowArray.push(data.Priority)
+                                            rowArray.push(data.Created)
+                                            rowArray.push(data.Due)
+                                            #foreach($cf in $customFieldsInProject)
+                                                rowArray.push('<td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">-</td>')
+                                            #end
+                                            dataTable.row.add(rowArray).draw(true)
+                                        }
+                                    })
+                                }
+                            })
+                            ## tempDataTable.forEach(data => {
+                            ##     if (!partialKeys.includes(data.key)) {
+                            ##         var rowArray = []
+                            ##         rowArray.push('<a href="$baseUrl/browse/' + data.key + '" ' + 'class="issueKey">' + data.key + '</a>');
+                            ##         rowArray.push(data.Summary)
+                            ##         rowArray.push(data.Description)
+                            ##         rowArray.push(data.Priority)
+                            ##         rowArray.push(data.Created)
+                            ##         rowArray.push(data.Due)
+                            ##         #foreach($cf in $customFieldsInProject)
+                            ##             rowArray.push('<td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">-</td>')
+                            ##         #end
+                            ##         dataTable.row.add(rowArray).draw(true)
+                            ##     }
+                            ## });
                             tableBody.each(function () {
                                 var cell = $(this)
                                 var issueKey = $(this).find("td .issueKey")
@@ -448,6 +505,17 @@ Released under the MIT license: http://jsbin.mit-license.org
                                     dataTable.row(cell).remove().draw();
                                 }
                             })
+
+                            partialKeys = []
+                            dataTable.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                                var rowData = this.data();
+                                var subStringRowData = rowData[0].substring(0, rowData[0].length-1)
+                                var lastIndexSlash = subStringRowData.lastIndexOf(">");
+                                var lastIndexBackSlash = subStringRowData.lastIndexOf("<")
+                                var partialKey = subStringRowData.substring(lastIndexSlash+1, lastIndexBackSlash)
+                                partialKeys.push(partialKey)
+                            } );
+                            console.log("afterPartialKeys: ", partialKeys)
                         },
                         error: function (response) {
                             console.log("errorjql: ", response)
