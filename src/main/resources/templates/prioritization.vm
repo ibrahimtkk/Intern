@@ -241,20 +241,23 @@ Released under the MIT license: http://jsbin.mit-license.org
                 $(this).toggleClass('selected');
                 var selectKey = $(this).children().first().children().text();
                 if (!selectedRows.includes(selectKey)) {
-                    selectedRows.push(selectKey)
+                    console.log("seçti")
                     for (var i = 0; i < jsonDataTable.length; i++) {
                         if (jsonDataTable[i]['key'] === selectKey) {
                             if (isNaN(parseInt(jsonDataTable[i]['Kaynak']))) {
                                 kaynakCount = selectedKaynak
                                 alert("Lütfen Kaynak Alanını ekleyin")
                             } else {
+                                console.log("kaynak seçilmiş")
                                 kaynakCount += parseInt(jsonDataTable[i]['Kaynak'])
                                 selectedKaynak = kaynakCount
+                                selectedRows.push(selectKey)
                             }
                         }
                     }
                 }
                 else {
+                    console.log("bıraktı")
                     var deselectIndex = selectedRows.indexOf(selectKey);
                     if (deselectIndex > -1) {
                         selectedRows.splice(deselectIndex, 1);
@@ -267,6 +270,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                     }
                 }
                 $("#kaynakMiktari").text(kaynakCount)
+                console.log("selectedRows: ", selectedRows)
                 console.log("kaynak>Count: ", kaynakCount)
                 console.log("selectedKaynak: ", selectedKaynak)
             } );
