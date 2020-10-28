@@ -245,7 +245,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                         if (jsonDataTable[i]['key'] === selectKey) {
 
                             if (isNaN(parseInt(jsonDataTable[i]['Kaynak']))) {
-                                console.log("3 if içindeyim")
+
                                 kaynakCount = selectedKaynak
                                 alert("Lütfen Kaynak Alanını ekleyin")
                                 $(this).removeClass('selected');
