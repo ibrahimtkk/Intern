@@ -42,6 +42,123 @@ Released under the MIT license: http://jsbin.mit-license.org
 
     <meta name="decorator" content="atl.general">
 
+    <style>
+
+        #content {
+            margin: 12px;
+        }
+
+        #tableBody>tr {
+            cursor: grab;
+        }
+        #tableBody>tr :active {
+            cursor: grabbing;
+        }
+
+        #loading-spinner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .might-overflow {
+            text-overflow: ellipsis;
+            overflow : hidden;
+            white-space: nowrap;
+        }
+
+        .might-overflow:hover {
+            text-overflow: clip;
+            white-space: normal;
+            word-break: break-all;
+        }
+
+        #loading-spinner aui-spinner {
+            margin: 1em;
+        }
+
+        .custom-card-style {
+            border-radius: 3px;
+            box-shadow:
+                    0 1px 1px rgba(9, 30, 66, 0.25),
+                    0 0 1px 0 rgba(9, 30, 66, 0.31);
+            margin: 0 auto;
+            padding: 10px;
+            width: 20em;
+        }
+
+        td {
+            min-width:15px;
+            max-width:100px;
+        }
+        #row1{
+            font-weight: bold;
+            text-align: left;
+            font-size: 13px;
+        }
+        #shadow:hover {
+            background-color: #f5f5f5;
+            padding: 10px;
+        }
+        .aui-help-content{
+            margin-bottom: 60px;
+        }
+        .row{
+            margin-bottom: 60px;
+        }
+        #buttons{
+            text-align: center;
+            margin-left:auto;
+        }
+        #auiTable{
+            margin-left: auto;
+            margin-right: auto;
+            position: center;
+            margin-bottom: 130px;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+            width: 100%;
+        }
+        #auiTable td, #auiTable tr{
+            border: 1px solid #ddd;
+        }
+        /*#auiTable tr:nth-child(even){background-color: #f2f2f2;}*/
+
+        /*table.dataTable tbody tr.selected {*/
+        /*    color: #6dc4e7;*/
+        /*}*/
+
+        #auiTable tr:hover {background-color: #ddd;}
+
+        #auiTable th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #0747a6;
+            color: #deebff;
+        }
+        table.dataTable.no-footer {
+            border-bottom: none;
+        }
+        table.dataTable thead th, table.dataTable thead td {
+            border-bottom: none;
+        }
+
+        .dataTables_wrapper .dataTables_filter {
+            float: left;
+        }
+        .dataTables_wrapper .dataTables_filter input {
+            font-weight: normal;
+        }
+
+        label {
+            color: #6b778c;
+        }
+
+
+    </style>
+
     <script>
         // create
         AJS.$(document).ready(function () {
@@ -49,6 +166,7 @@ Released under the MIT license: http://jsbin.mit-license.org
 
             var filterAndIssueKeys = [];
             var defaultIssueList = [];
+            // var fieldNames =  [], cells = []
 
             var sortable = new Sortable(tableBody, {
                 scroll: true,
@@ -97,10 +215,14 @@ Released under the MIT license: http://jsbin.mit-license.org
 
             /* def of DataTable */
             var dataTable = $("#auiTable").DataTable({
-                "order": [[ 3, "asc" ]],
-                "bLengthChange": false,
-                "pageLength": parseInt($issueList.size()),
-                "columnDefs": [
+                order: [[ 3, "asc" ]],
+                bLengthChange: false,
+                bPaginate: false,
+                bInfo: false,
+                bAutoWidth: false,
+                // "bFilter": false,
+                pageLength: parseInt($issueList.size()),
+                columnDefs: [
                     {
                         "targets": hiddenColumns,
                         "visible": false
@@ -112,14 +234,64 @@ Released under the MIT license: http://jsbin.mit-license.org
             var jsonDataTable = $('#auiTable').tableToJSON();
 
 
-            console.log("projectLeadList: ", "$projectLeadList")
-            #foreach($cf in $customFieldsInProject)
-                console.log("cf: ", "$cf.getId()")
-            #end
-            var option = new Option("option text", "value");
-            /// jquerify the DOM object 'o' so we can use the html method
-            $(option).html("option text");
-            $("#customFieldList-select2").append(option);
+            var kaynakCount = 0;
+            var selectedKaynak = JSON.parse(JSON.stringify(kaynakCount))
+            var selectedRows = []
+            $('#auiTable tbody').on( 'click', 'tr', function () {
+                $(this).toggleClass('selected');
+                var selectKey = $(this).children().first().children().text();
+                if (!selectedRows.includes(selectKey)) {
+                    selectedRows.push(selectKey)
+                    for (var i = 0; i < jsonDataTable.length; i++) {
+                        if (jsonDataTable[i]['key'] === selectKey) {
+                            if (isNaN(parseInt(jsonDataTable[i]['Kaynak']))) {
+                                kaynakCount = selectedKaynak
+                                alert("Lütfen Kaynak Alanını ekleyin")
+                            } else {
+                                kaynakCount += parseInt(jsonDataTable[i]['Kaynak'])
+                                selectedKaynak = kaynakCount
+                            }
+                        }
+                    }
+                }
+                else {
+                    var deselectIndex = selectedRows.indexOf(selectKey);
+                    if (deselectIndex > -1) {
+                        selectedRows.splice(deselectIndex, 1);
+                    }
+                    for (var i = 0; i < jsonDataTable.length; i++) {
+                        if (jsonDataTable[i]['key'] === selectKey) {
+                            kaynakCount -= parseInt(jsonDataTable[i]['Kaynak'])
+                            selectedKaynak = kaynakCount
+                        }
+                    }
+                }
+                $("#kaynakMiktari").text(kaynakCount)
+                console.log("kaynak>Count: ", kaynakCount)
+                console.log("selectedKaynak: ", selectedKaynak)
+            } );
+
+            // console.log("111")
+            //
+            // dataTable
+            //         .on( 'select', function ( e, dt, type, indexes ) {
+            //             var rowData = dataTable.rows( indexes ).data().toArray();
+            //             console.log("rowDataSelect:", rowData, e, dt, type, indexes)
+            //         } )
+            //         .on( 'deselect', function ( e, dt, type, indexes ) {
+            //             var rowData = dataTable.rows( indexes ).data().toArray();
+            //             console.log("rowDataDeselect: ", rowData, e, dt, type, indexes)
+            //         } );
+            //
+            // $('#auiTable').on( 'select', function ( e, dt, type, indexes ) {
+            //     console.log("seleeect")
+            //     if ( type === 'row' ) {
+            //         kod=dataTable.rows( {selected:true} ).data();
+            //         kodorder=kod[0][0];
+            //         alert('orders kod is:'+kodorder);
+            //     }
+            // });
+
 
             updatePriorities("$restriction");
 
@@ -140,8 +312,8 @@ Released under the MIT license: http://jsbin.mit-license.org
                 var issueKeys =[];
                 jsonDataTable.forEach(cell => {
                     issueKeys.push(cell.key)
-                    console.log("cellkey: ", cell.key)
                 })
+
                 var cfValues=bulkGetCfValuesFromIssue(issueKeys.join(","), e.val);
 
                 var index;
@@ -156,18 +328,22 @@ Released under the MIT license: http://jsbin.mit-license.org
                     var rowData = this.data();
                     rowData[index] = array[rowLoop]
                     dataTable.row(rowIdx).data(rowData)
+                    jsonDataTable[rowLoop][e.object.text] = array[rowLoop]
                     this.invalidate()
                 } );
                 dataTable.draw()
-                jsonDataTable = $('#auiTable').tableToJSON();
 
                 dataTable.column( index ).visible( true )
                 dataTable.columns.adjust().draw( true );
             });
             AJS.$("#customFieldList-select2").on("select2-removing", function(e) {
-                console.log("remove e: ", e)
+                fieldNames = []
+                dataTable.settings().columns()[0].forEach(function(index) {
+                    fieldNames.push($(dataTable.column(index).header()).text())
+                })
                 var index;
                 dataTable.columns()[0].forEach(innerIndex => {
+                    delete jsonDataTable[innerIndex][e.choice.text]
                     if (dataTable.column(innerIndex).header().textContent === e.choice.text){
                         index = innerIndex
                     }
@@ -194,12 +370,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                                 #foreach($cf in $customFieldsInProject)
                                     rowArray.push('<td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">-</td>')
                                 #end
-
-
-                                console.log("rowArray: ", rowArray)
                                 dataTable.row.add(rowArray).draw(true)
-                                jsonDataTable = $('#auiTable').tableToJSON();
-
                             }
                         } );
                     }
@@ -238,6 +409,14 @@ Released under the MIT license: http://jsbin.mit-license.org
                             if (deleteBoolean){
                                 dataTable.row(cell).remove().draw();
                             }
+                        })
+                        cells = []
+                        dataTable.rows().data().toArray().forEach(function(row) {
+                            var item = {}
+                            row.forEach(function(content, index) {
+                                item[fieldNames[index]] = content
+                            })
+                            cells.push(item)
                         })
                     },
                     error: function (response) {
@@ -328,121 +507,7 @@ Released under the MIT license: http://jsbin.mit-license.org
         });
     </script>
 
-    <style>
 
-
-        #content {
-            margin: 12px;
-        }
-
-        #tableBody>tr {
-            cursor: grab;
-        }
-        #tableBody>tr :active {
-            cursor: grabbing;
-        }
-
-        #loading-spinner {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .might-overflow {
-            text-overflow: ellipsis;
-            overflow : hidden;
-            white-space: nowrap;
-        }
-
-        .might-overflow:hover {
-            text-overflow: clip;
-            white-space: normal;
-            word-break: break-all;
-        }
-
-        #loading-spinner aui-spinner {
-            margin: 1em;
-        }
-
-        .custom-card-style {
-            border-radius: 3px;
-            box-shadow:
-                    0 1px 1px rgba(9, 30, 66, 0.25),
-                    0 0 1px 0 rgba(9, 30, 66, 0.31);
-            margin: 0 auto;
-            padding: 10px;
-            width: 20em;
-        }
-
-        td {
-            min-width:15px;
-            max-width:100px;
-        }
-        #row1{
-            font-weight: bold;
-            text-align: left;
-            font-size: 13px;
-        }
-        #shadow:hover {
-            background-color: #f5f5f5;
-            padding: 10px;
-
-        }
-        .aui-help-content{
-            margin-bottom: 60px;
-        }
-        .row{
-            margin-bottom: 60px;
-        }
-        #buttons{
-            text-align: center;
-            margin-left:auto;
-
-        }
-        #auiTable{
-            margin-left: auto;
-            margin-right: auto;
-            position: center;
-            margin-bottom: 130px;
-            border-collapse: separate;
-            border-spacing: 0 10px;
-            width: 100%;
-        }
-        #auiTable td, #auiTable tr{
-            border: 1px solid #ddd;
-        }
-        #auiTable tr:nth-child(even){background-color: #f2f2f2;}
-
-        #auiTable tr:hover {background-color: #ddd;}
-
-        #auiTable th {
-            padding-top: 12px;
-            padding-bottom: 12px;
-            text-align: left;
-            background-color: #0747a6;
-            color: #deebff;
-        }
-        table.dataTable.no-footer {
-            border-bottom: none;
-        }
-        table.dataTable thead th, table.dataTable thead td {
-            border-bottom: none;
-        }
-
-        .dataTables_wrapper .dataTables_filter {
-            float: left;
-        }
-        .dataTables_wrapper .dataTables_filter input {
-            font-weight: normal;
-        }
-
-        label {
-            color: #6b778c;
-        }
-
-
-    </style>
 </head>
 <body>
     #if( $issues.isEmpty() )
@@ -556,6 +621,10 @@ Released under the MIT license: http://jsbin.mit-license.org
                 #end
             </tbody>
         </table>
+
+        <br><br>
+        <p style="display:inline">Kaynakk: </p>
+        <p id="kaynakMiktari" style="display:inline"></p>
     </div>
 
     #end
