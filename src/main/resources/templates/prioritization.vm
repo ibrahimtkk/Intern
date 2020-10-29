@@ -219,7 +219,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                 bPaginate: false,
                 bInfo: false,
                 bAutoWidth: false,
-                // "bFilter": false,
+                bFilter: false,
                 pageLength: parseInt($issueList.size()),
                 columnDefs: [
                     {
@@ -233,27 +233,28 @@ Released under the MIT license: http://jsbin.mit-license.org
             var jsonDataTable = $('#auiTable').tableToJSON();
 
 
-            var kaynakCount = 0;
-            var selectedKaynak = JSON.parse(JSON.stringify(kaynakCount))
+            var butceCount = 0;
+            var selectedButce = JSON.parse(JSON.stringify(butceCount))
             var selectedRows = []
             $('#auiTable tbody').on( 'click', 'tr', function () {
                 $(this).toggleClass('selected');
+                console.log("jsonDataTable: ", jsonDataTable);
                 var selectKey = $(this).children().first().children().text();
                 if (!selectedRows.includes(selectKey)) {
 
                     for (var i = 0; i < jsonDataTable.length; i++) {
                         if (jsonDataTable[i]['key'] === selectKey) {
 
-                            if (isNaN(parseInt(jsonDataTable[i]['Kaynak']))) {
+                            if (isNaN(parseInt(jsonDataTable[i]['Bütçe']))) {
 
-                                kaynakCount = selectedKaynak
-                                alert("Lütfen Kaynak Alanını ekleyin")
+                                butceCount = selectedButce
+                                alert("Lütfen Bütçe Alanını ekleyin")
                                 $(this).removeClass('selected');
 
                             } else {
 
-                                kaynakCount += parseInt(jsonDataTable[i]['Kaynak'])
-                                selectedKaynak = kaynakCount
+                                butceCount += parseInt(jsonDataTable[i]['Bütçe'])
+                                selectedButce = butceCount
                                 selectedRows.push(selectKey)
 
                             }
@@ -270,15 +271,15 @@ Released under the MIT license: http://jsbin.mit-license.org
                     for (var i = 0; i < jsonDataTable.length; i++) {
                         if (jsonDataTable[i]['key'] === selectKey) {
 
-                            kaynakCount -= parseInt(jsonDataTable[i]['Kaynak'])
-                            selectedKaynak = kaynakCount
+                            butceCount -= parseInt(jsonDataTable[i]['Bütçe'])
+                            selectedButce = butceCount
                         }
                     }
                 }
-                $("#kaynakMiktari").text(kaynakCount)
+                $("#butceMiktari").text(butceCount)
                 console.log("selectedRows: ", selectedRows)
-                console.log("kaynak>Count: ", kaynakCount)
-                console.log("selectedKaynak: ", selectedKaynak)
+                console.log("butce>Count: ", butceCount)
+                console.log("selectedButce: ", selectedButce)
             } );
 
             // console.log("111")
@@ -324,27 +325,57 @@ Released under the MIT license: http://jsbin.mit-license.org
                     issueKeys.push(cell.key)
                 })
 
-                var cfValues=bulkGetCfValuesFromIssue(issueKeys.join(","), e.val);
 
-                var index;
-                dataTable.columns()[0].forEach(innerIndex => {
-                    if (dataTable.column(innerIndex).header().textContent === e.object.text){
-                        index = innerIndex
-                    }
-                })
-                var array=cfValues.split(",,,");
+                ## var projectLeadArray = []
+                ## #foreach($lead in $projectLeadList)
+                ##     projectLeadArray.push("$lead.user().firstName $lead.user().lastName()")
+                ## #end
 
-                dataTable.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
-                    var rowData = this.data();
-                    rowData[index] = array[rowLoop]
-                    dataTable.row(rowIdx).data(rowData)
-                    jsonDataTable[rowLoop][e.object.text] = array[rowLoop]
-                    this.invalidate()
-                } );
-                dataTable.draw()
+                // if (e.object.id === "projectLeader"){
+                //
+                //     var index;
+                //     dataTable.columns()[0].forEach(innerIndex => {
+                //         console.log("dataTable.column(innerIndex).header().textContent: ", dataTable.column(innerIndex).header())
+                //         if (dataTable.column(innerIndex).header().textContent === "Proje Lideri") {
+                //             index = innerIndex
+                //         }
+                //     })
+                //
+                //     // console.log("indexx: ", index)
+                //     //
+                //     // dataTable.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                //     //     var rowData = this.data();
+                //     //     rowData[index] = array[rowLoop]
+                //     //     dataTable.row(rowIdx).data(rowData)
+                //     //     jsonDataTable[rowLoop][e.object.text] = projectLeadArray[rowLoop]
+                //     //     this.invalidate()
+                //     // });
+                //     // dataTable.draw()
+                // }
+                // else {
 
-                dataTable.column( index ).visible( true )
-                dataTable.columns.adjust().draw( true );
+                    var cfValues = bulkGetCfValuesFromIssue(issueKeys.join(","), e.val);
+
+                    var index;
+                    dataTable.columns()[0].forEach(innerIndex => {
+                        if (dataTable.column(innerIndex).header().textContent === e.object.text) {
+                            index = innerIndex
+                        }
+                    })
+                    var array = cfValues.split(",,,");
+
+                    dataTable.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                        var rowData = this.data();
+                        rowData[index] = array[rowLoop]
+                        dataTable.row(rowIdx).data(rowData)
+                        jsonDataTable[rowLoop][e.object.text] = array[rowLoop]
+                        this.invalidate()
+                    });
+                    dataTable.draw()
+
+                    dataTable.column(index).visible(true)
+                    dataTable.columns.adjust().draw(true);
+                // }
             });
             AJS.$("#customFieldList-select2").on("select2-removing", function(e) {
                 fieldNames = []
@@ -639,6 +670,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                                 #foreach($cf in $customFieldsInProject)
                                     <option value="$cf.getId()">$cf.getName()</option>
                                 #end
+##                                <option id="projectLeader" name="projectLeader" value="projectLeader">Proje Lideri</option>
                             </select>
                         </form>
                     </div>
@@ -687,6 +719,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                     #foreach($cf in $customFieldsInProject)
                         <th style="font-weight: bold;" data-override="$cf.getId()">$cf.getName()</th>
                     #end
+##                    <th style="font-weight: bold;" data-override="Lead" id="row1">Proje Lideri</th>
                 </tr>
             </thead>
 
@@ -716,14 +749,17 @@ Released under the MIT license: http://jsbin.mit-license.org
 ##                        <td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">-</td>
                         <td id="$cf.getId()" name="$cf.getId()" class="$cf.getId()">-</td>
                     #end
+##                    #foreach($lead in $projectLeadList)
+##                        <td id="projectLeader" name="projectLeader">-</td>
+##                    #end
                 </tr>
                 #end
             </tbody>
         </table>
 
         <br><br>
-        <p style="display:inline">Kaynakk: </p>
-        <p id="kaynakMiktari" style="display:inline"></p>
+        <p style="display:inline">Butce: </p>
+        <p id="butceMiktari" style="display:inline"></p>
     </div>
 
     #end

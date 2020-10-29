@@ -45,8 +45,14 @@ public class Constants {
     public static final String GMY_ONCELIK_STRING = "customfield_11501";
     public static final long PriorityNumber = 10400L;
     public static final String PriorityNumberString = "customfield_10400";
-    public static final long ZriorityNumber = 10500L;
-    public static final String ZriorityNumberString = "customfield_10500";
+    public static final long ProjeLideri = 10700L;
+    public static final String ProjeLideriString = "customfield_10700";
+    public static final long ProjeIsmi = 10701L;
+    public static final String ProjeIsmiString = "customfield_10701";
+    public static final long BaslangicTarihi = 10703L;
+    public static final String BaslangicTarihiString = "customfield_10703";
+    public static final long BitisTarihi = 10704L;
+    public static final String BitisTarihiString = "customfield_10704";
 
     //Veniture Jira eski Ortam
     public static final String WFA = "project = FP AND issuetype = \"Project Card\" AND status = \"Waiting for approval\"";

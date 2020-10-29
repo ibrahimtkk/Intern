@@ -7,11 +7,16 @@ import com.atlassian.jira.component.pico.ComponentManager;
 import com.atlassian.jira.favourites.FavouritesManager;
 import com.atlassian.jira.issue.CustomFieldManager;
 import com.atlassian.jira.issue.Issue;
+import com.atlassian.jira.issue.ModifiedValue;
+import com.atlassian.jira.issue.MutableIssue;
+import com.atlassian.jira.issue.customfields.option.Option;
+import com.atlassian.jira.issue.customfields.option.Options;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.search.SearchException;
 import com.atlassian.jira.issue.search.SearchRequest;
 import com.atlassian.jira.issue.search.SearchRequestManager;
 import com.atlassian.jira.issue.search.SearchResults;
+import com.atlassian.jira.issue.util.DefaultIssueChangeHolder;
 import com.atlassian.jira.jql.parser.JqlParseException;
 import com.atlassian.jira.jql.parser.JqlQueryParser;
 import com.atlassian.jira.portal.PortalPage;
@@ -116,7 +121,6 @@ public class Priority extends HttpServlet {
             List dueDateList = new ArrayList();
             List createdList = new ArrayList();
             List priorityList = new ArrayList();
-            List projectLeadList = new ArrayList();
             CustomFieldManager customFieldManager=ComponentAccessor.getCustomFieldManager();
 
             results.getResults().forEach(issue1 -> {
@@ -128,17 +132,27 @@ public class Priority extends HttpServlet {
                 }
                 createdList.add(new SimpleDateFormat("YYYY-MM-dd hh:mm:ss").format(issue.getCreated()));
 
-                CustomField customField = customFieldManager.getCustomFieldObject(10400L);
+                CustomField customField = customFieldManager.getCustomFieldObject(Constants.PriorityNumber);
                 Double priorityNumber = (Double) customField.getValue(issue);
                 int intPriorityNumber = priorityNumber.intValue();
                 priorityList.add(intPriorityNumber);
 
                 Project project = issue.getProjectObject();
                 ApplicationUser projectLead = project.getProjectLead();
-                projectLeadList.add(projectLead);
+
+                // Proje Lideri
+                customField = customFieldManager.getCustomFieldObject(Constants.ProjeLideri);
+                ModifiedValue modifiedValue = new ModifiedValue(customField.getValue(issue), projectLead.getDisplayName());
+                customField.updateValue(null, issue, modifiedValue, new DefaultIssueChangeHolder());
+
+                //Proje Ismi
+                customField = customFieldManager.getCustomFieldObject(Constants.ProjeIsmi);
+                modifiedValue = new ModifiedValue(customField.getValue(issue), project.getName());
+                customField.updateValue(null, issue, modifiedValue, new DefaultIssueChangeHolder());
             });
             List<CustomField> customFieldsInProject = new GetCustomFieldsInExcel().invoke();
             List<Issue> issueList = results.getResults();
+
 
             context.put("issues", results.getResults());
             context.put("issueList", results.getResults());
@@ -152,7 +166,6 @@ public class Priority extends HttpServlet {
             context.put("dueDateList", dueDateList);
             context.put("createdList", createdList);
             context.put("priorityList", priorityList);
-            context.put("projectLeadList", projectLeadList);
 
             resp.setContentType("text/html;charset=utf-8");
             templateRenderer.render(PRIORITIZATION_SCREEN_TEMPLATE, context, resp.getWriter());
