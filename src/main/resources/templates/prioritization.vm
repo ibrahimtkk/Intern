@@ -277,9 +277,22 @@ Released under the MIT license: http://jsbin.mit-license.org
                     }
                 }
                 $("#butceMiktari").text(butceCount)
-                console.log("selectedRows: ", selectedRows)
-                console.log("butce>Count: ", butceCount)
-                console.log("selectedButce: ", selectedButce)
+
+
+                var kisit = $("#butceInput").val();
+
+                if (parseInt(butceCount) <= parseInt(kisit)){
+                    $("#butceMiktari").css("color","green")
+
+                }else if(parseInt(butceCount) > parseInt(kisit)){
+                    $("#butceMiktari").css("color","red")
+                }else{
+                    $("#butceMiktari").css("color","black")
+                }
+
+                // console.log("selectedRows: ", selectedRows)
+                // console.log("butce>Count: ", butceCount)
+                // console.log("selectedButce: ", selectedButce)
             } );
 
             // console.log("111")
@@ -565,6 +578,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                 }
             });
 
+
             function updatePrioritiesInJIRA(gmyOrBirim) {
                 var table = $('#auiTable').tableToJSON({
                     ignoreEmptyRows : true,
@@ -600,7 +614,6 @@ Released under the MIT license: http://jsbin.mit-license.org
                     }
                 });
             }
-
             function bulkGetCfValuesFromIssue(issueKeys, customfieldId){
                 var value="-";
                 jQuery.ajax({
@@ -743,6 +756,10 @@ Released under the MIT license: http://jsbin.mit-license.org
         </div>
     </div>
 
+<div style="float: right">
+    <label style="display:inline">Butce: </label>
+    <p id="butceMiktari" style="display:inline"></p>
+</div>
     <div class="aui-group list-group" id="tableDiv">
         <table class="aui aui-table-list" id="auiTable" >
             <thead>
@@ -793,12 +810,12 @@ Released under the MIT license: http://jsbin.mit-license.org
                 #end
             </tbody>
         </table>
-
-        <br><br>
-        <p style="display:inline">Butce: </p>
-        <p id="butceMiktari" style="display:inline"></p>
     </div>
 
     #end
+
+
+
+
 </body>
 </html>
