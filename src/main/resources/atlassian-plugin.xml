@@ -12,6 +12,7 @@
   <web-resource key="PortfolioManagement-resources" name="PortfolioManagement Web Resources"> 
     <dependency>com.atlassian.auiplugin:ajs</dependency>
     <dependency>com.atlassian.auiplugin:aui-select2</dependency>
+    <dependency>com.atlassian.auiplugin:aui-date-picker</dependency>
     <context>atl.general</context> 
   </web-resource>
     <web-item key="prioritization-gmy-webitem" name="Öncelik" section="system.top.navigation.bar" weight="200">

@@ -308,6 +308,9 @@ Released under the MIT license: http://jsbin.mit-license.org
 
             AJS.$("#customFieldList-select2").auiSelect2();
             AJS.$("#favFilter-select2").auiSelect2();
+            AJS.$("#constraintList-select2").auiSelect2();
+            AJS.$("#baslangicTarihiInput").datePicker({'overrideBrowserDefault': true});
+            AJS.$("#bitisTarihiInput").datePicker({'overrideBrowserDefault': true});
 
             AJS.$('#kaydetButton').off().on("click", function (e) {
                 var params = new window.URLSearchParams(window.location.search);
@@ -325,57 +328,27 @@ Released under the MIT license: http://jsbin.mit-license.org
                     issueKeys.push(cell.key)
                 })
 
+                var cfValues = bulkGetCfValuesFromIssue(issueKeys.join(","), e.val);
 
-                ## var projectLeadArray = []
-                ## #foreach($lead in $projectLeadList)
-                ##     projectLeadArray.push("$lead.user().firstName $lead.user().lastName()")
-                ## #end
+                var index;
+                dataTable.columns()[0].forEach(innerIndex => {
+                    if (dataTable.column(innerIndex).header().textContent === e.object.text) {
+                        index = innerIndex
+                    }
+                })
+                var array = cfValues.split(",,,");
 
-                // if (e.object.id === "projectLeader"){
-                //
-                //     var index;
-                //     dataTable.columns()[0].forEach(innerIndex => {
-                //         console.log("dataTable.column(innerIndex).header().textContent: ", dataTable.column(innerIndex).header())
-                //         if (dataTable.column(innerIndex).header().textContent === "Proje Lideri") {
-                //             index = innerIndex
-                //         }
-                //     })
-                //
-                //     // console.log("indexx: ", index)
-                //     //
-                //     // dataTable.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                //     //     var rowData = this.data();
-                //     //     rowData[index] = array[rowLoop]
-                //     //     dataTable.row(rowIdx).data(rowData)
-                //     //     jsonDataTable[rowLoop][e.object.text] = projectLeadArray[rowLoop]
-                //     //     this.invalidate()
-                //     // });
-                //     // dataTable.draw()
-                // }
-                // else {
+                dataTable.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    var rowData = this.data();
+                    rowData[index] = array[rowLoop]
+                    dataTable.row(rowIdx).data(rowData)
+                    jsonDataTable[rowLoop][e.object.text] = array[rowLoop]
+                    this.invalidate()
+                });
+                dataTable.draw()
 
-                    var cfValues = bulkGetCfValuesFromIssue(issueKeys.join(","), e.val);
-
-                    var index;
-                    dataTable.columns()[0].forEach(innerIndex => {
-                        if (dataTable.column(innerIndex).header().textContent === e.object.text) {
-                            index = innerIndex
-                        }
-                    })
-                    var array = cfValues.split(",,,");
-
-                    dataTable.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                        var rowData = this.data();
-                        rowData[index] = array[rowLoop]
-                        dataTable.row(rowIdx).data(rowData)
-                        jsonDataTable[rowLoop][e.object.text] = array[rowLoop]
-                        this.invalidate()
-                    });
-                    dataTable.draw()
-
-                    dataTable.column(index).visible(true)
-                    dataTable.columns.adjust().draw(true);
-                // }
+                dataTable.column(index).visible(true)
+                dataTable.columns.adjust().draw(true);
             });
             AJS.$("#customFieldList-select2").on("select2-removing", function(e) {
                 fieldNames = []
@@ -383,8 +356,15 @@ Released under the MIT license: http://jsbin.mit-license.org
                     fieldNames.push($(dataTable.column(index).header()).text())
                 })
                 var index;
-                dataTable.columns()[0].forEach(innerIndex => {
+                // dataTable.columns()[0].forEach(innerIndex => {
+                dataTable.rows().every( function ( rowIdx, tableLoop, innerIndex ) {
+                    console.log("innerIndex: ", innerIndex)
+                    console.log("befJsonDataTable: ", jsonDataTable)
+                    console.log("jsonDataTable[innerIndex]", jsonDataTable[innerIndex])
                     delete jsonDataTable[innerIndex][e.choice.text]
+                    console.log("aftjson: ", jsonDataTable)
+                })
+                dataTable.columns()[0].forEach(innerIndex => {
                     if (dataTable.column(innerIndex).header().textContent === e.choice.text){
                         index = innerIndex
                     }
@@ -555,6 +535,36 @@ Released under the MIT license: http://jsbin.mit-license.org
                 }
             });
 
+            AJS.$("#constraintList-select2").on('select2-selecting', function (e) {
+                if (e.object.text === "Bütçe"){
+                    $("#butceInput").css("visibility", "visible");
+                    $("#butceLabel").css("visibility", "visible");
+                }
+                else if (e.object.text === "Başlangıç Tarihi"){
+                    $("#baslangicTarihiInput").css("visibility", "visible");
+                    $("#baslangicTarihiLabel").css("visibility", "visible");
+                }
+                else if (e.object.text === "Bitiş Tarihi"){
+                    $("#bitisTarihiInput").css("visibility", "visible");
+                    $("#bitisTarihiLabel").css("visibility", "visible");
+                }
+            });
+
+            AJS.$("#constraintList-select2").on('select2-removing', function (e) {
+                if (e.choice.text === "Bütçe"){
+                    $("#butceInput").css("visibility", "hidden");
+                    $("#butceLabel").css("visibility", "hidden");
+                }
+                else if (e.choice.text === "Başlangıç Tarihi"){
+                    $("#baslangicTarihiInput").css("visibility", "hidden");
+                    $("#baslangicTarihiLabel").css("visibility", "hidden");
+                }
+                else if (e.choice.text === "Bitiş Tarihi"){
+                    $("#bitisTarihiInput").css("visibility", "hidden");
+                    $("#bitisTarihiLabel").css("visibility", "hidden");
+                }
+            });
+
             function updatePrioritiesInJIRA(gmyOrBirim) {
                 var table = $('#auiTable').tableToJSON({
                     ignoreEmptyRows : true,
@@ -695,7 +705,34 @@ Released under the MIT license: http://jsbin.mit-license.org
                     <button class="aui-button aui-button-primary" id="kaydetButton">Kaydet</button>
                 </div>
             </div>
-
+        </div>
+        <div class="col-xs-10 col-md-6">
+            <div class="aui-group">
+                <div class="aui-item" id="#select2-constraint">
+                    <form class="aui">
+                        <select id="constraintList-select2" data-placeholder="Kısıt eklemek için tıklayın" multiple>
+                            <option></option>
+                            <option value="butce">Bütçe</option>
+                            <option value="baslangicTarihi">Başlangıç Tarihi</option>
+                            <option value="bitisTarihi">Bitiş Tarihi</option>
+                        </select>
+                        <form>
+                            <div class="col-xs-6 col-md-4">
+                                <label for="butceInput" id="butceLabel" name="butceLabel" style="visibility: hidden;">Bütçe:</label>
+                                <input type="text" id="butceInput" name="butceInput" style="visibility: hidden;">
+                            </div>
+                            <div class="col-xs-6 col-md-4">
+                                <label for="baslangicTarihiInput" id="baslangicTarihiLabel" name="baslangicTarihiLabel" style="visibility: hidden;">Başlangıç Tarihi:</label>
+                                <input id="baslangicTarihiInput" name="baslangicTarihiInput" class="aui-date-picker" id="demo-range-always" type="date" max="2012-01-05" min="2011-12-25" style="visibility: hidden;"/>
+                            </div>
+                            <div class="col-xs-6 col-md-4">
+                                <label for="bitisTarihiInput" id="bitisTarihiLabel" name="bitisTarihiLabel" style="visibility: hidden;">Bitiş Tarihi:</label>
+                                <input id="bitisTarihiInput" name="bitisTarihiInput" class="aui-date-picker" id="demo-range-always" type="date" max="2012-01-05" min="2011-12-25" style="visibility: hidden;"/>
+                            </div>
+                        </form>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
