@@ -263,15 +263,21 @@ Released under the MIT license: http://jsbin.mit-license.org
                                         issueBaslangicTarihiString = issueBaslangicTarihiString.replaceAll(".0", "")
                                         var issueBaslangicTarihiDate = Date.parse(issueBaslangicTarihiString);
 
-                                        if (issueBaslangicTarihiDate >= baslangicKisitDate) {
-                                            $("#issueDurum").text("Olumlu");
-                                            $("#issueDurum").css("color", "green")
-                                            baslangicTarihiBoolean = true;
-                                        } else {
-                                            $("#issueDurum").text("Olumsuz(Başlangıç Tarihi Geçersiz)");
-                                            $("#issueDurum").css("color", "red")
-                                            baslangicTarihiBoolean = false;
+                                        console.log("baslangicKisitDate: " + baslangicKisitDate)
+                                        console.log("issueBaslangicTarihiDate: "+issueBaslangicTarihiDate)
+
+                                        if(!isNaN(baslangicKisitDate)){
+                                            if (issueBaslangicTarihiDate >= baslangicKisitDate) {
+                                                $("#issueDurum").text("Olumlu");
+                                                $("#issueDurum").css("color", "green")
+                                                baslangicTarihiBoolean = true;
+                                            } else {
+                                                $("#issueDurum").text("Olumsuz(Başlangıç Tarihi Geçersiz)");
+                                                $("#issueDurum").css("color", "red")
+                                                baslangicTarihiBoolean = false;
+                                            }
                                         }
+
 
                                     }
                                 }
@@ -282,13 +288,21 @@ Released under the MIT license: http://jsbin.mit-license.org
                                             issueBitisTarihiString = issueBitisTarihiString.replaceAll("-", "/")
                                             issueBitisTarihiString = issueBitisTarihiString.replaceAll(".0", "")
                                             var issueBitisTarihiDate = Date.parse(issueBitisTarihiString);
-                                            if (issueBitisTarihiDate <= bitisKisitDate) {
-                                                $("#issueDurum").text("Olumlu");
-                                                $("#issueDurum").css("color", "green")
-                                            } else {
-                                                $("#issueDurum").text("Olumsuz(Bitiş Tarihi Geçersiz)");
-                                                $("#issueDurum").css("color", "red")
+
+                                            console.log("issueBitisTarihiDate: "+issueBitisTarihiDate)
+                                            console.log("bitisKisitDate: "+ bitisKisitDate)
+
+                                            if(!isNaN(bitisKisitDate)){
+                                                if (issueBitisTarihiDate <= bitisKisitDate) {
+                                                    $("#issueDurum").text("Olumlu");
+                                                    $("#issueDurum").css("color", "green")
+                                                } else {
+                                                    $("#issueDurum").text("Olumsuz(Bitiş Tarihi Geçersiz)");
+                                                    $("#issueDurum").css("color", "red")
+                                                }
                                             }
+
+
                                         }
 
                                     }
@@ -333,7 +347,6 @@ Released under the MIT license: http://jsbin.mit-license.org
                 }
 
             } );
-
 
 
             updatePriorities("$restriction");
