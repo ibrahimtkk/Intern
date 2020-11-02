@@ -237,6 +237,8 @@ Released under the MIT license: http://jsbin.mit-license.org
             var butceCount = 0;
             var selectedButce = JSON.parse(JSON.stringify(butceCount))
             var selectedRows = []
+            var baslangicTarihiBoolean = true;
+            var bitisTarihiBoolean = true;
 
             $('#auiTable tbody').on( 'click', 'tr', function () {
                 console.log("-Before toggle: "+$(this).hasClass('selected').toString())
@@ -252,10 +254,10 @@ Released under the MIT license: http://jsbin.mit-license.org
                 console.log("Selected Rows:  "+selectedRows)
                 console.log("selectKey: "+selectKey)
                 if (!selectedRows.includes(selectKey)) {
-
+                    // var baslangicBool = true;
                     for (var i = 0; i < jsonDataTable.length; i++) {
                         if (jsonDataTable[i]['key'] === selectKey) {
-                            var baslangicTarihiBoolean = true;
+                            // var baslangicTarihiBoolean = true;
                             if (isNaN(parseInt(jsonDataTable[i]['Bütçe']))) {
 
                                 butceCount = selectedButce
@@ -275,12 +277,11 @@ Released under the MIT license: http://jsbin.mit-license.org
 
                                         if(!isNaN(baslangicKisitDate)){
                                             if (issueBaslangicTarihiDate >= baslangicKisitDate) {
-                                                $("#issueDurum").text("Olumlu");
-                                                $("#issueDurum").css("color", "green")
-                                                baslangicTarihiBoolean = true;
+                                                // $("#issueDurum").text("Olumlu");
+                                                // $("#issueDurum").css("color", "green")
                                             } else {
-                                                $("#issueDurum").text("Olumsuz(Başlangıç Tarihi Geçersiz)");
-                                                $("#issueDurum").css("color", "red")
+                                                // $("#issueDurum").text("Olumsuz(Başlangıç Tarihi Geçersiz)");
+                                                // $("#issueDurum").css("color", "red")
                                                 baslangicTarihiBoolean = false;
                                             }
                                         }
@@ -288,7 +289,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                                 }
                                 if (Object.keys(jsonDataTable[i]).includes("Bitiş Tarihi")  ) {
                                     if (jsonDataTable[i]["Bitiş Tarihi"] !== "-") {
-                                        if (baslangicTarihiBoolean) {
+                                        // if (baslangicTarihiBoolean) {
                                             var issueBitisTarihiString = jsonDataTable[i]["Bitiş Tarihi"];
                                             issueBitisTarihiString = issueBitisTarihiString.replaceAll("-", "/")
                                             issueBitisTarihiString = issueBitisTarihiString.replaceAll(".0", "")
@@ -299,16 +300,17 @@ Released under the MIT license: http://jsbin.mit-license.org
 
                                             if(!isNaN(bitisKisitDate)){
                                                 if (issueBitisTarihiDate <= bitisKisitDate) {
-                                                    $("#issueDurum").text("Olumlu");
-                                                    $("#issueDurum").css("color", "green")
+                                                    // $("#issueDurum").text("Olumlu");
+                                                    // $("#issueDurum").css("color", "green")
                                                 } else {
-                                                    $("#issueDurum").text("Olumsuz(Bitiş Tarihi Geçersiz)");
-                                                    $("#issueDurum").css("color", "red")
+                                                    // $("#issueDurum").text("Olumsuz(Bitiş Tarihi Geçersiz)");
+                                                    // $("#issueDurum").css("color", "red")
+                                                    bitisTarihiBoolean = false;
                                                 }
                                             }
 
 
-                                        }
+                                        // }
 
                                     }
                                 }
@@ -319,6 +321,20 @@ Released under the MIT license: http://jsbin.mit-license.org
                                 selectedRows.push(selectKey)
                             }
                         }
+                    }
+                    if (baslangicTarihiBoolean){
+                        if (bitisTarihiBoolean) {
+                            $("#issueDurum").text("Olumlu");
+                            $("#issueDurum").css("color", "green")
+                        }
+                        else {
+                            $("#issueDurum").text("Olumsuz(Bitiş Tarihi Geçersiz)");
+                            $("#issueDurum").css("color", "red")
+                        }
+                    }
+                    else {
+                        $("#issueDurum").text("Olumsuz(Başlangıç Tarihi Geçersiz)");
+                        $("#issueDurum").css("color", "red")
                     }
 
                 }
@@ -606,6 +622,14 @@ Released under the MIT license: http://jsbin.mit-license.org
                     $("#bitisTarihiLabel").css("visibility", "hidden");
                 }
             });
+
+            $("#baslangicTarihiInput").on("click", function() {
+                baslangicTarihiBoolean = true;
+            })
+            $("#bitisTarihiInput").on("click", function() {
+                bitisTarihiBoolean = true;
+            })
+
 
             $('#temizleButton').on( 'click', function () {
                 console.log("temizle -----------")
