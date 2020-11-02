@@ -421,15 +421,13 @@ Released under the MIT license: http://jsbin.mit-license.org
             AJS.$("#favFilter-select2").on("select2-removing", function(e) {
                 filterAndIssueKeys.forEach(filterAndIssueKey => {
                     if (filterAndIssueKey.filterName ===  e.choice.text ){
-                        tempDataTable.forEach(data => {
+                        jsonDataTable.forEach(data => {
                             if (!filterAndIssueKey.issueKeys.includes(data.key)) {
                                 var rowArray = []
                                 rowArray.push('<a href="$baseUrl/browse/' + data.key + '" ' + 'class="issueKey">' + data.key + '</a>');
                                 rowArray.push(data.Summary)
                                 rowArray.push(data.Description)
                                 rowArray.push(data.Priority)
-                                rowArray.push(data.Created)
-                                rowArray.push(data.Due)
                                 #foreach($cf in $customFieldsInProject)
                                     rowArray.push('<td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">-</td>')
                                 #end
@@ -447,17 +445,15 @@ Released under the MIT license: http://jsbin.mit-license.org
                     if (beforeSelectedOption !== "Bir seçenek seçin") {
                         filterAndIssueKeys.forEach(filterAndIssueKey => {
                             if (filterAndIssueKey.filterName === beforeSelectedOption) {
-                                tempDataTable.forEach(data => {
+                                jsonDataTable.forEach(data => {
                                     if (!filterAndIssueKey.issueKeys.includes(data.key)) {
                                         var rowArray = []
                                         rowArray.push('<a href="$baseUrl/browse/' + data.key + '" ' + 'class="issueKey">' + data.key + '</a>');
                                         rowArray.push(data.Summary)
                                         rowArray.push(data.Description)
                                         rowArray.push(data.Priority)
-                                        rowArray.push(data.Created)
-                                        rowArray.push(data.Due)
                                         #foreach($cf in $customFieldsInProject)
-                                            rowArray.push('<td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">-</td>')
+                                            rowArray.push('<td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">'+ data["$cf.getName()"] +'</td>')
                                         #end
                                         dataTable.row.add(rowArray).draw(true)
                                     }
@@ -503,17 +499,17 @@ Released under the MIT license: http://jsbin.mit-license.org
 
                             response.forEach(responseKey => {
                                 if (!partialKeys.includes(responseKey)){
-                                    tempDataTable.forEach(data => {
+                                    jsonDataTable.forEach(data => {
                                         if (data.key === responseKey){
                                             var rowArray = []
                                             rowArray.push('<a href="$baseUrl/browse/' + data.key + '" ' + 'class="issueKey">' + data.key + '</a>');
                                             rowArray.push(data.Summary)
                                             rowArray.push(data.Description)
                                             rowArray.push(data.Priority)
-                                            rowArray.push(data.Created)
-                                            rowArray.push(data.Due)
+                                            // rowArray.push(data.Created)
+                                            // rowArray.push(data.Due)
                                             #foreach($cf in $customFieldsInProject)
-                                                rowArray.push('<td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">-</td>')
+                                                rowArray.push('<td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">'+ data["$cf.getName()"] +'</td>')
                                             #end
                                             dataTable.row.add(rowArray).draw(true)
                                         }
