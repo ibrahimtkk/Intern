@@ -256,40 +256,44 @@ Released under the MIT license: http://jsbin.mit-license.org
                                 $(this).removeClass('selected');
 
                             } else {
-                                if (jsonDataTable[i]["Başlangıç Tarihi"] !== "-"){
-                                    var issueBaslangicTarihiString = jsonDataTable[i]["Başlangıç Tarihi"];
-                                    issueBaslangicTarihiString = issueBaslangicTarihiString.replaceAll("-", "/")
-                                    issueBaslangicTarihiString = issueBaslangicTarihiString.replaceAll(".0", "")
-                                    var issueBaslangicTarihiDate = Date.parse(issueBaslangicTarihiString);
+                                if (Object.keys(jsonDataTable[i]).includes("Başlangıç Tarihi")  ) {
+                                    if (jsonDataTable[i]["Başlangıç Tarihi"] !== "-") {
+                                        var issueBaslangicTarihiString = jsonDataTable[i]["Başlangıç Tarihi"];
+                                        issueBaslangicTarihiString = issueBaslangicTarihiString.replaceAll("-", "/")
+                                        issueBaslangicTarihiString = issueBaslangicTarihiString.replaceAll(".0", "")
+                                        var issueBaslangicTarihiDate = Date.parse(issueBaslangicTarihiString);
 
-                                    if (issueBaslangicTarihiDate >= baslangicKisitDate){
-                                        $("#issueDurum").text("Olumlu");
-                                        $("#issueDurum").css("color","green")
-                                        baslangicTarihiBoolean = true;
-                                    }
-                                    else {
-                                        $("#issueDurum").text("Olumsuz(Başlangıç Tarihi Geçersiz)");
-                                        $("#issueDurum").css("color","red")
-                                        baslangicTarihiBoolean = false;
-                                    }
-
-                                }
-                                if (jsonDataTable[i]["Bitiş Tarihi"] !== "-") {
-                                    if (baslangicTarihiBoolean) {
-                                        var issueBitisTarihiString = jsonDataTable[i]["Bitiş Tarihi"];
-                                        issueBitisTarihiString = issueBitisTarihiString.replaceAll("-", "/")
-                                        issueBitisTarihiString = issueBitisTarihiString.replaceAll(".0", "")
-                                        var issueBitisTarihiDate = Date.parse(issueBitisTarihiString);
-                                        if (issueBitisTarihiDate <= bitisKisitDate) {
+                                        if (issueBaslangicTarihiDate >= baslangicKisitDate) {
                                             $("#issueDurum").text("Olumlu");
                                             $("#issueDurum").css("color", "green")
+                                            baslangicTarihiBoolean = true;
                                         } else {
-                                            $("#issueDurum").text("Olumsuz(Bitiş Tarihi Geçersiz)");
+                                            $("#issueDurum").text("Olumsuz(Başlangıç Tarihi Geçersiz)");
                                             $("#issueDurum").css("color", "red")
+                                            baslangicTarihiBoolean = false;
                                         }
-                                    }
 
+                                    }
                                 }
+                                if (Object.keys(jsonDataTable[i]).includes("Bitiş Tarihi")  ) {
+                                    if (jsonDataTable[i]["Bitiş Tarihi"] !== "-") {
+                                        if (baslangicTarihiBoolean) {
+                                            var issueBitisTarihiString = jsonDataTable[i]["Bitiş Tarihi"];
+                                            issueBitisTarihiString = issueBitisTarihiString.replaceAll("-", "/")
+                                            issueBitisTarihiString = issueBitisTarihiString.replaceAll(".0", "")
+                                            var issueBitisTarihiDate = Date.parse(issueBitisTarihiString);
+                                            if (issueBitisTarihiDate <= bitisKisitDate) {
+                                                $("#issueDurum").text("Olumlu");
+                                                $("#issueDurum").css("color", "green")
+                                            } else {
+                                                $("#issueDurum").text("Olumsuz(Bitiş Tarihi Geçersiz)");
+                                                $("#issueDurum").css("color", "red")
+                                            }
+                                        }
+
+                                    }
+                                }
+
 
                                 butceCount += parseInt(jsonDataTable[i]['Bütçe'])
                                 selectedButce = butceCount
