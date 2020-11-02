@@ -166,7 +166,6 @@ Released under the MIT license: http://jsbin.mit-license.org
 
             var filterAndIssueKeys = [];
             var defaultIssueList = [];
-            // var fieldNames =  [], cells = []
 
             var sortable = new Sortable(tableBody, {
                 scroll: true,
@@ -239,11 +238,11 @@ Released under the MIT license: http://jsbin.mit-license.org
             var selectedRows = []
             var baslangicTarihiBoolean = true;
             var bitisTarihiBoolean = true;
+            var selectedThisRows = []
 
             $('#auiTable tbody').on( 'click', 'tr', function () {
-
                 $(this).toggleClass('selected');
-
+                selectedThisRows.push($(this))
                 var selectKey = $(this).children().first().children().text();
                 var baslangicKisit = $("#baslangicTarihiInput").val();
                 var bitisKisit = $("#bitisTarihiInput").val();
@@ -251,12 +250,9 @@ Released under the MIT license: http://jsbin.mit-license.org
                 var bitisKisitDate = Date.parse(bitisKisit);
 
                 if (!selectedRows.includes(selectKey)) {
-                    // var baslangicBool = true;
                     for (var i = 0; i < jsonDataTable.length; i++) {
                         if (jsonDataTable[i]['key'] === selectKey) {
-                            // var baslangicTarihiBoolean = true;
                             if (isNaN(parseInt(jsonDataTable[i]['Bütçe']))) {
-
                                 butceCount = selectedButce
                                 alert("Lütfen Bütçe Alanını ekleyin")
                                 $(this).removeClass('selected');
@@ -269,16 +265,9 @@ Released under the MIT license: http://jsbin.mit-license.org
                                         issueBaslangicTarihiString = issueBaslangicTarihiString.replaceAll(".0", "")
                                         var issueBaslangicTarihiDate = Date.parse(issueBaslangicTarihiString);
 
-                                        console.log("baslangicKisitDate: " + baslangicKisitDate)
-                                        console.log("issueBaslangicTarihiDate: "+issueBaslangicTarihiDate)
-
                                         if(!isNaN(baslangicKisitDate)){
                                             if (issueBaslangicTarihiDate >= baslangicKisitDate) {
-                                                // $("#issueDurum").text("Olumlu");
-                                                // $("#issueDurum").css("color", "green")
                                             } else {
-                                                // $("#issueDurum").text("Olumsuz(Başlangıç Tarihi Geçersiz)");
-                                                // $("#issueDurum").css("color", "red")
                                                 baslangicTarihiBoolean = false;
                                             }
                                         }
@@ -286,29 +275,17 @@ Released under the MIT license: http://jsbin.mit-license.org
                                 }
                                 if (Object.keys(jsonDataTable[i]).includes("Bitiş Tarihi")  ) {
                                     if (jsonDataTable[i]["Bitiş Tarihi"] !== "-") {
-                                        // if (baslangicTarihiBoolean) {
-                                            var issueBitisTarihiString = jsonDataTable[i]["Bitiş Tarihi"];
-                                            issueBitisTarihiString = issueBitisTarihiString.replaceAll("-", "/")
-                                            issueBitisTarihiString = issueBitisTarihiString.replaceAll(".0", "")
-                                            var issueBitisTarihiDate = Date.parse(issueBitisTarihiString);
+                                        var issueBitisTarihiString = jsonDataTable[i]["Bitiş Tarihi"];
+                                        issueBitisTarihiString = issueBitisTarihiString.replaceAll("-", "/")
+                                        issueBitisTarihiString = issueBitisTarihiString.replaceAll(".0", "")
+                                        var issueBitisTarihiDate = Date.parse(issueBitisTarihiString);
 
-                                            console.log("issueBitisTarihiDate: "+issueBitisTarihiDate)
-                                            console.log("bitisKisitDate: "+ bitisKisitDate)
-
-                                            if(!isNaN(bitisKisitDate)){
-                                                if (issueBitisTarihiDate <= bitisKisitDate) {
-                                                    // $("#issueDurum").text("Olumlu");
-                                                    // $("#issueDurum").css("color", "green")
-                                                } else {
-                                                    // $("#issueDurum").text("Olumsuz(Bitiş Tarihi Geçersiz)");
-                                                    // $("#issueDurum").css("color", "red")
-                                                    bitisTarihiBoolean = false;
-                                                }
+                                        if(!isNaN(bitisKisitDate)){
+                                            if (issueBitisTarihiDate < bitisKisitDate) {
+                                            } else {
+                                                bitisTarihiBoolean = false;
                                             }
-
-
-                                        // }
-
+                                        }
                                     }
                                 }
 
@@ -372,19 +349,20 @@ Released under the MIT license: http://jsbin.mit-license.org
             AJS.$("#favFilter-select2").auiSelect2();
             AJS.$("#constraintList-select2").auiSelect2();
             AJS.$("#baslangicTarihiInput").datePicker({
-                // 'overrideBrowserDefault': true,
-                dateFormat: "yy-mm-dd"
+                dateFormat: "yy-mm-dd",
+                onSelect: function (date) {
+                    datePickerChanged(date)
+                }
             })
             AJS.$("#bitisTarihiInput").datePicker({
-                // 'overrideBrowserDefault': true,
-                dateFormat: "yy-mm-dd"
+                dateFormat: "yy-mm-dd",
+                onSelect: function (date) {
+                    datePickerChanged(date)
+                }
             })
-            // baslangicDatePicker.datepicker("setDate", new Date());
-            // bitisDatePicker.datepicker("setDate", new Date());
 
             AJS.$('#kaydetButton').off().on("click", function (e) {
                 var params = new window.URLSearchParams(window.location.search);
-                console.log("restriction = "+ params.get('restriction'));
                 updatePrioritiesInJIRA(params.get('restriction'));
                 e.preventDefault();
             });
@@ -542,21 +520,6 @@ Released under the MIT license: http://jsbin.mit-license.org
                                     })
                                 }
                             })
-                            ## tempDataTable.forEach(data => {
-                            ##     if (!partialKeys.includes(data.key)) {
-                            ##         var rowArray = []
-                            ##         rowArray.push('<a href="$baseUrl/browse/' + data.key + '" ' + 'class="issueKey">' + data.key + '</a>');
-                            ##         rowArray.push(data.Summary)
-                            ##         rowArray.push(data.Description)
-                            ##         rowArray.push(data.Priority)
-                            ##         rowArray.push(data.Created)
-                            ##         rowArray.push(data.Due)
-                            ##         #foreach($cf in $customFieldsInProject)
-                            ##             rowArray.push('<td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">-</td>')
-                            ##         #end
-                            ##         dataTable.row.add(rowArray).draw(true)
-                            ##     }
-                            ## });
                             tableBody.each(function () {
                                 var cell = $(this)
                                 var issueKey = $(this).find("td .issueKey")
@@ -621,12 +584,78 @@ Released under the MIT license: http://jsbin.mit-license.org
                 }
             });
 
-            $("#baslangicTarihiInput").on("click", function() {
+            // $("#baslangicTarihiInput").on("click", function() {
+
+            function datePickerChanged(date){
                 baslangicTarihiBoolean = true;
-            })
-            $("#bitisTarihiInput").on("click", function() {
                 bitisTarihiBoolean = true;
-            })
+                selectedThisRows.forEach(selectedRow => {
+                    var selectKey = selectedRow.children().first().children().text();
+                    var baslangicKisit = $("#baslangicTarihiInput").val();
+                    var bitisKisit = $("#bitisTarihiInput").val();
+                    var baslangicKisitDate = Date.parse(baslangicKisit);
+                    var bitisKisitDate = Date.parse(bitisKisit);
+                    for (var i = 0; i < jsonDataTable.length; i++) {
+                        if (jsonDataTable[i]['key'] === selectKey) {
+                            if (isNaN(parseInt(jsonDataTable[i]['Bütçe']))) {
+                                butceCount = selectedButce
+                                alert("Lütfen Bütçe Alanını ekleyin")
+                                $(this).removeClass('selected');
+
+                            } else {
+                                if (Object.keys(jsonDataTable[i]).includes("Başlangıç Tarihi")  ) {
+                                    if (jsonDataTable[i]["Başlangıç Tarihi"] !== "-") {
+                                        var issueBaslangicTarihiString = jsonDataTable[i]["Başlangıç Tarihi"];
+                                        issueBaslangicTarihiString = issueBaslangicTarihiString.replaceAll("-", "/")
+                                        issueBaslangicTarihiString = issueBaslangicTarihiString.replaceAll(".0", "")
+                                        var issueBaslangicTarihiDate = Date.parse(issueBaslangicTarihiString);
+                                        if(!isNaN(baslangicKisitDate)){
+                                            if (issueBaslangicTarihiDate >= baslangicKisitDate) {
+                                            } else {
+                                                baslangicTarihiBoolean = false;
+                                            }
+                                        }
+                                    }
+                                }
+                                if (Object.keys(jsonDataTable[i]).includes("Bitiş Tarihi")  ) {
+                                    if (jsonDataTable[i]["Bitiş Tarihi"] !== "-") {
+                                        var issueBitisTarihiString = jsonDataTable[i]["Bitiş Tarihi"];
+                                        issueBitisTarihiString = issueBitisTarihiString.replaceAll("-", "/")
+                                        issueBitisTarihiString = issueBitisTarihiString.replaceAll(".0", "")
+                                        var issueBitisTarihiDate = Date.parse(issueBitisTarihiString);
+
+                                        if(!isNaN(bitisKisitDate)){
+                                            if (issueBitisTarihiDate < bitisKisitDate) {
+                                            } else {
+                                                bitisTarihiBoolean = false;
+                                            }
+                                        }
+                                    }
+                                }
+
+
+                                butceCount += parseInt(jsonDataTable[i]['Bütçe'])
+                                selectedButce = butceCount
+                                selectedRows.push(selectKey)
+                            }
+                        }
+                    }
+                    if (baslangicTarihiBoolean){
+                        if (bitisTarihiBoolean) {
+                            $("#issueDurum").text("Olumlu");
+                            $("#issueDurum").css("color", "green")
+                        }
+                        else {
+                            $("#issueDurum").text("Olumsuz(Bitiş Tarihi Geçersiz)");
+                            $("#issueDurum").css("color", "red")
+                        }
+                    }
+                    else {
+                        $("#issueDurum").text("Olumsuz(Başlangıç Tarihi Geçersiz)");
+                        $("#issueDurum").css("color", "red")
+                    }
+                })
+            }
 
 
             $('#temizleButton').on( 'click', function () {
