@@ -241,9 +241,8 @@ Released under the MIT license: http://jsbin.mit-license.org
             var bitisTarihiBoolean = true;
 
             $('#auiTable tbody').on( 'click', 'tr', function () {
-                console.log("-Before toggle: "+$(this).hasClass('selected').toString())
+
                 $(this).toggleClass('selected');
-                console.log("-After toggle: "+$(this).hasClass('selected').toString())
 
                 var selectKey = $(this).children().first().children().text();
                 var baslangicKisit = $("#baslangicTarihiInput").val();
@@ -251,8 +250,6 @@ Released under the MIT license: http://jsbin.mit-license.org
                 var baslangicKisitDate = Date.parse(baslangicKisit);
                 var bitisKisitDate = Date.parse(bitisKisit);
 
-                console.log("Selected Rows:  "+selectedRows)
-                console.log("selectKey: "+selectKey)
                 if (!selectedRows.includes(selectKey)) {
                     // var baslangicBool = true;
                     for (var i = 0; i < jsonDataTable.length; i++) {
@@ -339,7 +336,6 @@ Released under the MIT license: http://jsbin.mit-license.org
 
                 }
                 else {
-                    console.log("else içinde-----------")
                     var deselectIndex = selectedRows.indexOf(selectKey);
                     if (deselectIndex > -1) {
                         selectedRows.splice(deselectIndex, 1);
@@ -610,6 +606,8 @@ Released under the MIT license: http://jsbin.mit-license.org
 
             AJS.$("#constraintList-select2").on('select2-removing', function (e) {
                 if (e.choice.text === "Bütçe"){
+                    $("#butceInput").val("");
+                    $("#butceMiktari").css("color","black");
                     $("#butceInput").css("visibility", "hidden");
                     $("#butceLabel").css("visibility", "hidden");
                 }
@@ -632,8 +630,6 @@ Released under the MIT license: http://jsbin.mit-license.org
 
 
             $('#temizleButton').on( 'click', function () {
-                console.log("temizle -----------")
-
                 $("tr").removeClass("selected");
                 selectedRows=[]
                 butceCount=0;
@@ -641,7 +637,6 @@ Released under the MIT license: http://jsbin.mit-license.org
                 $("#butceMiktari").text(butceCount).css("color","black");
                 $("#issueDurum").text("").css("color","black");
 
-                console.log("  ---------------")
             });
 
 
