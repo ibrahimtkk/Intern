@@ -237,13 +237,20 @@ Released under the MIT license: http://jsbin.mit-license.org
             var butceCount = 0;
             var selectedButce = JSON.parse(JSON.stringify(butceCount))
             var selectedRows = []
+
             $('#auiTable tbody').on( 'click', 'tr', function () {
+                console.log("-Before toggle: "+$(this).hasClass('selected').toString())
                 $(this).toggleClass('selected');
+                console.log("-After toggle: "+$(this).hasClass('selected').toString())
+
                 var selectKey = $(this).children().first().children().text();
                 var baslangicKisit = $("#baslangicTarihiInput").val();
                 var bitisKisit = $("#bitisTarihiInput").val();
                 var baslangicKisitDate = Date.parse(baslangicKisit);
                 var bitisKisitDate = Date.parse(bitisKisit);
+
+                console.log("Selected Rows:  "+selectedRows)
+                console.log("selectKey: "+selectKey)
                 if (!selectedRows.includes(selectKey)) {
 
                     for (var i = 0; i < jsonDataTable.length; i++) {
@@ -277,8 +284,6 @@ Released under the MIT license: http://jsbin.mit-license.org
                                                 baslangicTarihiBoolean = false;
                                             }
                                         }
-
-
                                     }
                                 }
                                 if (Object.keys(jsonDataTable[i]).includes("Bitiş Tarihi")  ) {
@@ -312,17 +317,17 @@ Released under the MIT license: http://jsbin.mit-license.org
                                 butceCount += parseInt(jsonDataTable[i]['Bütçe'])
                                 selectedButce = butceCount
                                 selectedRows.push(selectKey)
-
                             }
                         }
                     }
 
                 }
                 else {
-
+                    console.log("else içinde-----------")
                     var deselectIndex = selectedRows.indexOf(selectKey);
                     if (deselectIndex > -1) {
                         selectedRows.splice(deselectIndex, 1);
+
                     }
                     for (var i = 0; i < jsonDataTable.length; i++) {
                         if (jsonDataTable[i]['key'] === selectKey) {
@@ -602,6 +607,19 @@ Released under the MIT license: http://jsbin.mit-license.org
                 }
             });
 
+            $('#temizleButton').on( 'click', function () {
+                console.log("temizle -----------")
+
+                $("tr").removeClass("selected");
+                selectedRows=[]
+                butceCount=0;
+
+                $("#butceMiktari").text(butceCount).css("color","black");
+                $("#issueDurum").text("").css("color","black");
+
+                console.log("  ---------------")
+            });
+
 
             function updatePrioritiesInJIRA(gmyOrBirim) {
                 var table = $('#auiTable').tableToJSON({
@@ -735,9 +753,14 @@ Released under the MIT license: http://jsbin.mit-license.org
                     </div>
                 </div>
             </div>
-            <div class="col-xs-6 col-md-3">
+            <div class="col-xs-6 col-md-2">
                 <div class="aui-group" id="buttons">
                     <button class="aui-button aui-button-primary" id="kaydetButton">Kaydet</button>
+                </div>
+            </div>
+            <div class="col-xs-6 col-md-2">
+                <div class="aui-group" id="buttons">
+                    <button class="aui-button" id="temizleButton">Seçimi Temizle</button>
                 </div>
             </div>
         </div>
