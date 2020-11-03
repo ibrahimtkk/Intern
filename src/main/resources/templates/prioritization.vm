@@ -104,7 +104,7 @@ Released under the MIT license: http://jsbin.mit-license.org
             margin-bottom: 60px;
         }
         .row{
-            margin-bottom: 60px;
+            margin-bottom: 10px;
         }
         #buttons{
             text-align: center;
@@ -797,42 +797,34 @@ Released under the MIT license: http://jsbin.mit-license.org
                     </div>
                 </div>
             </div>
-            <div class="col-xs-6 col-md-2">
-                <div class="aui-group" id="buttons">
-                    <button class="aui-button aui-button-primary" id="kaydetButton">Kaydet</button>
-                </div>
-            </div>
-            <div class="col-xs-6 col-md-2">
-                <div class="aui-group" id="buttons">
-                    <button class="aui-button" id="temizleButton">Seçimi Temizle</button>
-                </div>
-            </div>
         </div>
-        <div class="col-xs-10 col-md-8">
-            <div class="aui-group">
-                <div class="aui-item" id="#select2-constraint">
-                    <form class="aui">
-                        <select id="constraintList-select2" data-placeholder="Kısıt eklemek için tıklayın" multiple>
-                            <option></option>
-                            <option value="butce">Bütçe</option>
-                            <option value="baslangicTarihi">Başlangıç Tarihi</option>
-                            <option value="bitisTarihi">Bitiş Tarihi</option>
-                        </select>
-                        <form>
-                            <div class="col-xs-6 col-md-4">
-                                <label for="butceInput" id="butceLabel" name="butceLabel" style="visibility: hidden;">Bütçe:</label>
-                                <input type="text" id="butceInput" name="butceInput" style="visibility: hidden;">
-                            </div>
-                            <div class="col-xs-6 col-md-4">
-                                <label for="baslangicTarihiInput" id="baslangicTarihiLabel" name="baslangicTarihiLabel" style="visibility: hidden;">Başlangıç Tarihi:</label>
-                                <input id="baslangicTarihiInput" name="baslangicTarihiInput" class="aui-date-picker" id="demo-range-always" type="date" style="visibility: hidden;"/>
-                            </div>
-                            <div class="col-xs-6 col-md-4">
-                                <label for="bitisTarihiInput" id="bitisTarihiLabel" name="bitisTarihiLabel" style="visibility: hidden;">Bitiş Tarihi:</label>
-                                <input id="bitisTarihiInput" name="bitisTarihiInput" class="aui-date-picker" id="demo-range-always" type="date" style="visibility: hidden;"/>
-                            </div>
+        <div class="row">
+            <div class="col-xs-10 col-md-8">
+                <div class="aui-group">
+                    <div class="aui-item" id="#select2-constraint">
+                        <form class="aui">
+                            <select id="constraintList-select2" data-placeholder="Kısıt eklemek için tıklayın" multiple>
+                                <option></option>
+                                <option value="butce">Bütçe</option>
+                                <option value="baslangicTarihi">Başlangıç Tarihi</option>
+                                <option value="bitisTarihi">Bitiş Tarihi</option>
+                            </select>
+                            <form>
+                                <div class="col-xs-6 col-md-4">
+                                    <label for="butceInput" id="butceLabel" name="butceLabel" style="visibility: hidden;">Bütçe:</label>
+                                    <input type="text" id="butceInput" name="butceInput" style="visibility: hidden;">
+                                </div>
+                                <div class="col-xs-6 col-md-4">
+                                    <label for="baslangicTarihiInput" id="baslangicTarihiLabel" name="baslangicTarihiLabel" style="visibility: hidden;">Başlangıç Tarihi:</label>
+                                    <input id="baslangicTarihiInput" name="baslangicTarihiInput" class="aui-date-picker" id="demo-range-always" type="date" style="visibility: hidden;"/>
+                                </div>
+                                <div class="col-xs-6 col-md-4">
+                                    <label for="bitisTarihiInput" id="bitisTarihiLabel" name="bitisTarihiLabel" style="visibility: hidden;">Bitiş Tarihi:</label>
+                                    <input id="bitisTarihiInput" name="bitisTarihiInput" class="aui-date-picker" id="demo-range-always" type="date" style="visibility: hidden;"/>
+                                </div>
+                            </form>
                         </form>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -845,8 +837,21 @@ Released under the MIT license: http://jsbin.mit-license.org
         </div>
     </div>
 
+
+    <div class="row" style="margin-top:50px;">
+
+        <div class="col-xs-6 col-md-1" style="padding-left: 0px;">
+            <div class="aui-group" id="buttons">
+                <button class="aui-button aui-button-primary" id="kaydetButton">Kaydet</button>
+            </div>
+        </div>
+        <div class="col-xs-6 col-md-1" style="padding-left: 0px;">
+            <div class="aui-group" id="buttons">
+                <button class="aui-button" id="temizleButton">Seçimi Temizle</button>
+            </div>
+        </div>
         <div>
-            <div style="float: right; padding-left: 40px;">
+            <div style="float: right; padding-left: 40px; padding-right: 30px;">
                 <label style="display: inline">Durum: </label>
                 <p id="issueDurum" style="display: inline"></p>
             </div>
@@ -856,6 +861,9 @@ Released under the MIT license: http://jsbin.mit-license.org
                 <p id="butceMiktari" style="display:inline"></p>
             </div>
         </div>
+
+    </div>
+
     <div class="aui-group list-group" id="tableDiv">
         <table class="aui aui-table-list" id="auiTable" >
             <thead>
