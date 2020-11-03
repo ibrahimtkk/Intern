@@ -1,6 +1,5 @@
 package com.veniture.servlet;
 
-import com.atlassian.crowd.embedded.impl.ImmutableUser;
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.component.pico.ComponentManager;
@@ -8,44 +7,44 @@ import com.atlassian.jira.favourites.FavouritesManager;
 import com.atlassian.jira.issue.CustomFieldManager;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.ModifiedValue;
-import com.atlassian.jira.issue.MutableIssue;
-import com.atlassian.jira.issue.customfields.option.Option;
-import com.atlassian.jira.issue.customfields.option.Options;
 import com.atlassian.jira.issue.fields.CustomField;
-import com.atlassian.jira.issue.search.SearchException;
 import com.atlassian.jira.issue.search.SearchRequest;
 import com.atlassian.jira.issue.search.SearchRequestManager;
 import com.atlassian.jira.issue.search.SearchResults;
 import com.atlassian.jira.issue.util.DefaultIssueChangeHolder;
-import com.atlassian.jira.jql.parser.JqlParseException;
 import com.atlassian.jira.jql.parser.JqlQueryParser;
-import com.atlassian.jira.portal.PortalPage;
 import com.atlassian.jira.project.Project;
-import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
-import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.jira.user.ApplicationUsers;
-import com.atlassian.jira.user.DelegatingApplicationUser;
-import com.atlassian.jira.user.UserUtils;
-import com.atlassian.jira.user.util.UserManager;
-import com.atlassian.jira.web.action.ProjectActionSupport;
-import com.atlassian.jira.web.action.filter.ManageFilters;
 import com.atlassian.jira.web.bean.PagerFilter;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.JiraImport;
 import com.atlassian.query.Query;
+import com.atlassian.sal.api.net.RequestFactory;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.veniture.constants.Constants;
 import com.veniture.util.GetCustomFieldsInExcel;
-import org.apache.batik.css.engine.value.svg.FilterManager;
+import com.veniture.util.TeamsWithAvailabilityTimes;
+import model.pojo.TempoTeams.Team;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -66,16 +65,20 @@ public class Priority extends HttpServlet {
     private TemplateRenderer templateRenderer;
     @JiraImport
     private  JiraAuthenticationContext authenticationContext;
+    @JiraImport
+    public RequestFactory requestFactory;
     private final Logger logger = LoggerFactory.getLogger(Priority.class);// The transition ID
 
     private static final String PRIORITIZATION_SCREEN_TEMPLATE = "/templates/prioritization.vm";
 
     public Priority(   SearchService searchService,
                        TemplateRenderer templateRenderer,
-                       JiraAuthenticationContext authenticationContext) {
+                       JiraAuthenticationContext authenticationContext,
+                       RequestFactory requestFactory) {
         this.searchService = searchService;
         this.templateRenderer = templateRenderer;
         this.authenticationContext = authenticationContext;
+        this.requestFactory = requestFactory;
     }
 
     @Override
@@ -152,6 +155,19 @@ public class Priority extends HttpServlet {
             });
             List<CustomField> customFieldsInProject = new GetCustomFieldsInExcel().invoke();
             List<Issue> issueList = results.getResults();
+
+            String fullUrl = "http://localhost:8089/rest/tempo-teams/2/team";
+//            Request request = requestFactory.createRequest(Request.MethodType.GET, fullUrl);
+//            request.addBasicAuthentication("http://localhost:8089", "ibrahim.takak", "qwerty");
+//
+//            try{
+//                String reqs = request.execute();
+//            } catch (ResponseException e) {
+//                e.printStackTrace();
+//            }
+
+
+            List<Team> teams = new TeamsWithAvailabilityTimes(logger, requestFactory).invoke();
 
 
             context.put("issues", results.getResults());

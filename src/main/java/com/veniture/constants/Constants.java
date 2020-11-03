@@ -8,8 +8,8 @@ public class Constants {
     public static final String SC_SORGUSU = "project = PF";
     public static final String JIRA_BASE_URL = ComponentAccessor.getApplicationProperties().getString("jira.baseurl");
 
-    public static final String adminUsername = "";
-    public static final String adminPassword = "";
+    public static final String adminUsername = "ibrahim.takak";
+    public static final String adminPassword = "qwerty";
     public static final String venitureHostname = "test.veniture.com.tr";
     public static final String floHostname = "test.veniture.com.tr";
 

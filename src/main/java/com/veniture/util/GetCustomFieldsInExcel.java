@@ -26,11 +26,12 @@ public class GetCustomFieldsInExcel {
         ArrayList<CustomField> cfArrayList= new ArrayList<>();
         CustomFieldManager customFieldManager=ComponentAccessor.getCustomFieldManager();
 //        cfArrayList.add(customFieldManager.getCustomFieldObject(10600L));//PriorityNumber
-        cfArrayList.add(customFieldManager.getCustomFieldObject(10600L)); // Kaynak
-        cfArrayList.add(customFieldManager.getCustomFieldObject(10700L)); // ProjectLead
+        cfArrayList.add(customFieldManager.getCustomFieldObject(10600L)); // Butce
+        cfArrayList.add(customFieldManager.getCustomFieldObject(10700L)); // Proje Lideri
         cfArrayList.add(customFieldManager.getCustomFieldObject(10701L)); // Proje Ismi
         cfArrayList.add(customFieldManager.getCustomFieldObject(10703L)); // Baslangic Tarihi
         cfArrayList.add(customFieldManager.getCustomFieldObject(10704L)); // Bitis Tarihi
+        cfArrayList.add(customFieldManager.getCustomFieldObject(10709L)); // Kaynak
         return cfArrayList;
     }
 

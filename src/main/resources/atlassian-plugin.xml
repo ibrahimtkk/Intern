@@ -20,11 +20,25 @@
       <label key="Önceliklendirme"/>
       <link linkId="prioritization-item-link">/plugins/servlet/prioritization?restriction=gmy</link>
     </web-item>
-
    <servlet name="Priority Servlet" key="prioritization" class="com.veniture.servlet.Priority">
     <description>prioritization</description>
       <url-pattern>/prioritization</url-pattern>
    </servlet>
+
+<!--    <web-item key="projectapprove-webitem" name="Proje Onay" section="system.top.navigation.bar" weight="200">-->
+<!--      <description key="projectapprove-item-desc">Proje Onay</description>-->
+<!--      <label key="Proje Onay"/>-->
+<!--      <link linkId="projectapprove-item-link">/plugins/servlet/projectapprove</link>-->
+<!--&lt;!&ndash;      <condition class="com.veniture.condition.projectApprove"/>&ndash;&gt;-->
+<!--&lt;!&ndash;      <conditions type="AND">&ndash;&gt;-->
+<!--&lt;!&ndash;        <condition class="com.veniture.condition.gmy"/>&ndash;&gt;-->
+<!--&lt;!&ndash;        <condition class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition"/>&ndash;&gt;-->
+<!--&lt;!&ndash;      </conditions>&ndash;&gt;-->
+<!--    </web-item>-->
+<!--    <servlet name="Project Approve Servlet" key="projectapprove" class="com.veniture.servlet.ProjectApprove">-->
+<!--      <description>projectapprove</description>-->
+<!--      <url-pattern>/projectapprove</url-pattern>-->
+<!--    </servlet>-->
 
   <rest name="FLO Rest Service" key="florestservice" path="florestservice" version="1.2">
     <description key="florestservice">The rest service for FLO</description>
