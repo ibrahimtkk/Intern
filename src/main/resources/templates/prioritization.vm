@@ -43,6 +43,16 @@ Released under the MIT license: http://jsbin.mit-license.org
     <meta name="decorator" content="atl.general">
 
     <style>
+        .blink {
+            animation: blinker 2s linear infinite;
+            color: #bf2600;
+            font-size: 18px;
+            font-weight: bold;
+            font-family: sans-serif;
+        }
+        @keyframes blinker {
+            50% { opacity: 0; }
+        }
         #content {
             margin: 12px;
         }
@@ -332,11 +342,15 @@ Released under the MIT license: http://jsbin.mit-license.org
                 var butceKisit = $("#butceInput").val();
 
                 if (parseInt(butceCount) <= parseInt(butceKisit)){
+                    $("#butceMiktari").removeClass("blink")
                     $("#butceMiktari").css("color","green")
+                    $("#butceMiktari").css("font-weight","bold")
 
                 }else if(parseInt(butceCount) > parseInt(butceKisit)){
                     $("#butceMiktari").css("color","red")
+                    $("#butceMiktari").toggleClass("blink")
                 }else{
+                    $("#butceMiktari").removeClass("blink")
                     $("#butceMiktari").css("color","black")
                 }
 
@@ -654,9 +668,10 @@ Released under the MIT license: http://jsbin.mit-license.org
             }
 
 
-            $('#temizleButton').on( 'click', function () {
+            AJS.$('#temizleButton').on( 'click', function () {
                 $("tr").removeClass("selected");
-                selectedRows=[]
+                $("#butceMiktari").removeClass("blink");
+                selectedRows=[];
                 butceCount=0;
 
                 $("#butceMiktari").text(butceCount).css("color","black");
@@ -761,7 +776,7 @@ Released under the MIT license: http://jsbin.mit-license.org
         <div class="aui-help aui-help-empty-state">
             <div class="aui-help-content">
                 <h1>Proje Önceliklendirme</h1>
-                <p>Projeleri sürekle-bırak yöntemi ile istediğiniz sıraya taşıyınız. Önceliklendirme bittikten sonra kaydet tuşuna basınız.</p>
+                <p>Projeleri sürekle-bırak yöntemi ile istediğiniz sıraya taşıyınız. Önceliklendirme bittikten sonra kaydet tuşuna basınız. Bütçe kısıtını belirlemek için öncelikle kısıt alanı ekleyerek belirlediğiniz bütçe değerini girin.</p>
             </div>
         </div>
     </div>
@@ -840,25 +855,37 @@ Released under the MIT license: http://jsbin.mit-license.org
 
     <div class="row" style="margin-top:50px;">
 
-        <div class="col-xs-6 col-md-1" style="padding-left: 0px;">
+        <div class="col-xs-6 col-md-1">
             <div class="aui-group" id="buttons">
-                <button class="aui-button aui-button-primary" id="kaydetButton">Kaydet</button>
+                <button class="aui-button aui-button-primary" id="kaydetButton">Sıralamayı Kaydet</button>
             </div>
         </div>
-        <div class="col-xs-6 col-md-1" style="padding-left: 0px;">
+        <div class="col-xs-6 col-md-1" style="padding-left:60px">
             <div class="aui-group" id="buttons">
                 <button class="aui-button" id="temizleButton">Seçimi Temizle</button>
             </div>
         </div>
+        <div class="col-xs-6 col-md-1" style="padding-left:80px">
+            <div class="aui-group" id="buttons">
+                <button class="aui-button" id="onaylaButton">Projeyi Onayla</button>
+            </div>
+        </div>
         <div>
-            <div style="float: right; padding-left: 40px; padding-right: 30px;">
-                <label style="display: inline">Durum: </label>
-                <p id="issueDurum" style="display: inline"></p>
+
+##            <div style="float: right; padding-left: 20px; padding-right: 30px;">
+##                <label style="display: inline">Tarih Geçerlilik Durumu: </label>
+##                <!--<p id="issueDurum" style="display: inline"></p>-->
+##                <aui-badge id="issueDurum" style="font-size: 14px; display: inline;"></aui-badge>
+##            </div>
+            <div style="float: right; padding-left: 60px; padding-right: 30px;">
+                <label style="display: inline">Kaynak Durumu: </label>
+                <aui-badge id="kaynak" style="font-size: 14px; display: inline;"></aui-badge>
             </div>
 
             <div style="float: right;">
                 <label style="display:inline">Butce: </label>
-                <p id="butceMiktari" style="display:inline"></p>
+                <!--<p id="butceMiktari" style="display:inline"></p>-->
+                <aui-badge id="butceMiktari" style="font-size: 17px; display: inline;"></aui-badge>
             </div>
         </div>
 
