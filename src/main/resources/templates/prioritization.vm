@@ -36,6 +36,9 @@ Released under the MIT license: http://jsbin.mit-license.org
 
     <script src="https://cdn.jsdelivr.net/npm/table-to-json@1.0.0/lib/jquery.tabletojson.min.js" integrity="sha256-H8xrCe0tZFi/C2CgxkmiGksqVaxhW0PFcUKZJZo1yNU=" crossorigin="anonymous"></script>
 
+##    <script type="text/javascript" src="../js/jquery.ganttChart.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
 
     <meta charset="utf-8">
     <title>Proje Önceliklendirme</title>
@@ -249,6 +252,7 @@ Released under the MIT license: http://jsbin.mit-license.org
             var baslangicTarihiBoolean = true;
             var bitisTarihiBoolean = true;
             var selectedThisRows = []
+            var issueAndDates = []
 
             $('#auiTable tbody').on( 'click', 'tr', function () {
                 $(this).toggleClass('selected');
@@ -375,6 +379,127 @@ Released under the MIT license: http://jsbin.mit-license.org
                 }
             })
 
+            var issueKeys =[];
+            jsonDataTable.forEach(cell => {
+                issueKeys.push(cell.key)
+            })
+
+
+            var baslangicTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), "customfield_10703");
+            var bitisTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), "customfield_10704");
+
+            var baslangicTarihiArray = baslangicTarihiCFvalues.split(",,,");
+            var bitisTarihiArray = bitisTarihiCFvalues.split(",,,");
+            console.log("baslangicTarihiArray: ", baslangicTarihiArray)
+            console.log("bitisTarihiArray: ", bitisTarihiArray)
+
+            google.charts.load('current', {'packages':['gantt']});
+            google.charts.setOnLoadCallback(drawChart);
+
+            function drawChart() {
+
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Task ID');
+                data.addColumn('string', 'Task Name');
+                data.addColumn('string', 'Issue Key');
+                data.addColumn('date', 'Start Date');
+                data.addColumn('date', 'End Date');
+                data.addColumn('number', 'Duration');
+                data.addColumn('number', 'Percent Complete');
+                data.addColumn('string', 'Dependencies');
+
+                console.log("jsonDataTable: ", jsonDataTable)
+
+                var baslangicDate, bitisDate;
+                var ganttRows = []
+                var ganttRow = []
+                var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+                for (var i=0; i<jsonDataTable.length; i++){
+                    var jsonRow = jsonDataTable[i];
+                    if (baslangicTarihiArray[i] !== "-"){
+                        baslangicTarihiArray[i] = baslangicTarihiArray[i].replaceAll("-", "/")
+                        baslangicTarihiArray[i] = baslangicTarihiArray[i].replaceAll(".0", "")
+                        baslangicDate = new Date(baslangicTarihiArray[i])
+                        baslangicDate = new Date(baslangicDate.getFullYear(), baslangicDate.getMonth(), baslangicDate.getDate())
+                    }
+                    if (baslangicTarihiArray[i] === "-") {
+                        baslangicDate = new Date(2020, 10, 1+Math.floor(Math.random() * 10))
+                        baslangicDate = new Date(baslangicDate.getFullYear(), baslangicDate.getMonth(), baslangicDate.getDate())
+                    }
+                    if (bitisTarihiArray[i] !== "-"){
+                        bitisTarihiArray[i] = bitisTarihiArray[i].replaceAll("-", "/")
+                        bitisTarihiArray[i] = bitisTarihiArray[i].replaceAll(".0", "")
+                        bitisDate = new Date(bitisTarihiArray[i])
+                        bitisDate = new Date(bitisDate.getFullYear(), bitisDate.getMonth(), bitisDate.getDate())
+                    }
+                    if (bitisTarihiArray[i] === "-") {
+                        bitisDate = new Date(2020, 10, 11+Math.floor(Math.random() * 19))
+                        bitisDate = new Date(bitisDate.getFullYear(), bitisDate.getMonth(), bitisDate.getDate())
+                    }
+                    console.log(jsonRow['key'], baslangicDate, bitisDate)
+                    ganttRow = [jsonRow['key'], jsonRow['key'], jsonRow['key'], baslangicDate, bitisDate, null, 100, null]
+                    ganttRows.push(ganttRow)
+                }
+                data.addRows(ganttRows)
+                // data.addRows([
+                //     ['Spring 2014', 'Spring 2014', 'Spring 2014',
+                //         new Date(2014, 2, 22), new Date(2014, 5, 20), null, 100, null],
+                //     ['Summer 2014', 'Summer 2014', 'Summer 2014',
+                //         new Date(2014, 5, 21), new Date(2014, 8, 20), null, 100, null],
+                //     ['Autumn 2014', 'Autumn 2014', 'Autumn 2014',
+                //         new Date(2014, 8, 21), new Date(2014, 11, 20), null, 100, null],
+                //     ['Winter 2014', 'Winter 2014', 'Winter 2014',
+                //         new Date(2014, 11, 21), new Date(2015, 2, 21), null, 100, null],
+                //     ['Spring 2015', 'Spring 2015', 'Spring 2015',
+                //         new Date(2015, 2, 22), new Date(2015, 5, 20), null, 100, null]
+                // ]);
+
+                var options = {
+                    height: 400,
+                    gantt: {
+                        trackHeight: 30
+                    }
+                };
+
+                var chart = new google.visualization.Gantt(document.getElementById('gantt'));
+
+                chart.draw(data, options);
+            }
+            // var gant = $("#gantt")
+            // console.log("gantttt:", gant)
+            // AJS.$('#gantt').gantt({
+            //     source: demoSource,
+            //     navigate: "scroll",
+            //     scale: "weeks",
+            //     maxScale: "months",
+            //     minScale: "hours",
+            //     itemsPerPage: 10,
+            //     scrollToToday: false,
+            //     useCookie: true,
+            //     onItemClick: function(data) {
+            //         alert("Item clicked - show some details");
+            //     },
+            //     onAddClick: function(dt, rowId) {
+            //         alert("Empty space clicked - add an item!");
+            //     },
+            //     onRender: function() {
+            //         if (window.console && typeof console.log === "function") {
+            //             console.log("chart rendered");
+            //         }
+            //     }
+            // });
+            // AJS.$("#gantt").popover({
+            //     selector: ".bar",
+            //     title: function _getItemText() {
+            //         return this.textContent;
+            //     },
+            //     container: '.gantt',
+            //     content: "Here's some useful information.",
+            //     trigger: "hover",
+            //     placement: "auto right"
+            // });
+
             AJS.$('#kaydetButton').off().on("click", function (e) {
                 var params = new window.URLSearchParams(window.location.search);
                 updatePrioritiesInJIRA(params.get('restriction'));
@@ -391,6 +516,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                 })
 
                 var cfValues = bulkGetCfValuesFromIssue(issueKeys.join(","), e.val);
+                console.log("eee: ", e.val)
 
                 var index;
                 dataTable.columns()[0].forEach(innerIndex => {
@@ -756,6 +882,8 @@ Released under the MIT license: http://jsbin.mit-license.org
                 });
                 console.log("Priorities are updated (Not in JIRA DB))");
             }
+
+
         });
     </script>
 
@@ -780,7 +908,9 @@ Released under the MIT license: http://jsbin.mit-license.org
             </div>
         </div>
     </div>
-        
+
+
+
     <div>
         <div class="row">
             <div class="col-xs-6 col-md-4">
@@ -942,6 +1072,8 @@ Released under the MIT license: http://jsbin.mit-license.org
             </tbody>
         </table>
     </div>
+
+    <div class="gantt" name="gantt" id="gantt"></div>
 
     #end
 
