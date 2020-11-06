@@ -39,6 +39,7 @@ Released under the MIT license: http://jsbin.mit-license.org
 ##    <script type="text/javascript" src="../js/jquery.ganttChart.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
+##    <script type="text/javascript" src="../css/PortfolioManagement.css"></script>
 
     <meta charset="utf-8">
     <title>Proje Önceliklendirme</title>
@@ -513,6 +514,21 @@ Released under the MIT license: http://jsbin.mit-license.org
             AJS.$('#kaydetButton').off().on("click", function (e) {
                 var params = new window.URLSearchParams(window.location.search);
                 updatePrioritiesInJIRA(params.get('restriction'));
+                e.preventDefault();
+            });
+
+            AJS.$('#onaylaButton').off().on("click", function (e) {
+                // let startDate = "2020-11-16";
+                // let endDate = "2020-11-18";
+                // let selectedRowKeys = ["APY-1", "APY-2"]
+                /* BITIS TARIHI, SECILEN TARIHTEN BIR GUN SONRASI OLARAK GIRILMELI */
+                let constraintData = {
+                    "startDate" : "2020-11-16",
+                    "endDate" : "2020-11-19",
+                    "selectedRowKeys" : ["APY-1", "APY-2"],
+                    "resource" : "50"
+                }
+                calculateResource(constraintData);
                 e.preventDefault();
             });
             AJS.$("#loading-spinner").hide();
@@ -1066,6 +1082,24 @@ Released under the MIT license: http://jsbin.mit-license.org
                     i++;
                 });
                 console.log("Priorities are updated (Not in JIRA DB))");
+            }
+
+            function calculateResource(constraintData) {
+                let value="";
+                jQuery.ajax({
+                    url: AJS.params.baseURL + "/rest/florestservice/1.2/rest/calculateResource",
+                    type: 'GET',
+                    data: constraintData,
+                    async: false,
+                    error : function (response) {
+                        console.log("calculateResourceError")
+                        value= "-";
+                    },
+                    success: function (response, status, jqXHR) {
+                        console.log("calculateResource: ", response);
+                    }
+                });
+                return value;
             }
 
 

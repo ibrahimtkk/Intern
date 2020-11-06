@@ -126,8 +126,7 @@ import com.atlassian.sal.api.net.RequestFactory;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import model.pojo.TempoPlanner.FooterTotalAvailabilityInfos;
-import model.pojo.TempoPlanner.IssueTableData;
+import model.pojo.TempoPlanner.*;
 import model.pojo.TempoTeams.Team;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -196,7 +195,12 @@ public class RemoteSearcher {
         String StartDate = CurrentYear+"-"+(CurrentMonth+1)+"-"+CurrentDay;
         String EndDate = (CurrentYear) +"-12-30";
         //String EndDate = (CurrentYear) +"-"+(CurrentMonth+2)+"-30";
-        String QUERY = QUERY_AVAILABILITY_YEAR.replace("XXX", teamId.toString()).replace("YYY", StartDate).replace("ZZZ",EndDate);
+        String QUERY = QUERY_AVAILABILITY_YEAR_BY_DAY.replace("XXX", teamId.toString()).replace("YYY", StartDate).replace("ZZZ",EndDate);
+        return getResponseString(QUERY);
+    }
+
+    private String getResponseByStartAndEndDate(String startDate, String endDate) throws IOException {
+        String QUERY = QUERY_ALLOCATION_BY_DATE.replace("SSS", startDate).replace("EEE", endDate);
         return getResponseString(QUERY);
     }
 
@@ -211,6 +215,18 @@ public class RemoteSearcher {
         Type tempoTeamDataType = new TypeToken<List<Team>>() {}.getType();
         List<Team> tempoTeamData = GSON.fromJson(getResponseString(QUERY_TEAM), tempoTeamDataType);
         return tempoTeamData;
+    }
+
+    public List<Allocation> getAllAllocation() throws Exception {
+        Type tempoAllocationDataType = new TypeToken<List<Allocation>>() {}.getType();
+        List<Allocation> tempoAllocationData = GSON.fromJson(getResponseString(QUERY_ALLOCATION_BY_DATE), tempoAllocationDataType);
+        return tempoAllocationData;
+    }
+
+    public List<Allocation> getAllocationsByDate() throws IOException {
+        Type tempoAllocationDataType = new TypeToken<List<Allocation>>() {}.getType();
+        List<Allocation> tempoAllocationData = GSON.fromJson(getResponseByStartAndEndDate(STARTDATE, ENDDATE), tempoAllocationDataType);
+        return tempoAllocationData;
     }
 
 //    public Workload test() throws URIException {

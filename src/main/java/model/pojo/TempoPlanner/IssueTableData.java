@@ -10,9 +10,11 @@ public class IssueTableData {
     @SerializedName("header")
     @Expose
     private Header header;
+
     @SerializedName("rows")
     @Expose
     private List<Row> rows = null;
+
     @SerializedName("footer")
     @Expose
     private Footer footer;

@@ -2,6 +2,10 @@ package com.veniture.constants;
 
 import com.atlassian.jira.component.ComponentAccessor;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class Constants {
 
     public static final Boolean isTest = false;
@@ -13,13 +17,33 @@ public class Constants {
     public static final String venitureHostname = "test.veniture.com.tr";
     public static final String floHostname = "test.veniture.com.tr";
 
+    public static final String STARTDATE = "2020-11-09";
+    public static final String ENDDATE = "2020-11-19";
+
+    public static final String YEAR = "2020";
+    public static final String Holiday_API = "631e6283-8620-499b-a400-ea24bee74e4f";
+//    public static final String Holiday_API_Url = "curl -G -d country=\"TR\" -d year=\"YYYY\" -d pretty -d key=\"KKKK\" \"https://holidayapi.com/v1/holidays\"";
+    public static final String Holiday_API_Url = "https://holidayapi.com/v1/holidays";
+
+    public static final String[] holidayArray = {"2020-01-01", "2020-4-23", "2020-04-23", "2020-5-1", "2020-05-01", "2020-5-19", "2020-05-19",
+    "2020-5-23", "2020-5-24", "2020-5-25", "2020-5-26", "2020-05-23", "2020-05-24", "2020-05-25", "2020-05-26",
+    "2020-7-15", "2020-07-15",
+    "2020-7-31", "2020-8-1", "2020-8-2", "2020-8-3", "2020-07-31", "2020-08-1", "2020-08-2", "2020-08-3",
+            "2020-08-01", "2020-08-02", "2020-08-03", "2020-8-30", "2020-08-30", "2020-10-29", "2020-11-10"};
+    public static final List<String> holidays = Arrays.asList(holidayArray);
+
+
+
+
     public static final String schemeHTTP = "http://";
     public static final String schemeHTTPS = "https://";
     public static final String QUERY_TEAM = "/rest/tempo-teams/2/team";
+    public static final String QUERY_ALLOCATION = "/rest/tempo-planning/1/allocation";
     public static final String QUERY_WORKLOAD = "/rest/tempo-core/1/workloadscheme/1";
     //public static final String QUERY_AVAILABILITY = "/rest/tempo-planning/1/capacity/report/8?from=2019-11-19&to=2019-12-04&period=P1w";
     public static final String QUERY_AVAILABILITY_YEAR = "/rest/tempo-planning/1/capacity/report/XXX?from=YYY&to=ZZZ&period=P1w";
-
+    public static final String QUERY_AVAILABILITY_YEAR_BY_DAY = "/rest/tempo-planning/1/capacity/report/XXX?from=YYY&to=ZZZ&period=P1d";
+    public static final String QUERY_ALLOCATION_BY_DATE = "/rest/tempo-planning/1/allocation?startDate=SSS&endDate=EEE";
     //Veniture Jira - Prod Yeni Ortam
     public static final String ProjectId = "APY";
     //public static final String departmanJQL ="project ="+ProjectId+" and cf[11507] =currentUser() and status=\"Departman Önceliklendirmesi\" ORDER BY \"Departman Önceliği\"";

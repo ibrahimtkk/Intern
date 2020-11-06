@@ -1,10 +1,22 @@
-
+.blink {
+    animation: blinker 2s linear infinite;
+    color: #bf2600;
+    font-size: 18px;
+    font-weight: bold;
+    font-family: sans-serif;
+}
+@keyframes blinker {
+    50% { opacity: 0; }
+}
 #content {
     margin: 12px;
 }
 
 #tableBody>tr {
-    cursor: move;
+    cursor: grab;
+}
+#tableBody>tr :active {
+    cursor: grabbing;
 }
 
 #loading-spinner {
@@ -52,23 +64,59 @@ td {
 #shadow:hover {
     background-color: #f5f5f5;
     padding: 10px;
-
 }
 .aui-help-content{
     margin-bottom: 60px;
 }
 .row{
-    margin-bottom: 60px;
+    margin-bottom: 10px;
 }
 #buttons{
     text-align: center;
     margin-left:auto;
-    margin-right: auto;
-
 }
 #auiTable{
     margin-left: auto;
     margin-right: auto;
     position: center;
     margin-bottom: 130px;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+    width: 100%;
+}
+#auiTable td, #auiTable tr{
+    border: 1px solid #ddd;
+}
+/*#auiTable tr:nth-child(even){background-color: #f2f2f2;}*/
+
+/*table.dataTable tbody tr.selected {*/
+/*    color: #6dc4e7;*/
+/*}*/
+
+#auiTable tr:hover {background-color: #ddd;}
+
+#auiTable th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #0747a6;
+    color: #deebff;
+}
+table.dataTable.no-footer {
+    border-bottom: none;
+}
+table.dataTable thead th, table.dataTable thead td {
+    border-bottom: none;
+}
+
+.dataTables_wrapper .dataTables_filter {
+    float: left;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    font-weight: normal;
+}
+
+label {
+    color: #6b778c;
 }

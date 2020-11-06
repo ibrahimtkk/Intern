@@ -24,7 +24,9 @@ import com.atlassian.sal.api.net.RequestFactory;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.veniture.constants.Constants;
 import com.veniture.util.GetCustomFieldsInExcel;
+import com.veniture.util.PersonalAvailabilityTimes;
 import com.veniture.util.TeamsWithAvailabilityTimes;
+import model.pojo.TempoPlanner.Allocation;
 import model.pojo.TempoTeams.Team;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -167,7 +169,8 @@ public class Priority extends HttpServlet {
 //            }
 
 
-            List<Team> teams = new TeamsWithAvailabilityTimes(logger, requestFactory).invoke();
+//            List<Team> teams = new TeamsWithAvailabilityTimes(logger, requestFactory).invoke();
+            List<Allocation> allocations = new PersonalAvailabilityTimes(logger, requestFactory).invoke();
 
 
             context.put("issues", results.getResults());

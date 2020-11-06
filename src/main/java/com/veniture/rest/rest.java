@@ -27,13 +27,24 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.veniture.constants.Constants;
 import com.veniture.util.GetCustomFieldsInExcel;
+import com.veniture.util.RemoteSearcher;
 import com.veniture.util.tableRowBuilder;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 import model.TableRow;
+import model.pojo.TempoPlanner.Allocation;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,12 +58,17 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Type;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.veniture.constants.Constants.*;
 import static com.veniture.util.functions.*;
 
 @Path("/rest")
@@ -66,10 +82,13 @@ public class rest {
     private JiraAuthenticationContext authenticationContext;
     @JiraImport
     private IssueManager issueManager;
-
-
     @JiraImport
     OrganizationService organizationService;
+
+    Date allocationStartDate = null;
+    Date allocationEndDate = null;
+    private long resource = 0;
+    long fark = 0;
     private static final Logger logger = LoggerFactory.getLogger(rest.class);// The transition ID
 //    private static final Gson GSON = new Gson();
     private static final IssueService ISSUE_SERVICE = ComponentAccessor.getIssueService();
@@ -210,10 +229,78 @@ public class rest {
         return null;
     }
 
+    @GET
+    @Path("/calculateResource")
+    public String calculateResource(@Context HttpServletRequest req, @Context HttpServletResponse resp) throws IOException, ParseException {
+        Map map = req.getParameterMap();
+        String[] issueKeysArray = req.getParameterValues("selectedRowKeys[]");
+        String startDateString = req.getParameterValues("startDate")[0];
+        String endDateString = req.getParameterValues("endDate")[0];
+        String resourceString = req.getParameterValues("resource")[0];
+        List<Allocation> allocations = getAllocationsByDate(startDateString, endDateString);
+        List<String> issueKeys = Arrays.asList(issueKeysArray);
+        Date constraintStartDate = new SimpleDateFormat("yyyy-MM-dd").parse(startDateString);
+        Date constraintEndDate = new SimpleDateFormat("yyyy-MM-dd").parse(endDateString);
+        resource = 0;
+
+        allocations.forEach(allocation1 -> {
+            Allocation allocation = (Allocation) allocation1;
+            if ( issueKeys.contains( allocation.getPlanItem().getKey() )){
+                try {
+                    allocationStartDate = new SimpleDateFormat("yyyy-MM-dd").parse(allocation.getStart());
+                    allocationEndDate = new SimpleDateFormat("yyyy-MM-dd").parse(allocation.getEnd());
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                if (constraintStartDate.before(allocationStartDate)) {
+                    if (constraintEndDate.before(allocationEndDate)) {
+//                        fark = allocationEndDate.getTime() - constraintStartDate.getTime();
+                        try {
+                            fark = getNonHolidayCount(allocationStartDate, constraintEndDate);
+                        } catch (IOException | URISyntaxException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    else {
+//                        fark = constraintEndDate.getTime() - constraintStartDate.getTime();
+                        try {
+                            fark = getNonHolidayCount(allocationStartDate, allocationEndDate);
+                        } catch (IOException | URISyntaxException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                else {
+                    if (constraintEndDate.before(allocationEndDate)) {
+//                        fark = constraintEndDate.getTime() - constraintStartDate.getTime();
+                        try {
+                            fark = getNonHolidayCount(constraintStartDate, constraintEndDate);
+                        } catch (IOException | URISyntaxException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    else {
+//                        fark = allocationEndDate.getTime() - constraintStartDate.getTime();
+                        try {
+                            fark = getNonHolidayCount(constraintStartDate, allocationEndDate);
+                        } catch (IOException | URISyntaxException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+//                fark = fark / 1000; // timestamp shit
+//                fark = fark / 3600; // seconds to hours
+//                fark = fark / 24;   // hours to days
+                resource += fark * allocation.getSecondsPerDay()/3600;
+
+            }
+        });
+        return String.valueOf(resource);
+    }
+
     public static final String REST_SERVICEDESKAPI_ORGANIZATION = "https://crm.turkishtechnic.com/rest/servicedeskapi/organization";
     public static final String REST_SERVICEDESKAPI_SERVICEDESK_PROJECT_ORGANIZATION = "https://crm.turkishtechnic.com/rest/servicedeskapi/servicedesk/1/organization";
     public static final String Authorization = "Basic TV9BWUFMOk1hQDIwMjA=";
-
 
     private static HttpResponse<String> sendReq() {
         HttpResponse<String> response = null;
