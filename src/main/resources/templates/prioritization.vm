@@ -392,6 +392,8 @@ Released under the MIT license: http://jsbin.mit-license.org
                 issueKeys.push(cell.key)
             })
 
+            // var baslangicTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), "customfield_10703");
+            // var bitisTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), "customfield_10704");
 
             var baslangicTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), "customfield_11102");
             var bitisTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), "customfield_10900");
