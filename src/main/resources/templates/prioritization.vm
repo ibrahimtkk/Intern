@@ -367,15 +367,23 @@ Released under the MIT license: http://jsbin.mit-license.org
             AJS.$("#favFilter-select2").auiSelect2();
             AJS.$("#constraintList-select2").auiSelect2();
             AJS.$("#baslangicTarihiInput").datePicker({
+                overrideBrowserDefault:true,
                 dateFormat: "yy-mm-dd",
+                inline:true,
+                autoclose: true,
                 onSelect: function (date) {
-                    datePickerChanged(date)
+                    //datePickerChanged(date)
+                    datePickerFilter(date)
                 }
             })
             AJS.$("#bitisTarihiInput").datePicker({
+                overrideBrowserDefault:true,
                 dateFormat: "yy-mm-dd",
+                inline:true,
+                autoclose: true,
                 onSelect: function (date) {
-                    datePickerChanged(date)
+                    //datePickerChanged(date)
+                    datePickerFilter(date)
                 }
             })
 
@@ -385,8 +393,8 @@ Released under the MIT license: http://jsbin.mit-license.org
             })
 
 
-            var baslangicTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), "customfield_10703");
-            var bitisTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), "customfield_10704");
+            var baslangicTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), "customfield_11102");
+            var bitisTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), "customfield_10900");
 
             var baslangicTarihiArray = baslangicTarihiCFvalues.split(",,,");
             var bitisTarihiArray = bitisTarihiCFvalues.split(",,,");
@@ -792,6 +800,181 @@ Released under the MIT license: http://jsbin.mit-license.org
                     }
                 })
             }
+            function datePickerFilter(date){
+
+                console.log("-------datePickerFilter---------")
+                var baslangicKisit = $("#baslangicTarihiInput").val();
+                var bitisKisit = $("#bitisTarihiInput").val();
+
+                var baslangicKisitDate = Date.parse(baslangicKisit);
+                baslangicKisitDate=baslangicKisitDate/1000;
+
+                var bitisKisitDate = Date.parse(bitisKisit);
+                bitisKisitDate=bitisKisitDate/1000;
+
+                for (var i = 0; i < jsonDataTable.length; i++) {
+
+                    if (Object.keys(jsonDataTable[i]).includes("Başlangıç Tarihi") ) {
+                        if (jsonDataTable[i]["Başlangıç Tarihi"] !== "-") {
+                            var issueBaslangicTarihiString = jsonDataTable[i]["Başlangıç Tarihi"];
+                            issueBaslangicTarihiString = issueBaslangicTarihiString.replaceAll("-", "/")
+                            issueBaslangicTarihiString = issueBaslangicTarihiString.replaceAll(".0", "")
+                            var issueBaslangicTarihiDate = Date.parse(issueBaslangicTarihiString);
+                            issueBaslangicTarihiDate=issueBaslangicTarihiDate/1000;
+                            console.log(" issueBaslangicTarihiDate: "+issueBaslangicTarihiDate)
+                            console.log(" baslangicKisitDate: "+baslangicKisitDate)
+
+
+                            if(!isNaN(baslangicKisitDate)){
+
+                                if ( issueBaslangicTarihiDate >= baslangicKisitDate) {
+
+                                    var tableBody = $('#tableBody tr');
+                                    var keys=[]
+                                    tableBody.each(function () {
+                                        var cell = $(this)
+                                        var issueKey = $(this).find("td .issueKey")
+                                        keys.push(issueKey.text())
+                                    })
+
+                                    var flag=false;
+                                    if (!keys.includes(jsonDataTable[i]["key"])){
+                                        flag=true;
+                                        console.log("flag: "+flag)
+                                    }
+                                    if(flag){
+                                        console.log("flag true, push edilcek")
+
+                                        jsonDataTable.forEach(data => {
+                                            if (jsonDataTable[i]["key"]===(data.key)){
+                                                console.log("eklenecek satır jsondatatable da bulundu")
+                                                var rowArray=[]
+                                                rowArray.push('<a href="$baseUrl/browse/' + data.key + '" ' + 'class="issueKey">' + data.key + '</a>');
+                                                rowArray.push(data.Summary)
+                                                rowArray.push(data.Description)
+                                                rowArray.push(data.Priority)
+                                                #foreach($cf in $customFieldsInProject)
+                                                    rowArray.push('<td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">'+ data["$cf.getName()"] +'</td>')
+                                                #end
+                                                dataTable.row.add(rowArray).draw()
+
+                                            }
+                                        })
+
+                                    }
+
+
+                                } else {
+                                    console.log("else -- silinecek  "+ jsonDataTable[i]["key"])
+                                    var tableBody = $('#tableBody tr');
+                                    tableBody.each(function () {
+                                        var cell = $(this)
+                                        var issueKey = $(this).find("td .issueKey")
+                                        if (jsonDataTable[i]["key"] === issueKey.text()) {
+                                            dataTable.row(cell).remove().draw();
+                                        } else {
+                                        }
+
+                                    })
+                                }
+                            }
+                            else{
+                                console.log("date is not a number")
+                            }
+
+                        }
+
+                    }
+
+                    if (Object.keys(jsonDataTable[i]).includes("Bitiş Tarihi") ) {
+                        if (jsonDataTable[i]["Bitiş Tarihi"] !== "-") {
+                            var issueBitisTarihiString = jsonDataTable[i]["Bitiş Tarihi"];
+                            issueBitisTarihiString = issueBitisTarihiString.replaceAll("-", "/")
+                            issueBitisTarihiString = issueBitisTarihiString.replaceAll(".0", "")
+                            var issueBitisTarihiDate = Date.parse(issueBitisTarihiString);
+                            issueBitisTarihiDate=issueBitisTarihiDate/1000;
+
+                            if(!isNaN(bitisKisitDate)){
+
+                                if($("#baslangicTarihiInput").val() == "") {
+                                    if ( issueBitisTarihiDate <= bitisKisitDate) {
+
+                                        var tableBody = $('#tableBody tr');
+                                        var keys=[]
+                                        tableBody.each(function () {
+                                            var cell = $(this)
+                                            var issueKey = $(this).find("td .issueKey")
+                                            keys.push(issueKey.text())
+                                        })
+
+                                        var flag=false;
+                                        if (!keys.includes(jsonDataTable[i]["key"])){
+                                            flag=true;
+                                            console.log("flag: "+flag)
+                                        }
+                                        if(flag){
+
+                                            jsonDataTable.forEach(data => {
+                                                if (jsonDataTable[i]["key"]===(data.key)){
+                                                    console.log("eklenecek satır jsondatatable da bulundu")
+                                                    var rowArray=[]
+                                                    rowArray.push('<a href="$baseUrl/browse/' + data.key + '" ' + 'class="issueKey">' + data.key + '</a>');
+                                                    rowArray.push(data.Summary)
+                                                    rowArray.push(data.Description)
+                                                    rowArray.push(data.Priority)
+                                                    #foreach($cf in $customFieldsInProject)
+                                                        rowArray.push('<td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">'+ data["$cf.getName()"] +'</td>')
+                                                    #end
+                                                    dataTable.row.add(rowArray).draw()
+                                                }
+                                            })
+
+                                        }
+
+
+                                    }
+                                    else {
+                                        console.log("else -- silinecek  "+ jsonDataTable[i]["key"])
+                                        var tableBody = $('#tableBody tr');
+                                        tableBody.each(function () {
+                                            var cell = $(this)
+                                            var issueKey = $(this).find("td .issueKey")
+                                            if (jsonDataTable[i]["key"] === issueKey.text()) {
+                                                dataTable.row(cell).remove().draw();
+                                            } else {
+                                            }
+
+                                        })
+                                    }
+                                }else {
+                                    if ( issueBitisTarihiDate <= bitisKisitDate) {
+
+                                    }else{
+                                        console.log("else -- silinecek  "+ jsonDataTable[i]["key"])
+                                        var tableBody = $('#tableBody tr');
+                                        tableBody.each(function () {
+                                            var cell = $(this)
+                                            var issueKey = $(this).find("td .issueKey")
+                                            if (jsonDataTable[i]["key"] === issueKey.text()) {
+                                                dataTable.row(cell).remove().draw();
+                                            } else {
+                                            }
+
+                                        })
+                                    }
+                                }
+
+
+                            }else{
+                                console.log("date is not a number")
+                            }
+
+                        }
+                    }
+
+                }
+
+            }
 
 
             AJS.$('#temizleButton').on( 'click', function () {
@@ -961,11 +1144,11 @@ Released under the MIT license: http://jsbin.mit-license.org
                                 </div>
                                 <div class="col-xs-6 col-md-4">
                                     <label for="baslangicTarihiInput" id="baslangicTarihiLabel" name="baslangicTarihiLabel" style="visibility: hidden;">Başlangıç Tarihi:</label>
-                                    <input id="baslangicTarihiInput" name="baslangicTarihiInput" class="aui-date-picker" id="demo-range-always" type="date" style="visibility: hidden;"/>
+                                    <input id="baslangicTarihiInput" name="baslangicTarihiInput" class="aui-date-picker" id="demo-range-1" type="date" style="visibility: hidden;"/>
                                 </div>
                                 <div class="col-xs-6 col-md-4">
                                     <label for="bitisTarihiInput" id="bitisTarihiLabel" name="bitisTarihiLabel" style="visibility: hidden;">Bitiş Tarihi:</label>
-                                    <input id="bitisTarihiInput" name="bitisTarihiInput" class="aui-date-picker" id="demo-range-always" type="date" style="visibility: hidden;"/>
+                                    <input id="bitisTarihiInput" name="bitisTarihiInput" class="aui-date-picker" id="demo-range-1" type="date" style="visibility: hidden;"/>
                                 </div>
                             </form>
                         </form>
