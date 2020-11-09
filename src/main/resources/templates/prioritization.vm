@@ -393,11 +393,11 @@ Released under the MIT license: http://jsbin.mit-license.org
                 issueKeys.push(cell.key)
             })
 
-            // var baslangicTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), "customfield_10703");
-            // var bitisTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), "customfield_10704");
+            var baslangicTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), "customfield_10703");
+            var bitisTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), "customfield_10704");
 
-            var baslangicTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), "customfield_11102");
-            var bitisTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), "customfield_10900");
+            // var baslangicTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), "customfield_11102");
+            // var bitisTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), "customfield_10900");
 
             var baslangicTarihiArray = baslangicTarihiCFvalues.split(",,,");
             var bitisTarihiArray = bitisTarihiCFvalues.split(",,,");
@@ -518,14 +518,16 @@ Released under the MIT license: http://jsbin.mit-license.org
             });
 
             AJS.$('#onaylaButton').off().on("click", function (e) {
+                var minStartDate=minStartIssueDate(selectedRows);
+                var maxEndDate=maxEndIssueDate(selectedRows);
                 // let startDate = "2020-11-16";
                 // let endDate = "2020-11-18";
                 // let selectedRowKeys = ["APY-1", "APY-2"]
                 /* BITIS TARIHI, SECILEN TARIHTEN BIR GUN SONRASI OLARAK GIRILMELI */
                 let constraintData = {
-                    "startDate" : "2020-11-16",
-                    "endDate" : "2020-11-19",
-                    "selectedRowKeys" : ["APY-1", "APY-2"],
+                    "startDate" : minStartDate,
+                    "endDate" : maxEndDate,
+                    "selectedRowKeys" : selectedRows,
                     "resource" : "50"
                 }
                 calculateResource(constraintData);
@@ -824,10 +826,16 @@ Released under the MIT license: http://jsbin.mit-license.org
                 var baslangicKisit = $("#baslangicTarihiInput").val();
                 var bitisKisit = $("#bitisTarihiInput").val();
 
-                var baslangicKisitDate = Date.parse(baslangicKisit);
+                baslangicKisit=baslangicKisit+" 00:00:00"
+                var baslangicKisitFixedDate=new Date(baslangicKisit)
+
+                bitisKisit=bitisKisit+" 00:00:00"
+                var bitisKisitFixedDate=new Date(bitisKisit)
+
+                var baslangicKisitDate = Date.parse(baslangicKisitFixedDate);
                 baslangicKisitDate=baslangicKisitDate/1000;
 
-                var bitisKisitDate = Date.parse(bitisKisit);
+                var bitisKisitDate = Date.parse(bitisKisitFixedDate);
                 bitisKisitDate=bitisKisitDate/1000;
 
                 for (var i = 0; i < jsonDataTable.length; i++) {
@@ -839,8 +847,6 @@ Released under the MIT license: http://jsbin.mit-license.org
                             issueBaslangicTarihiString = issueBaslangicTarihiString.replaceAll(".0", "")
                             var issueBaslangicTarihiDate = Date.parse(issueBaslangicTarihiString);
                             issueBaslangicTarihiDate=issueBaslangicTarihiDate/1000;
-                            console.log(" issueBaslangicTarihiDate: "+issueBaslangicTarihiDate)
-                            console.log(" baslangicKisitDate: "+baslangicKisitDate)
 
 
                             if(!isNaN(baslangicKisitDate)){
@@ -994,6 +1000,85 @@ Released under the MIT license: http://jsbin.mit-license.org
 
             }
 
+            function maxEndIssueDate(selectedRows){
+                endDates=[]
+
+                for(var i=0; i<selectedRows.length; i++){
+                     for (var j = 0; j < jsonDataTable.length; j++) {
+                         if (jsonDataTable[j]['key'] === selectedRows[i]) {
+
+                             var issueBitişTarihiString = jsonDataTable[i]["Bitiş Tarihi"];
+                             issueBitişTarihiString = issueBitişTarihiString.replaceAll("-", "/")
+                             issueBitişTarihiString = issueBitişTarihiString.replaceAll(".0", "")
+                             var issueBitişTarihiDate = Date.parse(issueBitişTarihiString)/1000;
+
+                             endDates.push(issueBitişTarihiDate);
+                         }
+                     }
+                }
+
+                var maxEndDate=Math.max(...endDates);
+                //console.log("max end date: "+maxEndDate);
+
+                var justDate;
+                for (var j = 0; j < jsonDataTable.length; j++) {
+                    var issueBitişTarihiStringOrj = jsonDataTable[j]["Bitiş Tarihi"];
+                    var issueBitişTarihiString = jsonDataTable[j]["Bitiş Tarihi"];
+                    issueBitişTarihiString = issueBitişTarihiString.replaceAll("-", "/")
+                    issueBitişTarihiString = issueBitişTarihiString.replaceAll(".0", "")
+                    var issueBitişTarihiDate = Date.parse(issueBitişTarihiString)/1000;
+
+                    console.log(jsonDataTable[j]["key"]+ " bitiş tarihi: "+ issueBitişTarihiDate)
+                    if(issueBitişTarihiDate === maxEndDate) {
+                        var date=new Date(Date.parse(issueBitişTarihiString))
+
+                        date.setDate(date.getDate() + 1)
+
+                        var day=date.getDate()
+                        var month=date.getMonth()+1
+                        var year=date.getFullYear()
+                        var incrementedDate=year+"-"+month+"-"+day;
+
+                        //justDate = issueBitişTarihiStringOrj.split(" ")
+                        justDate=incrementedDate;
+                    }
+                }
+
+                return justDate;
+            }
+            function minStartIssueDate(selectedRows){
+                startDates=[]
+
+                for(var i=0; i<selectedRows.length; i++){
+                    for (var j = 0; j < jsonDataTable.length; j++) {
+                        if (jsonDataTable[j]['key'] === selectedRows[i]) {
+
+                            var issueBaşlangıçTarihiString = jsonDataTable[i]["Başlangıç Tarihi"];
+                            issueBaşlangıçTarihiString = issueBaşlangıçTarihiString.replaceAll("-", "/")
+                            issueBaşlangıçTarihiString = issueBaşlangıçTarihiString.replaceAll(".0", "")
+                            var issueBaşlangıçTarihiDate = Date.parse(issueBaşlangıçTarihiString)/1000;
+
+                            startDates.push(issueBaşlangıçTarihiDate);
+                        }
+                    }
+                }
+                minStartDate=Math.min(...startDates)
+                var justDate;
+                for (var j = 0; j < jsonDataTable.length; j++) {
+
+                    var issueBaşlangıçTarihiStringOrj = jsonDataTable[j]["Başlangıç Tarihi"];
+                    var issueBaşlangıçTarihiString = jsonDataTable[j]["Başlangıç Tarihi"];
+                    issueBaşlangıçTarihiString = issueBaşlangıçTarihiString.replaceAll("-", "/")
+                    issueBaşlangıçTarihiString = issueBaşlangıçTarihiString.replaceAll(".0", "")
+                    var issueBaşlangıçTarihiDate = Date.parse(issueBaşlangıçTarihiString)/1000;
+
+                    if(issueBaşlangıçTarihiDate === minStartDate) {
+                        justDate = issueBaşlangıçTarihiStringOrj.split(" ")
+                    }
+                }
+                return justDate[0];
+            }
+
 
             AJS.$('#temizleButton').on( 'click', function () {
                 $("tr").removeClass("selected");
@@ -1004,6 +1089,9 @@ Released under the MIT license: http://jsbin.mit-license.org
                 $("#butceMiktari").text(butceCount).css("color","black");
                 $("#issueDurum").text("").css("color","black");
 
+            });
+            AJS.$('#approveButton').on("click", function (){
+                approveProject(selectedRows);
             });
 
 
@@ -1102,6 +1190,29 @@ Released under the MIT license: http://jsbin.mit-license.org
                 return value;
             }
 
+            // function approveProject(selectedRows){
+            //     console.log("selected rows : "+ selectedRows)
+            //     jQuery.ajax({
+            //         url: AJS.params.baseURL + "/rest/florestservice/1.2/rest/approveProject",
+            //         type: 'GET',
+            //         data: {
+            //             issues: selectedRows
+            //         },
+            //         async: true,
+            //         beforeSend: function () {
+            //             console.log("approveSelectedProject beforeSend")
+            //         },
+            //         complete: function (response) {
+            //             console.log("approveSelectedProject complete")
+            //         },
+            //         error: function (response) {
+            //             console.log("approveSelectedProject has finished with ERROR !!!");
+            //         },
+            //         success: function (response, status, jqXHR) {
+            //             console.log("approveSelectedProject is successful");
+            //         }
+            //     });
+            // }
 
         });
     </script>
@@ -1216,7 +1327,12 @@ Released under the MIT license: http://jsbin.mit-license.org
         </div>
         <div class="col-xs-6 col-md-1" style="padding-left:80px">
             <div class="aui-group" id="buttons">
-                <button class="aui-button" id="onaylaButton">Projeyi Onayla</button>
+                <button class="aui-button" id="onaylaButton">Kaynak</button>
+            </div>
+        </div>
+        <div class="col-xs-6 col-md-1" style="padding-left:60px">
+            <div class="aui-group" id="buttons">
+                <button class="aui-button" id="approveButton">Approve</button>
             </div>
         </div>
         <div>
