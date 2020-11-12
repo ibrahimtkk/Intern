@@ -553,6 +553,10 @@ Released under the MIT license: http://jsbin.mit-license.org
             AJS.$('#onaylaButton').off().on("click", function (e) {
                 var minStartDate=minStartIssueDate(selectedRows);
                 var maxEndDate=maxEndIssueDate(selectedRows);
+
+                console.log("minStartDate: "+minStartDate)
+                console.log("maxEndDate: "+maxEndDate)
+
                 // let startDate = "2020-11-16";
                 // let endDate = "2020-11-18";
                 // let selectedRowKeys = ["APY-1", "APY-2"]
@@ -1036,13 +1040,18 @@ Released under the MIT license: http://jsbin.mit-license.org
             }
 
             function maxEndIssueDate(selectedRows){
+                console.log("-----------maxEndIssueDate----------")
                 endDates=[]
 
                 for(var i=0; i<selectedRows.length; i++){
                      for (var j = 0; j < jsonDataTable.length; j++) {
                          if (jsonDataTable[j]['key'] === selectedRows[i]) {
 
-                             var issueBitişTarihiString = jsonDataTable[i]["Bitiş Tarihi"];
+                             console.log("if (jsonDataTable[j]['key'] === selectedRows[i])")
+                             console.log("jsonDataTable[j]['key']: "+jsonDataTable[j]['key'])
+                             console.log("selectedRows[i]: "+selectedRows[i])
+
+                             var issueBitişTarihiString = jsonDataTable[j]["Bitiş Tarihi"];
                              issueBitişTarihiString = issueBitişTarihiString.replaceAll("-", "/")
                              issueBitişTarihiString = issueBitişTarihiString.replaceAll(".0", "")
                              var issueBitişTarihiDate = Date.parse(issueBitişTarihiString)/1000;
@@ -1052,8 +1061,9 @@ Released under the MIT license: http://jsbin.mit-license.org
                      }
                 }
 
+                console.log("end dates[]: "+endDates)
                 var maxEndDate=Math.max(...endDates);
-                //console.log("max end date: "+maxEndDate);
+                console.log("max end date: "+ maxEndDate);
 
                 var justDate;
                 for (var j = 0; j < jsonDataTable.length; j++) {
@@ -1063,11 +1073,19 @@ Released under the MIT license: http://jsbin.mit-license.org
                     issueBitişTarihiString = issueBitişTarihiString.replaceAll(".0", "")
                     var issueBitişTarihiDate = Date.parse(issueBitişTarihiString)/1000;
 
-                    console.log(jsonDataTable[j]["key"]+ " bitiş tarihi: "+ issueBitişTarihiDate)
+
                     if(issueBitişTarihiDate === maxEndDate) {
+                        // console.log("if (issueBitişTarihiDate === maxEndDate)")
+                        // console.log("issue: "+ jsonDataTable[j]["key"]+"  bitiş tarihi: "+jsonDataTable[j]["Bitiş Tarihi"])
+                        //
+                        // console.log("issueBitişTarihiDate: "+issueBitişTarihiDate)
+                        // console.log("maxEndDate: "+maxEndDate)
+
                         var date=new Date(Date.parse(issueBitişTarihiString))
 
-                        date.setDate(date.getDate() + 1)
+                        // console.log("date before inc: "+date)
+                        date.setDate(date.getDate()+1)
+                        // console.log("date after inc: "+date)
 
                         var day=date.getDate()
                         var month=date.getMonth()+1
@@ -1079,6 +1097,9 @@ Released under the MIT license: http://jsbin.mit-license.org
                     }
                 }
 
+
+                // console.log("justDate: "+justDate)
+                // console.log("-----------maxEndIssueDate----------")
                 return justDate;
             }
             function minStartIssueDate(selectedRows){
@@ -1088,10 +1109,11 @@ Released under the MIT license: http://jsbin.mit-license.org
                     for (var j = 0; j < jsonDataTable.length; j++) {
                         if (jsonDataTable[j]['key'] === selectedRows[i]) {
 
-                            var issueBaşlangıçTarihiString = jsonDataTable[i]["Başlangıç Tarihi"];
+                            var issueBaşlangıçTarihiString = jsonDataTable[j]["Başlangıç Tarihi"];
                             issueBaşlangıçTarihiString = issueBaşlangıçTarihiString.replaceAll("-", "/")
                             issueBaşlangıçTarihiString = issueBaşlangıçTarihiString.replaceAll(".0", "")
                             var issueBaşlangıçTarihiDate = Date.parse(issueBaşlangıçTarihiString)/1000;
+
 
                             startDates.push(issueBaşlangıçTarihiDate);
                         }
@@ -1111,6 +1133,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                         justDate = issueBaşlangıçTarihiStringOrj.split(" ")
                     }
                 }
+
                 return justDate[0];
             }
 
@@ -1127,7 +1150,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                 AJS.$("#kaynak").text("");
             });
             AJS.$('#approveButton').on("click", function (){
-                approveProject(selectedRows);
+                transitionIssue(selectedRows);
             });
 
 
@@ -1225,6 +1248,29 @@ Released under the MIT license: http://jsbin.mit-license.org
                     }
                 });
                 return value;
+            }
+            function transitionIssue(issueKey){
+                console.log("selected rows : "+ selectedRows)
+                jQuery.ajax({
+                    url: AJS.params.baseURL + "/rest/florestservice/1.2/rest/approveProject",
+                    type: 'POST',
+                    data: {
+                        issues: selectedRows
+                    },
+                    async: true,
+                    beforeSend: function () {
+                        console.log("approveSelectedProject beforeSend")
+                    },
+                    complete: function (response) {
+                        console.log("approveSelectedProject complete")
+                    },
+                    error: function (response) {
+                        console.log("approveSelectedProject has finished with ERROR !!!");
+                    },
+                    success: function (response, status, jqXHR) {
+                        console.log("approveSelectedProject is successful");
+                    }
+                });
             }
 
 
