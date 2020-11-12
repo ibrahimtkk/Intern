@@ -11,9 +11,13 @@ import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.fields.config.FieldConfig;
 import com.atlassian.jira.issue.util.DefaultIssueChangeHolder;
 import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.jira.user.UserPropertyManager;
+import com.atlassian.jira.user.preferences.ExtendedPreferences;
+import com.atlassian.jira.user.preferences.UserPreferencesManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.opensymphony.module.propertyset.PropertySet;
 import model.pojo.TempoPlanner.Allocation;
 import model.pojo.TempoPlanner.Holiday;
 import org.apache.commons.io.IOUtils;
@@ -30,10 +34,7 @@ import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static com.veniture.constants.Constants.*;
 import static com.veniture.constants.Constants.adminPassword;
@@ -169,6 +170,52 @@ public class functions {
             }
         }
         return nonHolidaysList.size();
+    }
+
+    public static long getWorkingDaysBetweenTwoDate(Date constraintStartDate, Date constraintEndDate, Date allocationStartDate, Date allocationEndDate){
+        long fark = 0;
+        if (constraintStartDate.before(allocationStartDate)) {
+            if (constraintEndDate.before(allocationEndDate)) {
+                try {
+                    fark = getNonHolidayCount(allocationStartDate, constraintEndDate);
+                } catch (IOException | URISyntaxException e) {
+                    e.printStackTrace();
+                }
+            }
+            else {
+                try {
+                    fark = getNonHolidayCount(allocationStartDate, allocationEndDate);
+                } catch (IOException | URISyntaxException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        else {
+            if (constraintEndDate.before(allocationEndDate)) {
+                try {
+                    fark = getNonHolidayCount(constraintStartDate, constraintEndDate);
+                } catch (IOException | URISyntaxException e) {
+                    e.printStackTrace();
+                }
+            }
+            else {
+                try {
+                    fark = getNonHolidayCount(constraintStartDate, allocationEndDate);
+                } catch (IOException | URISyntaxException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return fark;
+    }
+
+    public static List<String> getUserProperty(){
+        List<String> userPropertyList = new ArrayList<>();
+        UserPropertyManager userPropertyManager = ComponentAccessor.getUserPropertyManager();
+        ApplicationUser applicationUser = ComponentAccessor.getUserManager().getUserByName("2.ibrahim");
+        PropertySet propertySet = userPropertyManager.getPropertySet(applicationUser);
+        String values = propertySet.getString("jira.meta.projeler");
+        return userPropertyList;
     }
 
 //    public static int getWorkingDaysBetweenTwoDates(Date startDate, Date endDate) {

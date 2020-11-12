@@ -241,10 +241,11 @@ public class rest {
         List<String> issueKeys = Arrays.asList(issueKeysArray);
         Date constraintStartDate = new SimpleDateFormat("yyyy-MM-dd").parse(startDateString);
         Date constraintEndDate = new SimpleDateFormat("yyyy-MM-dd").parse(endDateString);
+        int constraintResource = Integer.parseInt(resourceString);
         resource = 0;
 
         allocations.forEach(allocation1 -> {
-            Allocation allocation = (Allocation) allocation1;
+            Allocation allocation = allocation1;
             if ( issueKeys.contains( allocation.getPlanItem().getKey() )){
                 try {
                     allocationStartDate = new SimpleDateFormat("yyyy-MM-dd").parse(allocation.getStart());
@@ -252,49 +253,14 @@ public class rest {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                if (constraintStartDate.before(allocationStartDate)) {
-                    if (constraintEndDate.before(allocationEndDate)) {
-//                        fark = allocationEndDate.getTime() - constraintStartDate.getTime();
-                        try {
-                            fark = getNonHolidayCount(allocationStartDate, constraintEndDate);
-                        } catch (IOException | URISyntaxException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    else {
-//                        fark = constraintEndDate.getTime() - constraintStartDate.getTime();
-                        try {
-                            fark = getNonHolidayCount(allocationStartDate, allocationEndDate);
-                        } catch (IOException | URISyntaxException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-                else {
-                    if (constraintEndDate.before(allocationEndDate)) {
-//                        fark = constraintEndDate.getTime() - constraintStartDate.getTime();
-                        try {
-                            fark = getNonHolidayCount(constraintStartDate, constraintEndDate);
-                        } catch (IOException | URISyntaxException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    else {
-//                        fark = allocationEndDate.getTime() - constraintStartDate.getTime();
-                        try {
-                            fark = getNonHolidayCount(constraintStartDate, allocationEndDate);
-                        } catch (IOException | URISyntaxException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-//                fark = fark / 1000; // timestamp shit
-//                fark = fark / 3600; // seconds to hours
-//                fark = fark / 24;   // hours to days
+                fark = getWorkingDaysBetweenTwoDate(constraintStartDate, constraintEndDate, allocationStartDate, allocationEndDate);
                 resource += fark * allocation.getSecondsPerDay()/3600;
 
             }
         });
+//        if (constraintResource < resource) {
+            getUserProperty();
+//        }
         return String.valueOf(resource);
     }
 

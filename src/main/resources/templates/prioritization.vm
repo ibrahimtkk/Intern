@@ -212,6 +212,9 @@ Released under the MIT license: http://jsbin.mit-license.org
         AJS.$(document).ready(function () {
             window.onbeforeunload = null;
 
+            let butceCFstring = "customfield_10600";
+            let basTarihCFstring = "customfield_10703"
+            let bitTarihCFstring = "customfield_10704"
             var filterAndIssueKeys = [];
             var defaultIssueList = [];
 
@@ -256,7 +259,7 @@ Released under the MIT license: http://jsbin.mit-license.org
 
             var hiddenColumns = []
             var i;
-            for (i=4; i<4+parseInt("$customFieldsInProject.size()"); i++){
+            for (i=7; i<7+parseInt("$customFieldsInProject.size()"); i++){
                 hiddenColumns.push(i);
             }
 
@@ -277,7 +280,6 @@ Released under the MIT license: http://jsbin.mit-license.org
                 ]
             });
 
-            var tempDataTable = $('#auiTable').tableToJSON();
             var jsonDataTable = $('#auiTable').tableToJSON();
 
 
@@ -426,19 +428,45 @@ Released under the MIT license: http://jsbin.mit-license.org
                 issueKeys.push(cell.key)
             })
 
-            // var baslangicTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), "customfield_10703");
-            // var bitisTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), "customfield_10704");
+            var butceCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), butceCFstring);
+            var baslangicTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), basTarihCFstring);
+            var bitisTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), bitTarihCFstring);
+            addCFVal("Bütçe", butceCFstring, butceCFvalues);
+            addCFVal("Başlangıç Tarihi", basTarihCFstring, baslangicTarihiCFvalues);
+            addCFVal("Bitiş Tarihi", bitTarihCFstring, bitisTarihiCFvalues);
 
-            var baslangicTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), "customfield_11102");
-            var bitisTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), "customfield_10900");
+
+            // var baslangicTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), "customfield_11102");
+            // var bitisTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), "customfield_10900");
 
             var baslangicTarihiArray = baslangicTarihiCFvalues.split(",,,");
             var bitisTarihiArray = bitisTarihiCFvalues.split(",,,");
-            console.log("baslangicTarihiArray: ", baslangicTarihiArray)
-            console.log("bitisTarihiArray: ", bitisTarihiArray)
 
             google.charts.load('current', {'packages':['gantt']});
             google.charts.setOnLoadCallback(drawChart);
+
+            // Başlangıç Tarihi, basTarihCFstring
+            function addCFVal(CFValText, CFstring, CFarray){
+                var index;
+                dataTable.columns()[0].forEach(innerIndex => {
+                    if (dataTable.column(innerIndex).header().textContent === CFValText) {
+                        index = innerIndex
+                    }
+                })
+                var array = CFarray.split(",,,");
+                console.log("array: ", array)
+
+                dataTable.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    var rowData = this.data();
+                    rowData[index] = array[rowLoop]
+                    dataTable.row(rowIdx).data(rowData)
+                    jsonDataTable[rowLoop][CFstring] = array[rowLoop]
+                    this.invalidate()
+                });
+                dataTable.draw()
+                dataTable.column(index).visible(true)
+                dataTable.columns.adjust().draw(true);
+            }
 
             function drawChart() {
 
@@ -481,7 +509,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                         bitisDate = new Date(2020, 10, 11+Math.floor(Math.random() * 19))
                         bitisDate = new Date(bitisDate.getFullYear(), bitisDate.getMonth(), bitisDate.getDate())
                     }
-                    console.log(jsonRow['key'], baslangicDate, bitisDate)
+                    // console.log(jsonRow['key'], baslangicDate, bitisDate)
                     ganttRow = [jsonRow['key'], jsonRow['key'], jsonRow['key'], baslangicDate, bitisDate, null, 100, null]
                     ganttRows.push(ganttRow)
                 }
@@ -1450,6 +1478,9 @@ Released under the MIT license: http://jsbin.mit-license.org
                     <th data-override="Summary" style="font-weight:bold;" id="row1">Özet</th>
                     <th class="aui-table-column-unsortable" data-override="Description"  id="row1">Açıklama</th>
                     <th class="aui-table-column-priority" data-override="Priority"  id="row1">Öncelik</th>
+                    <th class="aui-table-column-butce" data-override="Butce"  id="row1">Bütçe</th>
+                    <th class="aui-table-column-baslangic-tarihi" data-override="BaslangicTarihi"  id="row1">Başlangıç Tarihi</th>
+                    <th class="aui-table-column-bitis-tarihi" data-override="BitisTarihi"  id="row1">Bitiş Tarihi</th>
 ##                    <th class="aui-table-column-unsortable" data-override="Created" id="row1">Oluşturulma Tarihi</th>
 ##                    <th class="aui-table-column-unsortable" data-override="Due" id="row1">Bitiş Tarihi</th>
                     #foreach($cf in $customFieldsInProject)
@@ -1473,6 +1504,10 @@ Released under the MIT license: http://jsbin.mit-license.org
                     </td>
 ##                    <td data-id="issuePriority" id="issuePriority" name="issuePriority" class="might-overflow">-</td>
                     <td id="issuePriority" name="issuePriority" class="might-overflow">-</td>
+                    <td id="issueButce" name="issueButce" class="might-overflow">-</td>
+                    <td id="issueBaslangicTarihi" name="issueBaslangicTarihi" class="might-overflow">-</td>
+                    <td id="issueBitisTarihi" name="issueBitisTarihi" class="might-overflow">-</td>
+
 ##                    <td id="issueCreated" name="issueCreated" class="might-overflow">$issue.getCreated()</td>
 ##                    <td id="issueDue" name="issueDue" class="might-overflow">
 ##                        #if ( !$issue.getDueDate() )
