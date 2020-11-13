@@ -213,8 +213,11 @@ Released under the MIT license: http://jsbin.mit-license.org
             window.onbeforeunload = null;
 
             let butceCFstring = "customfield_10600";
+            let butceJSONstring = "Bütçe"
             let basTarihCFstring = "customfield_10703"
+            let basTarihJSONstring = "BaslangicTarihi"
             let bitTarihCFstring = "customfield_10704"
+            let bitTarihJSONstring = "BitisTarihi"
             var filterAndIssueKeys = [];
             var defaultIssueList = [];
 
@@ -431,9 +434,9 @@ Released under the MIT license: http://jsbin.mit-license.org
             var butceCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), butceCFstring);
             var baslangicTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), basTarihCFstring);
             var bitisTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), bitTarihCFstring);
-            addCFVal("Bütçe", butceCFstring, butceCFvalues);
-            addCFVal("Başlangıç Tarihi", basTarihCFstring, baslangicTarihiCFvalues);
-            addCFVal("Bitiş Tarihi", bitTarihCFstring, bitisTarihiCFvalues);
+            addCFVal("Bütçe", butceJSONstring, butceCFvalues);
+            addCFVal("Başlangıç Tarihi", basTarihJSONstring, baslangicTarihiCFvalues);
+            addCFVal("Bitiş Tarihi", bitTarihJSONstring, bitisTarihiCFvalues);
 
 
             // var baslangicTarihiCFvalues = bulkGetCfValuesFromIssue(issueKeys.join(","), "customfield_11102");
@@ -1478,7 +1481,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                     <th data-override="Summary" style="font-weight:bold;" id="row1">Özet</th>
                     <th class="aui-table-column-unsortable" data-override="Description"  id="row1">Açıklama</th>
                     <th class="aui-table-column-priority" data-override="Priority"  id="row1">Öncelik</th>
-                    <th class="aui-table-column-butce" data-override="Butce"  id="row1">Bütçe</th>
+                    <th class="aui-table-column-butce" data-override="Bütçe"  id="row1">Bütçe</th>
                     <th class="aui-table-column-baslangic-tarihi" data-override="BaslangicTarihi"  id="row1">Başlangıç Tarihi</th>
                     <th class="aui-table-column-bitis-tarihi" data-override="BitisTarihi"  id="row1">Bitiş Tarihi</th>
 ##                    <th class="aui-table-column-unsortable" data-override="Created" id="row1">Oluşturulma Tarihi</th>
