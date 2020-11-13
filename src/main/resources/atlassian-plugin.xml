@@ -8,11 +8,13 @@
     <param name="plugin-icon">images/pluginIcon.png</param>  
     <param name="plugin-logo">images/pluginLogo.png</param>
   </plugin-info>
-  <resource type="i18n" name="i18n" location="PortfolioManagement"/>
+<!--  <resource type="i18n" name="i18n" location="PortfolioManagement"/>-->
   <web-resource key="PortfolioManagement-resources" name="PortfolioManagement Web Resources">
-<!--    <resource type="download" name="PortfolioManagement.css" location="resources/css/PortfolioManagement.css">-->
-<!--      <property key="content-type" value="text/css"/>-->
-<!--    </resource>-->
+      <resource type="download" name="PortfolioManagement.css" location="/css/PortfolioManagement.css"/>
+
+<!--      <web-resource key="git-user-name">-->
+<!--          <resource location="/../../../node_modules/git-user-name/index.js" name="index.js" type="download"/>-->
+<!--      </web-resource>-->
     <dependency>com.atlassian.auiplugin:ajs</dependency>
     <dependency>com.atlassian.auiplugin:aui-select2</dependency>
     <dependency>com.atlassian.auiplugin:aui-date-picker</dependency>

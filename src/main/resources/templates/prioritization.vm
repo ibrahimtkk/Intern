@@ -46,166 +46,7 @@ Released under the MIT license: http://jsbin.mit-license.org
 
     <meta name="decorator" content="atl.general">
 
-    <style>
-        .blink {
-            animation: blinker 2s linear infinite;
-            color: #bf2600;
-            font-size: 18px;
-            font-weight: bold;
-            font-family: sans-serif;
-        }
-        @keyframes blinker {
-            50% { opacity: 0; }
-        }
-        #content {
-            margin: 12px;
-        }
-
-        #tableBody>tr {
-            cursor: grab;
-        }
-        #tableBody>tr :active {
-            cursor: grabbing;
-        }
-
-        #loading-spinner {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .might-overflow {
-            text-overflow: ellipsis;
-            overflow : hidden;
-            white-space: nowrap;
-        }
-
-        .might-overflow:hover {
-            text-overflow: clip;
-            white-space: normal;
-            word-break: break-all;
-        }
-
-        #loading-spinner aui-spinner {
-            margin: 1em;
-        }
-
-        .custom-card-style {
-            border-radius: 3px;
-            box-shadow:
-                    0 1px 1px rgba(9, 30, 66, 0.25),
-                    0 0 1px 0 rgba(9, 30, 66, 0.31);
-            margin: 0 auto;
-            padding: 10px;
-            width: 20em;
-        }
-
-        #row1{
-            font-weight: bold;
-            text-align: left;
-            font-size: 13px;
-        }
-
-        #shadow{
-            box-shadow: 0px 0px 9px 0px rgba(0,0,0,0.1);
-        }
-        #shadow:hover {
-            background-color: #dddddd;
-
-            /*padding: 10px;*/
-        }
-        .aui-help-content{
-            margin-bottom: 60px;
-        }
-        .row{
-            margin-bottom: 10px;
-            padding-left: 15px;
-        }
-        #buttons{
-            text-align: center;
-            margin-left:auto;
-        }
-        #auiTable{
-            margin-left: auto;
-            margin-right: auto;
-            position: center;
-            margin-bottom: 15px;
-            border-collapse: separate;
-            border-spacing: 1px 10px;
-            width: 100%;
-            table-layout: auto;
-        }
-        #auiTable td, #auiTable tr{
-            border: 1px solid #ffffff;
-            border-radius: 20px;
-        }
-
-        /*#auiTable tr:nth-child(even){background-color: #f2f2f2;}*/
-
-        /*table.dataTable tbody tr.selected {*/
-        /*    color: #6dc4e7;*/
-        /*}*/
-
-        #auiTable tr:hover {
-            background-color: #dddddd;
-
-        }
-
-        #auiTable th {
-            padding-top: 8px;
-            padding-bottom: 8px;
-            text-align: left;
-            background-color: #0747a6;
-            color: #ffffff;
-            border-radius: 15px;
-
-        }
-        table.dataTable.no-footer {
-            border-bottom: none;
-        }
-        table.dataTable thead th, table.dataTable thead td {
-            border-bottom: none;
-        }
-
-        .dataTables_wrapper .dataTables_filter {
-            float: left;
-        }
-
-        .dataTables_wrapper .dataTables_filter input {
-            font-weight: normal;
-        }
-
-        label {
-            color: #6b778c;
-        }
-        #tableDiv {
-            table-layout: auto;
-            max-width: 10000px;
-            margin-left: auto;
-            margin-right: auto;
-            margin-bottom: 100px;
-            padding-left: 10px;
-            padding-right: 10px;
-        }
-        /*.gantt{*/
-        /*    table-layout: auto;*/
-        /*    max-width: 10000px;*/
-        /*    margin-left: auto;*/
-        /*    margin-right: auto;*/
-        /*    padding-left: 10px;*/
-        /*    padding-right: 10px;*/
-        /*}*/
-        #more {display: none;}
-        #butceInput, #baslangicTarihiInput, #bitisTarihiInput{
-            color:darkgray;
-            border-color: whitesmoke;
-            border-radius: 5px;
-        }
-
-
-    </style>
-
+    <link rel="stylesheet" href="../css/PortfolioManagement.css" />
 
     <script>
         // create
@@ -218,6 +59,9 @@ Released under the MIT license: http://jsbin.mit-license.org
             let basTarihJSONstring = "BaslangicTarihi"
             let bitTarihCFstring = "customfield_10900";
             let bitTarihJSONstring = "BitisTarihi"
+
+            // var userName = require('git-user-name');
+            // console.log("gitusername: ", userName());
 
             var filterAndIssueKeys = [];
             var defaultIssueList = [];
