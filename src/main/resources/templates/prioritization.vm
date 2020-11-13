@@ -247,7 +247,8 @@ Released under the MIT license: http://jsbin.mit-license.org
 
             } );
 
-
+            var baslangicDate;
+            var bitisDate;
             updatePriorities("$restriction");
             AJS.$("#customFieldList-select2").auiSelect2();
             AJS.$("#favFilter-select2").auiSelect2();
@@ -259,6 +260,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                 autoclose: true,
                 onSelect: function (date) {
                     //datePickerChanged(date)
+                    baslangicDate=startDate(date)
                     datePickerFilter(date)
                 }
             })
@@ -269,6 +271,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                 autoclose: true,
                 onSelect: function (date) {
                     //datePickerChanged(date)
+                    bitisDate=endDate(date)
                     datePickerFilter(date)
                 }
             })
@@ -427,19 +430,14 @@ Released under the MIT license: http://jsbin.mit-license.org
             });
 
             AJS.$('#onaylaButton').off().on("click", function (e) {
-                var minStartDate=minStartIssueDate(selectedRows);
-                var maxEndDate=maxEndIssueDate(selectedRows);
-
-                console.log("minStartDate: "+minStartDate)
-                console.log("maxEndDate: "+maxEndDate)
 
                 // let startDate = "2020-11-16";
                 // let endDate = "2020-11-18";
                 // let selectedRowKeys = ["APY-1", "APY-2"]
                 /* BITIS TARIHI, SECILEN TARIHTEN BIR GUN SONRASI OLARAK GIRILMELI */
                 let constraintData = {
-                    "startDate" : minStartDate,
-                    "endDate" : maxEndDate,
+                    "startDate" : baslangicDate.toString(),
+                    "endDate" : bitisDate.toString(),
                     "selectedRowKeys" : selectedRows,
                     "resource" : "50"
                 }
@@ -1137,6 +1135,37 @@ Released under the MIT license: http://jsbin.mit-license.org
                         console.log("approveSelectedProject is successful");
                     }
                 });
+            }
+            function startDate(date){
+                console.log("Başlangıc date: "+date)
+                var date=new Date(date)
+                date.setDate(date.getDate())
+
+                var day=date.getDate()
+                var month=date.getMonth()+1
+                var year=date.getFullYear()
+                var startDateString=year+"-"+month+"-"+day;
+                console.log("startDateString: "+startDateString)
+
+                return startDateString;
+            }
+            function endDate(date){
+                console.log("Bitiş date: "+date)
+                var day = new Date(date);
+                console.log("day: "+day);
+
+                var nextDay = new Date(day);
+                nextDay.setDate(day.getDate()+1);
+                var day=nextDay.getDate();
+                var month = nextDay.getMonth()+1;
+                var year= nextDay.getFullYear()
+                console.log (year+"-"+month+"-"+day)
+
+
+                var endDateString=year+"-"+month+"-"+day;
+                console.log("endDateString: "+endDateString)
+
+                return endDateString;
             }
 
 
