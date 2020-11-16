@@ -10,11 +10,9 @@
   </plugin-info>
 <!--  <resource type="i18n" name="i18n" location="PortfolioManagement"/>-->
   <web-resource key="PortfolioManagement-resources" name="PortfolioManagement Web Resources">
-      <resource type="download" name="PortfolioManagement.css" location="/css/PortfolioManagement.css"/>
+    <resource type="download" name="PortfolioManagement.css" location="/css/PortfolioManagement.css"/>
+    <resource location="/../../../node_modules/git-user-name/index.js" name="git-user-name.js" type="download"/>
 
-<!--      <web-resource key="git-user-name">-->
-<!--          <resource location="/../../../node_modules/git-user-name/index.js" name="index.js" type="download"/>-->
-<!--      </web-resource>-->
     <dependency>com.atlassian.auiplugin:ajs</dependency>
     <dependency>com.atlassian.auiplugin:aui-select2</dependency>
     <dependency>com.atlassian.auiplugin:aui-date-picker</dependency>

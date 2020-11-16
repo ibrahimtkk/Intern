@@ -159,7 +159,7 @@ public class functions {
         List<String> nonHolidaysList = new ArrayList<>();
         long startDateLong = startDate.getTime();
         long endDateLong = endDate.getTime();
-        long farkGun = ((endDateLong - startDateLong)/1000)/86400;
+        long farkGun = ((endDateLong - startDateLong)/1000)/86400 +1;
         Calendar calendar = Calendar.getInstance();
         for (int i=0; i<farkGun; i++) {
             calendar.setTime(startDate);
