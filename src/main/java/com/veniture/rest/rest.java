@@ -14,6 +14,9 @@ import com.atlassian.jira.jql.parser.JqlParseException;
 import com.atlassian.jira.jql.parser.JqlQueryParser;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.jira.user.UserPropertyManager;
+import com.atlassian.jira.user.util.UserManager;
+import com.atlassian.jira.user.util.UserUtil;
 import com.atlassian.jira.util.json.JSONArray;
 import com.atlassian.jira.util.json.JSONException;
 import com.atlassian.jira.util.json.JSONObject;
@@ -29,6 +32,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.opensymphony.module.propertyset.PropertySet;
 import com.veniture.constants.Constants;
 import com.veniture.util.GetCustomFieldsInExcel;
 import com.veniture.util.RemoteSearcher;
@@ -258,9 +262,51 @@ public class rest {
 
             }
         });
-//        if (constraintResource < resource) {
-            getUserProperty();
-//        }
+
+        List<String> userPropertyList = new ArrayList<>();
+        UserPropertyManager userPropertyManager = ComponentAccessor.getUserPropertyManager();
+        UserManager userManager = ComponentAccessor.getUserManager();
+
+        UserUtil userUtil = ComponentAccessor.getUserUtil();
+        List<String> suggestionUserName = new ArrayList<String>();
+        List<String> result = new ArrayList<String>();
+
+        userUtil.getUsers().forEach(u -> {
+            ApplicationUser us = u;
+            result.add(us.getName()) ;
+        });
+
+
+
+        for (String user:result){
+            String u= user;
+
+            ApplicationUser applicationUser = ComponentAccessor.getUserManager().getUserByName(u);
+
+            PropertySet propertySet = userPropertyManager.getPropertySet(applicationUser);
+            String projects = propertySet.getString("jira.meta.projeler");
+
+            if(projects != null){
+                String[] projectsArr= projects.split(",");
+
+
+                for(int j=0; j<issueKeysArray.length;j++){
+                    for(int k=0; k<projectsArr.length; k++){
+                        if(issueKeysArray[j].equals(projectsArr[k])){
+                            suggestionUserName.add(applicationUser.getName());
+
+                        }
+                    }
+
+                }
+
+
+            }
+
+        }
+        for (String i:suggestionUserName){
+            String name = i;
+        }
         return String.valueOf(resource);
     }
 
