@@ -268,8 +268,8 @@ public class rest {
         UserManager userManager = ComponentAccessor.getUserManager();
 
         UserUtil userUtil = ComponentAccessor.getUserUtil();
-        List<String> suggestionUserName = new ArrayList<String>();
-        List<String> result = new ArrayList<String>();
+        List<String> suggestionUserName = new ArrayList<>();
+        List<String> result = new ArrayList<>();
 
         userUtil.getUsers().forEach(u -> {
             ApplicationUser us = u;
@@ -277,37 +277,51 @@ public class rest {
         });
 
 
-
-        for (String user:result){
-            String u= user;
-
-            ApplicationUser applicationUser = ComponentAccessor.getUserManager().getUserByName(u);
-
+        result.forEach(user -> {
+            ApplicationUser applicationUser = ComponentAccessor.getUserManager().getUserByName(user);
             PropertySet propertySet = userPropertyManager.getPropertySet(applicationUser);
             String projects = propertySet.getString("jira.meta.projeler");
 
-            if(projects != null){
-                String[] projectsArr= projects.split(",");
-
-
-                for(int j=0; j<issueKeysArray.length;j++){
-                    for(int k=0; k<projectsArr.length; k++){
-                        if(issueKeysArray[j].equals(projectsArr[k])){
-                            suggestionUserName.add(applicationUser.getName());
-
-                        }
-                    }
-
-                }
-
-
+            if (projects != null){
+                List<String> projectsList = Arrays.asList(projects.split(", "));
+                issueKeys.forEach(issueKey -> {
+                    if (projectsList.contains(issueKey))
+                        suggestionUserName.add(applicationUser.getName());
+                });
             }
+        });
 
-        }
+//        for (String user:result){
+//            String u= user;
+//            ApplicationUser applicationUser = ComponentAccessor.getUserManager().getUserByName(u);
+//            PropertySet propertySet = userPropertyManager.getPropertySet(applicationUser);
+//            String projects = propertySet.getString("jira.meta.projeler");
+//
+//            if(projects != null){
+//                String[] projectsArr= projects.split(",");
+//                for(int j=0; j<issueKeysArray.length;j++){
+//                    for(int k=0; k<projectsArr.length; k++){
+//                        if(issueKeysArray[j].equals(projectsArr[k])){
+//                            suggestionUserName.add(applicationUser.getName());
+//
+//                        }
+//                    }
+//                }
+//            }
+//
+//        }
         for (String i:suggestionUserName){
             String name = i;
         }
         return String.valueOf(resource);
+    }
+
+    @POST
+    @Path("/assignUserToTempo")
+    public String assignUserToTempo(@Context HttpServletRequest req, @Context HttpServletResponse resp) throws IOException, ParseException {
+        String issue = req.getParameterValues("issue")[0];
+
+        return "";
     }
 
     public static final String REST_SERVICEDESKAPI_ORGANIZATION = "https://crm.turkishtechnic.com/rest/servicedeskapi/organization";
