@@ -53,11 +53,11 @@ Released under the MIT license: http://jsbin.mit-license.org
         AJS.$(document).ready(function () {
             window.onbeforeunload = null;
 
-            let butceCFstring = "customfield_10600";
+            let butceCFstring = "customfield_11000";
             let butceJSONstring = "Bütçe"
-            let basTarihCFstring = "customfield_10703";
+            let basTarihCFstring = "customfield_11102";
             let basTarihJSONstring = "BaslangicTarihi"
-            let bitTarihCFstring = "customfield_10704";
+            let bitTarihCFstring = "customfield_10900";
             let bitTarihJSONstring = "BitisTarihi"
 
             // var userName = require('git-user-name');
@@ -251,7 +251,9 @@ Released under the MIT license: http://jsbin.mit-license.org
             var bitisDate;
             updatePriorities("$restriction");
             AJS.$("#customFieldList-select2").auiSelect2();
-            AJS.$("#favFilter-select2").auiSelect2();
+            AJS.$("#favFilter-select2").auiSelect2({
+                allowClear: true
+            });
             AJS.$("#constraintList-select2").auiSelect2();
             AJS.$("#baslangicTarihiInput").datePicker({
                 overrideBrowserDefault:true,
@@ -495,11 +497,19 @@ Released under the MIT license: http://jsbin.mit-license.org
             });
 
             var k;
-            AJS.$("#favFilter-select2").on("select2-removing", function(e) {
-                filterAndIssueKeys.forEach(filterAndIssueKey => {
-                    if (filterAndIssueKey.filterName ===  e.choice.text ){
-                        jsonDataTable.forEach(data => {
-                            if (!filterAndIssueKey.issueKeys.includes(data.key)) {
+
+            AJS.$("#favFilter-select2").change(function (e) {
+
+                if(!this.value){
+                    var tableBody = $('#tableBody tr');
+                    var keys=[]
+                    tableBody.each(function () {
+                        var cell = $(this)
+                        var issueKey = $(this).find("td .issueKey")
+                        keys.push(issueKey.text());
+                    });
+                    jsonDataTable.forEach(data => {
+                            if(!keys.includes(data.key)){
                                 var rowArray = []
                                 rowArray.push('<a href="$baseUrl/browse/' + data.key + '" ' + 'class="issueKey">' + data.key + '</a>');
                                 rowArray.push(data.Summary)
@@ -513,14 +523,15 @@ Released under the MIT license: http://jsbin.mit-license.org
                                 #end
                                 dataTable.row.add(rowArray).draw(true)
                             }
+
                         } );
-                    }
-                })
-            });
+                }
+
+            } );
+
             var beforeSelectedOption = ""
             AJS.$("#favFilter-select2").on('select2-selecting', function (e) {
                 var data = e.object.text;
-
                 if (e.object.text === "Filtre eklemek için tıklayın"){
                     if (beforeSelectedOption !== "Filtre eklemek için tıklayın") {
                         filterAndIssueKeys.forEach(filterAndIssueKey => {
@@ -1221,7 +1232,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                     <div class="aui-item" id="#select2-customFields">
                         <form class="aui">
                             <select id="customFieldList-select2" data-placeholder="Alan eklemek için tıklayın" multiple>
-                                <option></option>
+                                <option value=""></option>
                                 #foreach($cf in $customFieldsInProject)
                                     <option value="$cf.getId()">$cf.getName()</option>
                                 #end
@@ -1235,10 +1246,10 @@ Released under the MIT license: http://jsbin.mit-license.org
                 <div class="aui-group">
                     <div class="aui-item" id="#select2-favFilters">
                         <form class="aui">
-                            <select id="favFilter-select2" data-placeholder="Filtre eklemek için tıklayın" size="1">
-                                <option>Filtre eklemek için tıklayın</option>
+                            <select id="favFilter-select2" data-placeholder="Filtre eklemek için tıklayın" size="1" >
+                                <option value=""></option>
                                 #foreach($favFilter in $favouriteFilters)
-                                    <option value="$favFilter">$favFilter</option>
+                                    <option value="$favFilter">$favFilter <a href="#" id="remove-fav-filter-single-select" class="select2-search-choice-close" tabindex="-1"></a></option>
                                 #end
                             </select>
                         </form>
@@ -1343,17 +1354,17 @@ Released under the MIT license: http://jsbin.mit-license.org
         <table class="aui aui-table-list" id="auiTable" >
             <thead>
             <tr id="tableHeader">
-                <th class="aui-table-column-issue-key" data-override="key"  id="row1">Kayıt Anahtarı</th>
-                <th data-override="Summary" style="font-weight:bold;" id="row1">Özet</th>
+                <th class="aui-table-column-issue-key" data-override="key"  id="row1" style="width: 8%;">Kayıt Anahtarı</th>
+                <th data-override="Summary" id="row1">Özet</th>
                 <th class="aui-table-column-unsortable" data-override="Description"  id="row1">Açıklama</th>
-                <th class="aui-table-column-priority" data-override="Priority"  id="row1">Öncelik</th>
-                <th class="aui-table-column-butce" data-override="Bütçe"  id="row1">Bütçe</th>
-                <th class="aui-table-column-baslangic-tarihi" data-override="BaslangicTarihi"  id="row1">Başlangıç Tarihi</th>
-                <th class="aui-table-column-bitis-tarihi" data-override="BitisTarihi"  id="row1">Bitiş Tarihi</th>
+                <th class="aui-table-column-priority" data-override="Priority"  id="row1" style="width: 6%;">Öncelik</th>
+                <th class="aui-table-column-butce" data-override="Bütçe"  id="row1" style="width: 6%;">Bütçe</th>
+                <th class="aui-table-column-baslangic-tarihi" data-override="BaslangicTarihi"  id="row1" style="width: 10%;">Başlangıç Tarihi</th>
+                <th class="aui-table-column-bitis-tarihi" data-override="BitisTarihi"  id="row1" style="width: 10%;">Bitiş Tarihi</th>
                 ##                    <th class="aui-table-column-unsortable" data-override="Created" id="row1">Oluşturulma Tarihi</th>
                 ##                    <th class="aui-table-column-unsortable" data-override="Due" id="row1">Bitiş Tarihi</th>
                 #foreach($cf in $customFieldsInProject)
-                    <th id="row1" style="font-weight: bold;" data-override="$cf.getId()">$cf.getName()</th>
+                    <th id="row1" style="width: 8%;" data-override="$cf.getId()">$cf.getName()</th>
                 #end
                 ##                    <th style="font-weight: bold;" data-override="Lead" id="row1">Proje Lideri</th>
             </tr>

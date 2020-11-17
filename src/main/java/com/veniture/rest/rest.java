@@ -158,6 +158,7 @@ public class rest {
         List<String> cfValues = new ArrayList<>();
         for (String issueKey:issueKeys){
             String cfValue;
+            String[] cfValueArr;
             try {
                 Issue issue= ISSUE_SERVICE.getIssue(CURRENT_USER,issueKey).getIssue();
                 if (customField.getCustomFieldType().getName().equals("User Picker (single user)")){
@@ -165,6 +166,12 @@ public class rest {
                     cfValue=applicationUser.getDisplayName();
                 }else {
                     cfValue = issue.getCustomFieldValue(customField).toString();
+
+                    if (customField.getName().equals("Başlangıç Tarihi") || customField.getName().equals("Bitiş Tarihi")){
+                        cfValueArr = cfValue.split(" ");
+                        cfValue = cfValueArr[0];
+                    }
+
                 }
             } catch (Exception e) {
                 cfValue = "-";
