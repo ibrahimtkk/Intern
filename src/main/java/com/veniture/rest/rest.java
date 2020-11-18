@@ -40,7 +40,10 @@ import com.veniture.util.tableRowBuilder;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
+import model.DateAndHour;
 import model.TableRow;
+import model.UserWorkingHours;
+import model.UserWorkingStartAndEndDate;
 import model.pojo.TempoPlanner.Allocation;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -88,6 +91,8 @@ public class rest {
     private IssueManager issueManager;
     @JiraImport
     OrganizationService organizationService;
+
+    List<UserWorkingStartAndEndDate> availableUsers = null;
 
     Date allocationStartDate = null;
     Date allocationEndDate = null;
@@ -240,7 +245,7 @@ public class rest {
         return null;
     }
 
-    @GET
+    @POST
     @Path("/calculateResource")
     public String calculateResource(@Context HttpServletRequest req, @Context HttpServletResponse resp) throws IOException, ParseException {
         Map map = req.getParameterMap();
@@ -270,57 +275,24 @@ public class rest {
             }
         });
 
-        List<String> userPropertyList = new ArrayList<>();
-        UserPropertyManager userPropertyManager = ComponentAccessor.getUserPropertyManager();
-        UserManager userManager = ComponentAccessor.getUserManager();
+        List<String> suggestionUserName = getHaveSameProjectUsers(issueKeys);
 
-        UserUtil userUtil = ComponentAccessor.getUserUtil();
-        List<String> suggestionUserName = new ArrayList<>();
-        List<String> result = new ArrayList<>();
-
-        userUtil.getUsers().forEach(u -> {
-            ApplicationUser us = u;
-            result.add(us.getName()) ;
-        });
-
-
-        result.forEach(user -> {
-            ApplicationUser applicationUser = ComponentAccessor.getUserManager().getUserByName(user);
-            PropertySet propertySet = userPropertyManager.getPropertySet(applicationUser);
-            String projects = propertySet.getString("jira.meta.projeler");
-
-            if (projects != null){
-                List<String> projectsList = Arrays.asList(projects.split(", "));
-                issueKeys.forEach(issueKey -> {
-                    if (projectsList.contains(issueKey))
-                        suggestionUserName.add(applicationUser.getName());
-                });
+        issueKeys.forEach(issueKey -> {
+            try {
+                List<UserWorkingHours> usersAndWorkingHour = getWorkingHoursOfUsers(allocations, suggestionUserName);
+                List<List<DateAndHour>> totalWorkingHoursOfUsers = getTotalWorkingHoursOfUsers(usersAndWorkingHour, suggestionUserName);
+                List<UserWorkingStartAndEndDate> userWorkingStartAndEndDateList = getUserWorkingStartAndEndDateList(usersAndWorkingHour);
+                availableUsers = checkWorkingTimeAndSuggestAnotherUser(totalWorkingHoursOfUsers, userWorkingStartAndEndDateList, suggestionUserName, issueKey);
+                logger.info("111");
+            } catch (IOException | URISyntaxException e) {
+                e.printStackTrace();
             }
         });
-
-//        for (String user:result){
-//            String u= user;
-//            ApplicationUser applicationUser = ComponentAccessor.getUserManager().getUserByName(u);
-//            PropertySet propertySet = userPropertyManager.getPropertySet(applicationUser);
-//            String projects = propertySet.getString("jira.meta.projeler");
-//
-//            if(projects != null){
-//                String[] projectsArr= projects.split(",");
-//                for(int j=0; j<issueKeysArray.length;j++){
-//                    for(int k=0; k<projectsArr.length; k++){
-//                        if(issueKeysArray[j].equals(projectsArr[k])){
-//                            suggestionUserName.add(applicationUser.getName());
-//
-//                        }
-//                    }
-//                }
-//            }
-//
-//        }
         for (String i:suggestionUserName){
             String name = i;
         }
-        return String.valueOf(resource);
+        String json = new Gson().toJson(availableUsers );
+        return json;
     }
 
     @POST

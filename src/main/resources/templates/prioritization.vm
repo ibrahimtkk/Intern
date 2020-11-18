@@ -39,6 +39,8 @@ Released under the MIT license: http://jsbin.mit-license.org
     ##    <script type="text/javascript" src="../js/jquery.ganttChart.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
     ##    <script type="text/javascript" src="../css/PortfolioManagement.css"></script>
 
     <meta charset="utf-8">
@@ -53,11 +55,11 @@ Released under the MIT license: http://jsbin.mit-license.org
         AJS.$(document).ready(function () {
             window.onbeforeunload = null;
 
-            let butceCFstring = "customfield_11000";
+            let butceCFstring = "customfield_10600";
             let butceJSONstring = "Bütçe"
-            let basTarihCFstring = "customfield_11102";
+            let basTarihCFstring = "customfield_10703";
             let basTarihJSONstring = "BaslangicTarihi"
-            let bitTarihCFstring = "customfield_10900";
+            let bitTarihCFstring = "customfield_10704";
             let bitTarihJSONstring = "BitisTarihi"
 
             // var userName = require('git-user-name');
@@ -107,7 +109,7 @@ Released under the MIT license: http://jsbin.mit-license.org
 
             var hiddenColumns = []
             var i;
-            for (i=7; i<7+parseInt("$customFieldsInProject.size()"); i++){
+            for (i=8; i<8+parseInt("$customFieldsInProject.size()"); i++){
                 hiddenColumns.push(i);
             }
 
@@ -1029,6 +1031,49 @@ Released under the MIT license: http://jsbin.mit-license.org
                 transitionIssue(selectedRows);
             });
 
+            AJS.$('#kullaniciOnerButton').on("click", function(){
+                var hhh = document.getElementById("swAlert");
+                hhh.style.visibility = "visible";
+                console.log("hhh: ", hhh)
+                // var html =
+                //         '<div class="row" style="margin-top:50px;">' +
+                //             '<div class="col-xs-5 col-md-1" style="padding-left:15px">' +
+                //                 '<form>' +
+                //                     '<select id="mySelect">' +
+                //                         '<option>Apple</option>' +
+                //                         '<option>Pear</option>' +
+                //                         '<option>Banana</option>' +
+                //                         '<option>Orange</option>' +
+                //                     '</select>' +
+                //                 '</form>' +
+                //             '</div>' +
+                //             '<div class="col-xs-5 col-md-1" style="padding-left:55px">' +
+                //                 '<form>' +
+                //                     '<select id="mySelect2">' +
+                //                         '<option>Apple</option>' +
+                //                         '<option>Pear</option>' +
+                //                         '<option>Banana</option>' +
+                //                         '<option>Orange</option>' +
+                //                     '</select>' +
+                //                 '</form>' +
+                //             '</div>' +
+                //         '</div>'
+                var html = hhh
+                html = outerHTML(hhh)
+                var numberOfLineBreaks = html.split("↵");
+                console.log("number: ", numberOfLineBreaks)
+
+                console.log("jml: ", html)
+                Swal.fire({
+                    title: "<i>Title</i>",
+                    html: html,
+                    confirmButtonText: "V <u>redu</u>",
+                });
+            })
+
+            function outerHTML(node){
+                return node.outerHTML || new XMLSerializer().serializeToString(node);
+            }
 
             function updatePrioritiesInJIRA(gmyOrBirim) {
                 var table = $('#auiTable').tableToJSON({
@@ -1110,16 +1155,16 @@ Released under the MIT license: http://jsbin.mit-license.org
                 let value="";
                 jQuery.ajax({
                     url: AJS.params.baseURL + "/rest/florestservice/1.2/rest/calculateResource",
-                    type: 'GET',
+                    type: 'POST',
                     data: constraintData,
                     async: false,
                     error : function (response) {
-                        console.log("calculateResourceError")
+                        console.log("calculateResourceError: ", response)
                         value= "-";
                     },
                     success: function (response, status, jqXHR) {
-                        AJS.$("#kaynak").text(response+" Adam/Gün");
-                        console.log("calculateResource: ", response);
+                        console.log("calculateResource: ", JSON.parse(response));
+                        // AJS.$("#kaynak").text(response+" Adam/Gün");
                     }
                 });
                 return value;
@@ -1311,6 +1356,29 @@ Released under the MIT license: http://jsbin.mit-license.org
         </div>
     </div>
 
+    <div class="row" id="swAlert" hidden="hidden" style="margin-top:50px;">
+        <div class="col-xs-5 col-md-1" style="padding-left:15px">
+            <form>
+                <select id="mySelect">
+                    <option>Apple</option>
+                    <option>Pear</option>
+                    <option>Banana</option>
+                    <option>Orange</option>
+                    </select>
+                </form>
+            </div>
+        <div class="col-xs-5 col-md-1" style="padding-left:15px">
+            <form>
+                <select id="mySelect2">
+                    <option>Apple</option>
+                    <option>Pear</option>
+                    <option>Banana</option>
+                    <option>Orange</option>
+                </select>
+                </form>
+            </div>
+        </div>
+
 
     <div class="row" style="margin-top:50px;">
 
@@ -1361,6 +1429,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                 <th class="aui-table-column-butce" data-override="Bütçe"  id="row1" style="width: 6%;">Bütçe</th>
                 <th class="aui-table-column-baslangic-tarihi" data-override="BaslangicTarihi"  id="row1" style="width: 10%;">Başlangıç Tarihi</th>
                 <th class="aui-table-column-bitis-tarihi" data-override="BitisTarihi"  id="row1" style="width: 10%;">Bitiş Tarihi</th>
+                <th class="aui-table-column-kullanici-onerisi" data-override="KullaniciOnerisi"  id="row1" style="width: 10%;">Öneri</th>
                 ##                    <th class="aui-table-column-unsortable" data-override="Created" id="row1">Oluşturulma Tarihi</th>
                 ##                    <th class="aui-table-column-unsortable" data-override="Due" id="row1">Bitiş Tarihi</th>
                 #foreach($cf in $customFieldsInProject)
@@ -1387,6 +1456,11 @@ Released under the MIT license: http://jsbin.mit-license.org
                     <td id="issueButce" name="issueButce" class="might-overflow">-</td>
                     <td id="issueBaslangicTarihi" name="issueBaslangicTarihi" class="might-overflow">-</td>
                     <td id="issueBitisTarihi" name="issueBitisTarihi" class="might-overflow">-</td>
+                    <td id="kaynakKullaniciOnerisi" name="kaynakKullaniciOnerisi" class="might-overflow">
+                        <div class="aui-group" id="buttons">
+                            <button class="aui-button" id="kullaniciOnerButton">Kullanıcı Öner</button>
+                        </div>
+                    </td>
 
                     ##                    <td id="issueCreated" name="issueCreated" class="might-overflow">$issue.getCreated()</td>
                     ##                    <td id="issueDue" name="issueDue" class="might-overflow">
