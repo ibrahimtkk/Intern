@@ -54,12 +54,11 @@ Released under the MIT license: http://jsbin.mit-license.org
         // create
         AJS.$(document).ready(function () {
             window.onbeforeunload = null;
-
-            let butceCFstring = "customfield_10600";
+            let butceCFstring = "customfield_11000";
             let butceJSONstring = "Bütçe"
-            let basTarihCFstring = "customfield_10703";
+            let basTarihCFstring = "customfield_11102";
             let basTarihJSONstring = "BaslangicTarihi"
-            let bitTarihCFstring = "customfield_10704";
+            let bitTarihCFstring = "customfield_10900";
             let bitTarihJSONstring = "BitisTarihi"
 
             // var userName = require('git-user-name');
@@ -453,6 +452,9 @@ Released under the MIT license: http://jsbin.mit-license.org
                 //Header'ı göster
                 AJS.$('#auiTable > thead  th[data-override*="'+e.val+'"]').show();
 
+                // AJS.$("tr").find("th:nth-child(8)").before('#auiTable > thead  th[data-override*="'+e.val+'"]').show();
+
+
                 var issueKeys =[];
                 jsonDataTable.forEach(cell => {
                     issueKeys.push(cell.key)
@@ -520,9 +522,15 @@ Released under the MIT license: http://jsbin.mit-license.org
                                 rowArray.push(data.Bütçe)
                                 rowArray.push(data.BaslangicTarihi)
                                 rowArray.push(data.BitisTarihi)
+                                rowArray.push('<td id="kaynakKullaniciOnerisi" name="kaynakKullaniciOnerisi" class="might-overflow">'+
+                                        '<div class="aui-group" id="buttons">'+
+                                        '<button class="aui-button" id="kullaniciOnerButton">Kullanıcı Öner</button>'+
+                                        '</div>'+
+                                        '</td>')
                                 #foreach($cf in $customFieldsInProject)
                                     rowArray.push('<td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">-</td>')
                                 #end
+
                                 dataTable.row.add(rowArray).draw(true)
                             }
 
@@ -548,6 +556,11 @@ Released under the MIT license: http://jsbin.mit-license.org
                                         rowArray.push(data.Bütçe)
                                         rowArray.push(data.BaslangicTarihi)
                                         rowArray.push(data.BitisTarihi)
+                                        rowArray.push('<td id="kaynakKullaniciOnerisi" name="kaynakKullaniciOnerisi" class="might-overflow">'+
+                                                '<div class="aui-group" id="buttons">'+
+                                                '<button class="aui-button" id="kullaniciOnerButton">Kullanıcı Öner</button>'+
+                                                '</div>'+
+                                                '</td>')
                                         #foreach($cf in $customFieldsInProject)
                                             console.log("custom field: "+"$cf")
                                             rowArray.push('<td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">'+ data["$cf.getName()"] +'</td>')
@@ -608,9 +621,15 @@ Released under the MIT license: http://jsbin.mit-license.org
                                             rowArray.push(data.BitisTarihi)
                                             // rowArray.push(data.Created)
                                             // rowArray.push(data.Due)
+                                            rowArray.push('<td id="kaynakKullaniciOnerisi" name="kaynakKullaniciOnerisi" class="might-overflow">'+
+                                                    '<div class="aui-group" id="buttons">'+
+                                                    '<button class="aui-button" id="kullaniciOnerButton">Kullanıcı Öner</button>'+
+                                                    '</div>'+
+                                                    '</td>')
                                             #foreach($cf in $customFieldsInProject)
                                                 rowArray.push('<td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">'+ data["$cf.getName()"] +'</td>')
                                             #end
+
                                             dataTable.row.add(rowArray).draw(true)
                                         }
                                     })
@@ -813,6 +832,11 @@ Released under the MIT license: http://jsbin.mit-license.org
                                             rowArray.push(data.Bütçe)
                                             rowArray.push(data.BaslangicTarihi)
                                             rowArray.push(data.BitisTarihi)
+                                            rowArray.push('<td id="kaynakKullaniciOnerisi" name="kaynakKullaniciOnerisi" class="might-overflow">'+
+                                                    '<div class="aui-group" id="buttons">'+
+                                                    '<button class="aui-button" id="kullaniciOnerButton">Kullanıcı Öner</button>'+
+                                                    '</div>'+
+                                                    '</td>')
                                             #foreach($cf in $customFieldsInProject)
                                                 rowArray.push('<td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">'+ data["$cf.getName()"] +'</td>')
                                             #end
@@ -882,6 +906,11 @@ Released under the MIT license: http://jsbin.mit-license.org
                                                 rowArray.push(data.Bütçe)
                                                 rowArray.push(data.BaslangicTarihi)
                                                 rowArray.push(data.BitisTarihi)
+                                                rowArray.push('<td id="kaynakKullaniciOnerisi" name="kaynakKullaniciOnerisi" class="might-overflow">'+
+                                                        '<div class="aui-group" id="buttons">'+
+                                                        '<button class="aui-button" id="kullaniciOnerButton">Kullanıcı Öner</button>'+
+                                                        '</div>'+
+                                                        '</td>')
                                                 #foreach($cf in $customFieldsInProject)
                                                     rowArray.push('<td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">'+ data["$cf.getName()"] +'</td>')
                                                 #end
@@ -1291,12 +1320,12 @@ Released under the MIT license: http://jsbin.mit-license.org
                                 </div>
                                 <div class="col-xs-6 col-md-4">
                                     <label for="text-input" id="baslangicTarihiLabel" style="visibility: hidden;">Başlangıç tarihi <span class="aui-icon aui-icon-small aui-iconfont-calendar" id="tarihIconBas" style="visibility: hidden;"/></label>
-                                    <input class="text" type="text" id="baslangicTarihiInput" name="baslangicTarihiInput" class="aui-date-picker" id="demo-range-1" type="date" style="visibility: hidden;">
+                                    <input class="text" type="text" id="baslangicTarihiInput" name="baslangicTarihiInput" class="aui-date-picker" id="demo-range-1" type="date" autocomplete="off" style="visibility: hidden;">
 
                                 </div>
                                 <div class="col-xs-6 col-md-4">
                                     <label for="text-input" id="bitisTarihiLabel" style="visibility: hidden;">Bitiş tarihi <span class="aui-icon aui-icon-small aui-iconfont-calendar" id="tarihIconBit" style="visibility: hidden;"/></label>
-                                    <input class="text" type="text" id="bitisTarihiInput" name="bitisTarihiInput" class="aui-date-picker" id="demo-range-1" type="date" style="visibility: hidden;">
+                                    <input class="text" type="text" id="bitisTarihiInput" name="bitisTarihiInput" class="aui-date-picker" id="demo-range-1" type="date" autocomplete="off" style="visibility: hidden;">
 
                                 </div>
                                 ##                                <div class="col-xs-6 col-md-4">
@@ -1434,7 +1463,6 @@ Released under the MIT license: http://jsbin.mit-license.org
                             <button class="aui-button" id="kullaniciOnerButton">Kullanıcı Öner</button>
                         </div>
                     </td>
-
                     ##                    <td id="issueCreated" name="issueCreated" class="might-overflow">$issue.getCreated()</td>
                     ##                    <td id="issueDue" name="issueDue" class="might-overflow">
                     ##                        #if ( !$issue.getDueDate() )
@@ -1450,6 +1478,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                     ##                    #foreach($lead in $projectLeadList)
                     ##                        <td id="projectLeader" name="projectLeader">-</td>
                     ##                    #end
+
                 </tr>
                 #end
             </tbody>
