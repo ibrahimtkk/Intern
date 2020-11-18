@@ -1032,38 +1032,11 @@ Released under the MIT license: http://jsbin.mit-license.org
             });
 
             AJS.$('#kullaniciOnerButton').on("click", function(){
-                var hhh = document.getElementById("swAlert");
-                hhh.style.visibility = "visible";
-                console.log("hhh: ", hhh)
-                // var html =
-                //         '<div class="row" style="margin-top:50px;">' +
-                //             '<div class="col-xs-5 col-md-1" style="padding-left:15px">' +
-                //                 '<form>' +
-                //                     '<select id="mySelect">' +
-                //                         '<option>Apple</option>' +
-                //                         '<option>Pear</option>' +
-                //                         '<option>Banana</option>' +
-                //                         '<option>Orange</option>' +
-                //                     '</select>' +
-                //                 '</form>' +
-                //             '</div>' +
-                //             '<div class="col-xs-5 col-md-1" style="padding-left:55px">' +
-                //                 '<form>' +
-                //                     '<select id="mySelect2">' +
-                //                         '<option>Apple</option>' +
-                //                         '<option>Pear</option>' +
-                //                         '<option>Banana</option>' +
-                //                         '<option>Orange</option>' +
-                //                     '</select>' +
-                //                 '</form>' +
-                //             '</div>' +
-                //         '</div>'
-                var html = hhh
-                html = outerHTML(hhh)
-                var numberOfLineBreaks = html.split("↵");
-                console.log("number: ", numberOfLineBreaks)
+                var hiddenHTML = document.getElementById("swAlert");
+                let html = hiddenHTML.cloneNode(true);
+                html.style.visibility = "visible";
+                html = outerHTML(html)
 
-                console.log("jml: ", html)
                 Swal.fire({
                     title: "<i>Title</i>",
                     html: html,
@@ -1356,28 +1329,28 @@ Released under the MIT license: http://jsbin.mit-license.org
         </div>
     </div>
 
-    <div class="row" id="swAlert" hidden="hidden" style="margin-top:50px;">
+    <div class="row" id="swAlert" style="margin-top:50px; visibility:hidden">
         <div class="col-xs-5 col-md-1" style="padding-left:15px">
             <form>
-                <select id="mySelect">
-                    <option>Apple</option>
-                    <option>Pear</option>
-                    <option>Banana</option>
-                    <option>Orange</option>
-                    </select>
-                </form>
-            </div>
-        <div class="col-xs-5 col-md-1" style="padding-left:15px">
-            <form>
-                <select id="mySelect2">
+                <select id="mySelect" multiple>
                     <option>Apple</option>
                     <option>Pear</option>
                     <option>Banana</option>
                     <option>Orange</option>
                 </select>
-                </form>
-            </div>
+            </form>
         </div>
+        <div class="col-xs-5 col-md-1" style="padding-left:15px">
+            <form>
+                <select id="mySelect2" multiple>
+                    <option>Apple</option>
+                    <option>Pear</option>
+                    <option>Banana</option>
+                    <option>Orange</option>
+                </select>
+            </form>
+        </div>
+    </div>
 
 
     <div class="row" style="margin-top:50px;">
