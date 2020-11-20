@@ -134,6 +134,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                     },
                     {
                         "targets": "aui-table-column-kullanici-onerisi",
+
                         render: function (data, type, row, meta) {
                             console.log("meta row"+meta.row);
                             return '<div class="aui-group kullaniciOnerButton" id="buttons"><button class="aui-button kullaniciOnerButtonb" id="'+meta.row+'">Kullanıcı Öner</button></div>';
@@ -155,10 +156,12 @@ Released under the MIT license: http://jsbin.mit-license.org
             var selectedThisRows = []
             var issueAndDates = []
 
-            $('#auiTable tbody').on( 'click', 'tr', function () {
-                $(this).toggleClass('selected');
-                selectedThisRows.push($(this))
-                var selectKey = $(this).children().first().children().text();
+            $('#auiTable tbody tr').on( 'click', 'td:not(:nth-child(8))', function () {
+
+                $(this).closest('tr').toggleClass('selected');
+                selectedThisRows.push($(this).closest('tr'))
+                var selectKey = $(this).closest('tr').children().first().children().text();
+
                 var baslangicKisit = $("#baslangicTarihiInput").val();
                 var bitisKisit = $("#bitisTarihiInput").val();
                 var baslangicKisitDate = Date.parse(baslangicKisit);
@@ -1431,7 +1434,7 @@ Released under the MIT license: http://jsbin.mit-license.org
             <tbody id="tableBody">
                 #foreach( $issue in $issueList )
                 <tr id="shadow" data-id="$issue.getSummary()">
-                    <td id="issueKey" name="issueKey"><a href="$baseUrl/browse/$issue.getKey()" class="issueKey">$issue.getKey()</a></td>
+                    <td id="issueKey" name="issueKey" class="issueKeyTd"><a href="$baseUrl/browse/$issue.getKey()" class="issueKey">$issue.getKey()</a></td>
                     <td id="issueSummary" name="issueSummary">$issue.getSummary()</td>
                     <td id="issueDescription" name="issueDescription" class="might-overflow">
                         #if ( !$issue.getDescription() )
