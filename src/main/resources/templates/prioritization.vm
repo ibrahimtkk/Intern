@@ -127,6 +127,10 @@ Released under the MIT license: http://jsbin.mit-license.org
                 bAutoWidth: false,
                 bFilter: false,
                 pageLength: parseInt($issueList.size()),
+                "createdRow": function( row, data, dataIndex ) {
+                    $(row).attr('id', 'shadow');
+                    $(row).attr('data-id', data[1]);
+                },
                 columnDefs: [
                     {
                         "targets": hiddenColumns,
@@ -134,10 +138,71 @@ Released under the MIT license: http://jsbin.mit-license.org
                     },
                     {
                         "targets": "aui-table-column-kullanici-onerisi",
-
                         render: function (data, type, row, meta) {
-                            console.log("meta row"+meta.row);
                             return '<div class="aui-group kullaniciOnerButton" id="buttons"><button class="aui-button kullaniciOnerButtonb" id="'+meta.row+'">Kullanıcı Öner</button></div>';
+                        }
+                    },
+                    {
+                        'targets': 0,
+                        'createdCell':  function (td, cellData, rowData, row, col) {
+                            $(td).attr('id', 'issueKey');
+                            $(td).attr('name', 'issueKey');
+                            $(td).addClass('issueKeyTd');
+                        }
+                    },
+                    {
+                        'targets': 1,
+                        'createdCell': function (td, cellData, rowData, row, col) {
+                            $(td).attr('id', 'issueSummary');
+                            $(td).attr('name', 'issueSummary');
+                        }
+                    },
+                    {
+                        'targets': 2,
+                        'createdCell':  function (td, cellData, rowData, row, col) {
+                            $(td).attr('id', 'issueDescription');
+                            $(td).attr('name', 'issueDescription');
+                            $(td).addClass('might-overflow');
+                        }
+                    },
+                    {
+                        'targets': 3,
+                        'createdCell':  function (td, cellData, rowData, row, col) {
+                            $(td).attr('id', 'issuePriority');
+                            $(td).attr('name', 'issuePriority');
+                            $(td).addClass('might-overflow');
+                        }
+                    },
+                    {
+                        'targets': 4,
+                        'createdCell':  function (td, cellData, rowData, row, col) {
+                            $(td).attr('id', 'issueButce');
+                            $(td).attr('name', 'issueButce');
+                            $(td).addClass('might-overflow');
+                        }
+                    },
+                    {
+                        'targets': 5,
+                        'createdCell':  function (td, cellData, rowData, row, col) {
+                            $(td).attr('id', 'issueBaslangicTarihi');
+                            $(td).attr('name', 'issueBaslangicTarihi');
+                            $(td).addClass('might-overflow');
+                        }
+                    },
+                    {
+                        'targets': 6,
+                        'createdCell':  function (td, cellData, rowData, row, col) {
+                            $(td).attr('id', 'issueBitisTarihi');
+                            $(td).attr('name', 'issueBitisTarihi');
+                            $(td).addClass('might-overflow');
+                        }
+                    },
+                    {
+                        'targets': 7,
+                        'createdCell':  function (td, cellData, rowData, row, col) {
+                            $(td).attr('id', 'kaynakKullaniciOnerisi');
+                            $(td).attr('name', 'kaynakKullaniciOnerisi');
+                            $(td).addClass('might-overflow');
                         }
                     }
                 ]
@@ -156,9 +221,10 @@ Released under the MIT license: http://jsbin.mit-license.org
             var selectedThisRows = []
             var issueAndDates = []
 
-            $('#auiTable tbody tr').on( 'click', 'td:not(:nth-child(8))', function () {
-
+            $('#auiTable tbody').on( 'click', 'td:not(:nth-child(8))', function () {
+                console.log("!!clikcked!!")
                 $(this).closest('tr').toggleClass('selected');
+                console.log($(this).closest('tr'))
                 selectedThisRows.push($(this).closest('tr'))
                 var selectKey = $(this).closest('tr').children().first().children().text();
 
@@ -263,6 +329,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                 }
 
             } );
+
 
             var baslangicDate;
             var bitisDate;
@@ -529,24 +596,24 @@ Released under the MIT license: http://jsbin.mit-license.org
                         keys.push(issueKey.text());
                     });
                     jsonDataTable.forEach(data => {
-                            if(!keys.includes(data.key)){
-                                var rowArray = []
-                                rowArray.push('<a href="$baseUrl/browse/' + data.key + '" ' + 'class="issueKey">' + data.key + '</a>');
-                                rowArray.push(data.Summary)
-                                rowArray.push(data.Description)
-                                rowArray.push(data.Priority)
-                                rowArray.push(data.Bütçe)
-                                rowArray.push(data.BaslangicTarihi)
-                                rowArray.push(data.BitisTarihi)
-                                rowArray.push(butonHtmlElement)
-                                #foreach($cf in $customFieldsInProject)
-                                    rowArray.push('<td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">-</td>')
-                                #end
+                        if(!keys.includes(data.key)){
+                            var rowArray = []
+                            rowArray.push('<a href="$baseUrl/browse/' + data.key + '" ' + 'class="issueKey">' + data.key + '</a>');
+                            rowArray.push(data.Summary)
+                            rowArray.push(data.Description)
+                            rowArray.push(data.Priority)
+                            rowArray.push(data.Bütçe)
+                            rowArray.push(data.BaslangicTarihi)
+                            rowArray.push(data.BitisTarihi)
+                            rowArray.push(butonHtmlElement)
+                            #foreach($cf in $customFieldsInProject)
+                                rowArray.push('<td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">-</td>')
+                            #end
 
-                                dataTable.row.add(rowArray).draw(true)
-                            }
+                            dataTable.row.add(rowArray).draw(true)
+                        }
 
-                        } );
+                    } );
                 }
 
             } );
