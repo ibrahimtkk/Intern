@@ -18,6 +18,11 @@ Released under the MIT license: http://jsbin.mit-license.org
 <html>
 <head>
     <!-- Latest compiled and minified CSS-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -203,6 +208,28 @@ Released under the MIT license: http://jsbin.mit-license.org
                             $(td).attr('id', 'kaynakKullaniciOnerisi');
                             $(td).attr('name', 'kaynakKullaniciOnerisi');
                             $(td).addClass('might-overflow');
+                        }
+                    }
+                ]
+            });
+            var kaynakAsimTable = $("#kaynakAsimTable").DataTable({
+                bLengthChange: false,
+                bPaginate: false,
+                bInfo: false,
+                bAutoWidth: false,
+                bFilter: false,
+                "ordering": false,
+                columnDefs: [
+                    {
+                        'targets':0,
+                        'createdCell': function (td, cellData, rowData, row, col) {
+                            $(td).attr('headers', 'basic-fname');
+                        }
+                    },
+                    {
+                        'targets':1,
+                        'createdCell': function (td, cellData, rowData, row, col) {
+                            $(td).attr('headers', 'basic-lname');
                         }
                     }
                 ]
@@ -525,9 +552,26 @@ Released under the MIT license: http://jsbin.mit-license.org
                     "startDate" : baslangicDate.toString(),
                     "endDate" : bitisDate.toString(),
                     "selectedRowKeys" : selectedRows,
-                    "resource" : "50"
+                    "resource" : "8"
                 }
-                calculateResource(constraintData);
+                resourceOverload(constraintData);
+
+                var hiddenHTML = document.getElementById("swAlertKaynakAsimi");
+                let html = hiddenHTML.cloneNode(true);
+                html.style.visibility = "visible";
+                html = outerHTML(html)
+
+                Swal.fire({
+                    //title: "<i>Kaynak Durumu</i>",
+                    html: html,
+                    confirmButtonText: "Kapat",
+                    customClass: 'swal-wide'
+                }).then((result) => {
+                    /* Read more about isConfirmed, isDenied below */
+                    if (result.isConfirmed) {
+                        kaynakAsimTable.clear().draw();
+                    }
+                });
                 e.preventDefault();
             });
             AJS.$("#loading-spinner").hide();
@@ -1119,9 +1163,7 @@ Released under the MIT license: http://jsbin.mit-license.org
 
                 AJS.$("#kaynak").text("");
             });
-            AJS.$('#approveButton').on("click", function (){
-                transitionIssue(selectedRows);
-            });
+
 
             // AJS.$('.kullaniciOnerButtonb').on("click", function(){
             //     var hiddenHTML = document.getElementById("swAlert");
@@ -1228,46 +1270,40 @@ Released under the MIT license: http://jsbin.mit-license.org
                 });
                 console.log("Priorities are updated (Not in JIRA DB))");
             }
-            function calculateResource(constraintData) {
+            function resourceOverload(constraintData) {
                 let value="";
                 jQuery.ajax({
-                    url: AJS.params.baseURL + "/rest/florestservice/1.2/rest/calculateResource",
+                    url: AJS.params.baseURL + "/rest/florestservice/1.2/rest/resourceOverload",
                     type: 'POST',
                     data: constraintData,
                     async: false,
                     error : function (response) {
-                        console.log("calculateResourceError: ", response)
+                        console.log("resourceOverloadError: ", response)
                         value= "-";
                     },
                     success: function (response, status, jqXHR) {
-                        console.log("calculateResource: ", JSON.parse(response));
-                        // AJS.$("#kaynak").text(response+" Adam/Gün");
+                        if(response === "" || response === " "){
+                            AJS.$("#kaynakAsimTable").css("visibility","hidden")
+                            AJS.$("#kaynakAsimi").text("Seçilen projeler için kaynak aşımı bulunmamaktadır.");
+                        }else{
+                            AJS.$("#kaynakAsimTable").css("visibility","visible")
+                            var responseArr=[];
+                            responseArr = response.split(" ");
+                            console.log("!-! response: "+ response)
+                            console.log("!-! responseArr: "+responseArr);
+                            for(var i=0; i<responseArr.length;i++){
+                                var nameProject = [];
+                                nameProject = responseArr[i].split(",")
+                                var justName=nameProject[0];
+                                nameProject[0]='<span class="aui-icon aui-icon-small aui-iconfont-person" ></span>'+justName
+
+                                kaynakAsimTable.row.add(nameProject).draw(true)
+                            }
+                        }
+
                     }
                 });
                 return value;
-            }
-            function transitionIssue(issueKey){
-                console.log("selected rows : "+ selectedRows)
-                jQuery.ajax({
-                    url: AJS.params.baseURL + "/rest/florestservice/1.2/rest/approveProject",
-                    type: 'POST',
-                    data: {
-                        issues: selectedRows
-                    },
-                    async: true,
-                    beforeSend: function () {
-                        console.log("approveSelectedProject beforeSend")
-                    },
-                    complete: function (response) {
-                        console.log("approveSelectedProject complete")
-                    },
-                    error: function (response) {
-                        console.log("approveSelectedProject has finished with ERROR !!!");
-                    },
-                    success: function (response, status, jqXHR) {
-                        console.log("approveSelectedProject is successful");
-                    }
-                });
             }
             function startDate(date){
                 console.log("Başlangıc date: "+date)
@@ -1301,7 +1337,6 @@ Released under the MIT license: http://jsbin.mit-license.org
                 //
                 // return endDateString;
             }
-
 
         });
         function myFunction() {
@@ -1347,69 +1382,81 @@ Released under the MIT license: http://jsbin.mit-license.org
 
     </div>
 
-    <div>
-        <div class="row">
-            <div class="col-xs-6 col-md-2">
-                <div class="aui-group">
-                    <div class="aui-item" id="#select2-customFields">
-                        <form class="aui">
-                            <select id="customFieldList-select2" data-placeholder="Alan eklemek için tıklayın" multiple>
-                                <option value=""></option>
-                                #foreach($cf in $customFieldsInProject)
-                                    <option value="$cf.getId()">$cf.getName()</option>
-                                #end
-                                ##                                <option id="projectLeader" name="projectLeader" value="projectLeader">Proje Lideri</option>
-                            </select>
-                        </form>
+
+    <div class="card row" style="margin-left: 15px;padding-left: 0px;margin-right: 20px;">
+        <div class="card-body" style="margin-left: -20px;">
+
+            <div>
+                <div>
+                    <div class="col-xs-6 col-md-2">
+                        <div class="aui-group">
+                            <div class="aui-item" id="#select2-customFields">
+                                <form class="aui">
+                                    <select id="customFieldList-select2" data-placeholder="Alan eklemek için tıklayın" multiple>
+                                        <option value=""></option>
+                                        #foreach($cf in $customFieldsInProject)
+                                            <option value="$cf.getId()">$cf.getName()</option>
+                                        #end
+                                        ##                                <option id="projectLeader" name="projectLeader" value="projectLeader">Proje Lideri</option>
+                                    </select>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-6 col-md-4">
+                        <div class="aui-group">
+                            <div class="aui-item" id="#select2-favFilters">
+                                <form class="aui">
+                                    <select id="favFilter-select2" data-placeholder="Filtre eklemek için tıklayın" size="1" >
+                                        <option value=""></option>
+                                        #foreach($favFilter in $favouriteFilters)
+                                            <option value="$favFilter">$favFilter <a href="#" id="remove-fav-filter-single-select" class="select2-search-choice-close" tabindex="-1"></a></option>
+                                        #end
+                                    </select>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-6 col-md-6">
+                        <div class="aui-group">
+                            <div class="aui-item" id="#select2-constraint">
+                                <form class="aui">
+                                    <select id="constraintList-select2" data-placeholder="Kısıt eklemek için tıklayın" multiple>
+                                        <option></option>
+                                        <option value="butce">Bütçe</option>
+                                        <option value="baslangicTarihi">Başlangıç Tarihi</option>
+                                        <option value="bitisTarihi">Bitiş Tarihi</option>
+                                    </select>
+                                    <form class="aui">
+                                        <div class="col-xs-6 col-md-4">
+                                            <label for="text-input" id="butceLabel" style="visibility: hidden;">Bütçe </label>
+                                            <input class="text" type="text" id="butceInput" name="butceInput" style="visibility: hidden;">
+                                        </div>
+                                        <div class="col-xs-6 col-md-4">
+                                            <label for="text-input" id="baslangicTarihiLabel" style="visibility: hidden;">Başlangıç tarihi <span class="aui-icon aui-icon-small aui-iconfont-calendar" id="tarihIconBas" style="visibility: hidden;"/></label>
+                                            <input class="text" type="text" id="baslangicTarihiInput" name="baslangicTarihiInput" class="aui-date-picker" id="demo-range-1" type="date" autocomplete="off" style="visibility: hidden;">
+
+                                        </div>
+                                        <div class="col-xs-6 col-md-4">
+                                            <label for="text-input" id="bitisTarihiLabel" style="visibility: hidden;">Bitiş tarihi <span class="aui-icon aui-icon-small aui-iconfont-calendar" id="tarihIconBit" style="visibility: hidden;"/></label>
+                                            <input class="text" type="text" id="bitisTarihiInput" name="bitisTarihiInput" class="aui-date-picker" id="demo-range-1" type="date" autocomplete="off" style="visibility: hidden;">
+
+                                        </div>
+                                    </form>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-xs-6 col-md-4">
-                <div class="aui-group">
-                    <div class="aui-item" id="#select2-favFilters">
-                        <form class="aui">
-                            <select id="favFilter-select2" data-placeholder="Filtre eklemek için tıklayın" size="1" >
-                                <option value=""></option>
-                                #foreach($favFilter in $favouriteFilters)
-                                    <option value="$favFilter">$favFilter <a href="#" id="remove-fav-filter-single-select" class="select2-search-choice-close" tabindex="-1"></a></option>
-                                #end
-                            </select>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xs-6 col-md-6">
-                <div class="aui-group">
-                    <div class="aui-item" id="#select2-constraint">
-                        <form class="aui">
-                            <select id="constraintList-select2" data-placeholder="Kısıt eklemek için tıklayın" multiple>
-                                <option></option>
-                                <option value="butce">Bütçe</option>
-                                <option value="baslangicTarihi">Başlangıç Tarihi</option>
-                                <option value="bitisTarihi">Bitiş Tarihi</option>
-                            </select>
-                            <form class="aui">
-                                <div class="col-xs-6 col-md-4">
-                                    <label for="text-input" id="butceLabel" style="visibility: hidden;">Bütçe </label>
-                                    <input class="text" type="text" id="butceInput" name="butceInput" style="visibility: hidden;">
-                                </div>
-                                <div class="col-xs-6 col-md-4">
-                                    <label for="text-input" id="baslangicTarihiLabel" style="visibility: hidden;">Başlangıç tarihi <span class="aui-icon aui-icon-small aui-iconfont-calendar" id="tarihIconBas" style="visibility: hidden;"/></label>
-                                    <input class="text" type="text" id="baslangicTarihiInput" name="baslangicTarihiInput" class="aui-date-picker" id="demo-range-1" type="date" autocomplete="off" style="visibility: hidden;">
-
-                                </div>
-                                <div class="col-xs-6 col-md-4">
-                                    <label for="text-input" id="bitisTarihiLabel" style="visibility: hidden;">Bitiş tarihi <span class="aui-icon aui-icon-small aui-iconfont-calendar" id="tarihIconBit" style="visibility: hidden;"/></label>
-                                    <input class="text" type="text" id="bitisTarihiInput" name="bitisTarihiInput" class="aui-date-picker" id="demo-range-1" type="date" autocomplete="off" style="visibility: hidden;">
-
-                                </div>
-                            </form>
-                        </form>
-                    </div>
-                </div>
+            <div style="margin-left: 15px;">
+                <label style="display:inline">Toplam Bütçe</label>
+                &nbsp;
+                <aui-badge id="butceMiktari" style="font-size: 14px; display: inline;"></aui-badge>
             </div>
         </div>
     </div>
+
 
     <div class="aui-group">
         <div id="loading-spinner" class="custom-card-style">
@@ -1418,66 +1465,32 @@ Released under the MIT license: http://jsbin.mit-license.org
         </div>
     </div>
 
-    <div class="row" id="swAlert" style="margin-top:50px; visibility:hidden">
-        <div class="col-xs-5 col-md-1" style="padding-left:15px">
-            <form>
-                <select id="mySelect" multiple>
-                    <option>Apple</option>
-                    <option>Pear</option>
-                    <option>Banana</option>
-                    <option>Orange</option>
-                </select>
-            </form>
-        </div>
-        <div class="col-xs-5 col-md-1" style="padding-left:15px">
-            <form>
-                <select id="mySelect2" multiple>
-                    <option>Apple</option>
-                    <option>Pear</option>
-                    <option>Banana</option>
-                    <option>Orange</option>
-                </select>
-            </form>
-        </div>
-    </div>
 
+    <div class="row" style="margin-left:0px;">
+##        <div>
+##            <label style="float:left; display:inline">Toplam Bütçe</label>
+##            &nbsp;
+##            <!--<p id="butceMiktari" style="display:inline"></p>-->
+##            <aui-badge id="butceMiktari" style="font-size: 14px; display: inline;"></aui-badge>
+##        </div>
 
-    <div class="row" style="margin-top:50px;">
-
-        <div class="col-xs-6 col-md-1" style="padding-left:15px">
-            <div class="aui-group" id="buttons">
-                <button class="aui-button" id="temizleButton">Seçimi Temizle</button>
-            </div>
-        </div>
-        <div class="col-xs-6 col-md-1" style="padding-left:40px">
-            <div class="aui-group" id="buttons">
-                <button class="aui-button" id="onaylaButton">Kaynak</button>
-            </div>
-        </div>
-        <div class="col-xs-6 col-md-1">
-            <div class="aui-group" id="buttons">
-                <button class="aui-button" id="approveButton">Approve</button>
-            </div>
-        </div>
-        <div>
-
-            ##            <div style="float: right; padding-left: 20px; padding-right: 30px;">
-            ##                <label style="display: inline">Tarih Geçerlilik Durumu: </label>
-            ##                <!--<p id="issueDurum" style="display: inline"></p>-->
-            ##                <aui-badge id="issueDurum" style="font-size: 14px; display: inline;"></aui-badge>
-            ##            </div>
-            <div style="float: right; padding-left: 60px; padding-right: 30px;">
-                <label style="display: inline">Kaynak Durumu: </label>
-                <aui-badge id="kaynak" style="font-size: 14px; display: inline;"></aui-badge>
-            </div>
-
-            <div style="float: right;">
-                <label style="display:inline">Butce: </label>
-                <!--<p id="butceMiktari" style="display:inline"></p>-->
-                <aui-badge id="butceMiktari" style="font-size: 17px; display: inline;"></aui-badge>
-            </div>
-        </div>
-
+        ##            <div style="float: right; padding-left: 20px; padding-right: 30px;">
+        ##                <label style="display: inline">Tarih Geçerlilik Durumu: </label>
+        ##                <!--<p id="issueDurum" style="display: inline"></p>-->
+        ##                <aui-badge id="issueDurum" style="font-size: 14px; display: inline;"></aui-badge>
+        ##            </div>
+        ##            <div style="float: right; padding-left: 60px; padding-right: 30px;">
+        ##                <label style="display: inline">Kaynak Durumu: </label>
+        ##                <aui-badge id="kaynak" style="font-size: 14px; display: inline;"></aui-badge>
+        ##            </div>            ##            <div style="float: right; padding-left: 20px; padding-right: 30px;">
+        ##            ##                <label style="display: inline">Tarih Geçerlilik Durumu: </label>
+        ##            ##                <!--<p id="issueDurum" style="display: inline"></p>-->
+        ##            ##                <aui-badge id="issueDurum" style="font-size: 14px; display: inline;"></aui-badge>
+        ##            ##            </div>
+        ####            <div style="float: right; padding-left: 60px; padding-right: 30px;">
+        ####                <label style="display: inline">Kaynak Durumu: </label>
+        ####                <aui-badge id="kaynak" style="font-size: 14px; display: inline;"></aui-badge>
+        ####            </div>
     </div>
 
     <div class="aui-group list-group" id="tableDiv">
@@ -1540,14 +1553,65 @@ Released under the MIT license: http://jsbin.mit-license.org
             </tbody>
         </table>
         <div>
-            <div class="aui-group" id="buttons">
+            <div class="aui-group" id="buttons" >
+                <button class="aui-button" id="temizleButton" style="float: left;">Seçimi Temizle</button>
+                <button class="aui-button" id="onaylaButton" style="float:left;">Kaynak Aşım Durumu</button>
                 <button class="aui-button aui-button-primary" id="kaydetButton" style="float: right;">Sıralamayı Kaydet</button>
             </div>
+##            <div class="col-xs-6 col-md-1" style="padding-left:15px; float: left;">
+##                <div class="aui-group" id="buttons">
+##                    <button class="aui-button" id="temizleButton">Seçimi Temizle</button>
+##                </div>
+##            </div>
         </div>
     </div>
 
     <div class="gantt" name="gantt" id="gantt"></div>
+    <div class="row" id="swAlert" style="margin-top:50px; visibility:hidden">
+        <div class="col-xs-5 col-md-1" style="padding-left:15px">
+            <form>
+                <select id="mySelect" multiple>
+                    <option>Apple</option>
+                    <option>Pear</option>
+                    <option>Banana</option>
+                    <option>Orange</option>
+                </select>
+            </form>
+        </div>
+        <div class="col-xs-5 col-md-1" style="padding-left:15px">
+            <form>
+                <select id="mySelect2" multiple>
+                    <option>Apple</option>
+                    <option>Pear</option>
+                    <option>Banana</option>
+                    <option>Orange</option>
+                </select>
+            </form>
+        </div>
+    </div>
+    <div id="swAlertKaynakAsimi" style="margin-top:50px; visibility:hidden">
+        <div class="aui-message aui-message-info">
+            <p class="title">
+                <strong>Kaynak Aşım Durumu</strong>
+            </p>
+            <p id="kaynakAsimi"></p>
+        </div>
 
+        <table class="aui" id="kaynakAsimTable">
+            <thead>
+            <tr>
+                <th id="basic-fname">Kaynak</th>
+                <th id="basic-lname">Proje</th>
+            </tr>
+            </thead>
+##            <tbody>
+##            <tr>
+##                <td headers="basic-fname"><span class="aui-icon aui-icon-small aui-iconfont-person" ></span></td>
+##                <td headers="basic-lname"></td>
+##            </tr>
+##            </tbody>
+        </table>
+    </div>
 
     #end
 
@@ -1556,3 +1620,5 @@ Released under the MIT license: http://jsbin.mit-license.org
 
 </body>
 </html>
+
+

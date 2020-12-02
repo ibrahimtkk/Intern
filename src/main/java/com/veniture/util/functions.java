@@ -105,9 +105,18 @@ public class functions {
         List<Allocation> tempoAllocationData = GSON.fromJson(getResponseByStartAndEndDate(startDate, endDate), tempoAllocationDataType);
         return tempoAllocationData;
     }
+    public static List<Allocation> getAllocationsByDateAndAssigneeKey(String startDate, String endDate, String assigneeKey) throws IOException {
+        Type tempoAllocationDataType = new TypeToken<List<Allocation>>() {}.getType();
+        List<Allocation> tempoAllocationData = GSON.fromJson(getResponseByStartAndEndDateAndAssigneeKey(startDate, endDate, assigneeKey), tempoAllocationDataType);
+        return tempoAllocationData;
+    }
 
     public static String getResponseByStartAndEndDate(String startDate, String endDate) throws IOException {
         String QUERY = QUERY_ALLOCATION_BY_DATE.replace("SSS", startDate).replace("EEE", endDate);
+        return getResponseString(QUERY);
+    }
+    public static String getResponseByStartAndEndDateAndAssigneeKey(String startDate, String endDate,String assigneeKey) throws IOException {
+        String QUERY = QUERY_ALLOCATION_BY_DATE_ASSIGNEE_KEY.replace("SSS", startDate).replace("EEE", endDate).replace("AAA", assigneeKey);
         return getResponseString(QUERY);
     }
 
@@ -183,7 +192,7 @@ public class functions {
             String projects = propertySet.getString("jira.meta.projeler");
 
             if (projects != null){
-                List<String> projectsList = Arrays.asList(projects.split(", "));
+                List<String> projectsList = Arrays.asList(projects.split(","));
                 issueKeys.forEach(issueKey -> {
                     if (projectsList.contains(issueKey))
                         suggestionUserName.add(applicationUser.getName());

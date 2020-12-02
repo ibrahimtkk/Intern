@@ -266,6 +266,7 @@ public class rest {
                 try {
                     allocationStartDate = new SimpleDateFormat("yyyy-MM-dd").parse(allocation.getStart());
                     allocationEndDate = new SimpleDateFormat("yyyy-MM-dd").parse(allocation.getEnd());
+
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -274,6 +275,8 @@ public class rest {
 
             }
         });
+        String kaynak = String.valueOf(resource);
+
 
         List<String> suggestionUserName = getHaveSameProjectUsers(issueKeys);
 
@@ -292,8 +295,64 @@ public class rest {
             String name = i;
         }
         String json = new Gson().toJson(availableUsers );
-        return json;
+
+        return kaynak;
     }
+
+    @POST
+    @Path("/resourceOverload")
+    public String resourceOverload(@Context HttpServletRequest req, @Context HttpServletResponse resp) throws IOException, ParseException {
+        Map map = req.getParameterMap();
+        String[] issueKeysArray = req.getParameterValues("selectedRowKeys[]");
+        String startDateString = req.getParameterValues("startDate")[0];
+        String endDateString = req.getParameterValues("endDate")[0];
+        String resourceString = req.getParameterValues("resource")[0];
+        List<Allocation> allocations = getAllocationsByDate(startDateString, endDateString);
+
+        List<String> issueKeys = Arrays.asList(issueKeysArray);
+        Date constraintStartDate = new SimpleDateFormat("yyyy-MM-dd").parse(startDateString);
+        Date constraintEndDate = new SimpleDateFormat("yyyy-MM-dd").parse(endDateString);
+        int constraintResource = Integer.parseInt(resourceString);
+        resource = 0;
+
+        List<String> userNames = new ArrayList<>();
+        allocations.forEach(allocation1 -> {
+            Allocation allocation = allocation1;
+            if ( issueKeys.contains( allocation.getPlanItem().getKey())){
+                try {
+                    allocationStartDate = new SimpleDateFormat("yyyy-MM-dd").parse(allocation.getStart());
+                    allocationEndDate = new SimpleDateFormat("yyyy-MM-dd").parse(allocation.getEnd());
+
+                    List<Allocation> allocation2 = getAllocationsByDateAndAssigneeKey(allocation.getStart(), allocation.getEnd(), allocation.getAssignee().getKey());
+                    allocation2.forEach(al2->{
+                        Allocation all2 = al2;
+                        try{
+                            allocationStartDate = new SimpleDateFormat("yyyy-MM-dd").parse(all2.getStart());
+                            allocationEndDate = new SimpleDateFormat("yyyy-MM-dd").parse(all2.getEnd());
+                        }catch  (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        fark = getWorkingDaysBetweenTwoDate(constraintStartDate, constraintEndDate, allocationStartDate, allocationEndDate);
+                        resource += all2.getSecondsPerDay()/3600;
+
+
+                        if(resource > constraintResource){
+                            //kaynak aşımı oluştu
+                            userNames.add(all2.getAssignee().getKey() + ","+ allocation.getPlanItem().getKey() );
+                        }
+                    });
+                    resource=0;
+                } catch (ParseException | IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+        String names = userNames.stream().collect(Collectors.joining(" "));
+        return names;
+    }
+
 
     @POST
     @Path("/assignUserToTempo")
