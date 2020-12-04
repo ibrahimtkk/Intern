@@ -221,6 +221,28 @@ Released under the MIT license: http://jsbin.mit-license.org
                     }
                 ]
             });
+            var resourceOverloadforProjectTable=$("#resourceOverloadforProjectTable").DataTable({
+                bLengthChange: false,
+                bPaginate: false,
+                bInfo: false,
+                bAutoWidth: false,
+                bFilter: false,
+                "ordering": false,
+                columnDefs: [
+                    {
+                        'targets':0,
+                        'createdCell': function (td, cellData, rowData, row, col) {
+                            $(td).attr('headers', 'basic-fname');
+                        }
+                    },
+                    {
+                        'targets':1,
+                        'createdCell': function (td, cellData, rowData, row, col) {
+                            $(td).attr('headers', 'basic-lname');
+                        }
+                    }
+                ]
+            });
             var jsonDataTable = $('#auiTable').tableToJSON();
 
             var butceCount = 0;
@@ -320,14 +342,14 @@ Released under the MIT license: http://jsbin.mit-license.org
 
             } );
 
-            var baslangicDate;
-            var bitisDate;
+            var baslangicDate;var bitisDate;
+            var baslangicDateforProjectPlanning;var bitisDateforProjectPlanning;
             updatePriorities("$restriction");
             AJS.$("#customFieldList-select2").auiSelect2();
             AJS.$("#favFilter-select2").auiSelect2({
                 allowClear: true
             });
-            //AJS.$("#constraintList-select2").auiSelect2();
+            AJS.$("#projectKey-select2").auiSelect2();
             AJS.$("#baslangicTarihiInput").datePicker({
                 overrideBrowserDefault:true,
                 dateFormat: "yy-mm-dd",
@@ -348,6 +370,25 @@ Released under the MIT license: http://jsbin.mit-license.org
                     datePickerFilter(date)
                 }
             })
+            AJS.$("#projectBaslangicTarihiInput").datePicker({
+                overrideBrowserDefault:true,
+                dateFormat: "yy-mm-dd",
+                inline:true,
+                autoclose: true,
+                onSelect: function (date) {
+                    baslangicDateforProjectPlanning=startDate(date)
+                }
+            })
+            AJS.$("#projectBitisTarihiInput").datePicker({
+                overrideBrowserDefault:true,
+                dateFormat: "yy-mm-dd",
+                inline:true,
+                autoclose: true,
+                onSelect: function (date) {
+                    bitisDateforProjectPlanning=endDate(date)
+                }
+            })
+
 
             var issueKeys =[];
             jsonDataTable.forEach(cell => {
@@ -367,7 +408,16 @@ Released under the MIT license: http://jsbin.mit-license.org
             google.charts.load('current', {'packages':['gantt']});
             google.charts.setOnLoadCallback(drawChart);
 
-
+            var projectKeys=[];
+            AJS.$("#projectKey-select2").on('select2-selecting', function (e) {
+                projectKeys.push(e.val)
+            })
+            AJS.$("#projectKey-select2").on('select2-removing', function (e) {
+                const index = projectKeys.indexOf(e.val);
+                if (index > -1) {
+                    projectKeys.splice(index, 1);
+                }
+            })
             AJS.$('#kaydetButton').off().on("click", function (e) {
                 var params = new window.URLSearchParams(window.location.search);
                 updatePrioritiesInJIRA(params.get('restriction'));
@@ -396,6 +446,17 @@ Released under the MIT license: http://jsbin.mit-license.org
                         kaynakAsimTable.clear().draw();
                     }
                 });
+                e.preventDefault();
+            });
+            AJS.$("#kaynakAsimforProjectPlanning").off().on("click", function (e) {
+                resourceOverloadforProjectTable.clear().draw();
+                let constraintDataa = {
+                    "startDate" : baslangicDateforProjectPlanning.toString(),
+                    "endDate" : bitisDateforProjectPlanning.toString(),
+                    "projectKey" : projectKeys,
+                    "resource" : "8"
+                }
+                resourceOverloadProjectPlanning(constraintDataa);
                 e.preventDefault();
             });
             AJS.$("#loading-spinner").hide();
@@ -882,6 +943,38 @@ Released under the MIT license: http://jsbin.mit-license.org
                 });
                 return value;
             }
+            function resourceOverloadProjectPlanning(constraintData) {
+                let value="";
+                jQuery.ajax({
+                    url: AJS.params.baseURL + "/rest/florestservice/1.2/rest/resourceOverloadProjectPlanning",
+                    type: 'POST',
+                    data: constraintData,
+                    async: false,
+                    error : function (response) {
+                        value= "-";
+                    },
+                    success: function (response, status, jqXHR) {
+                        if(response === "" || response === " "){
+                            AJS.$("#resourceOverloadforProjectTable").css("visibility","hidden")
+                            AJS.$("#resourceOverloadInfo").css("visibility","visible");
+                        }else{
+                            AJS.$("#resourceOverloadforProjectTable").css("visibility","visible")
+                            AJS.$("#resourceOverloadInfo").css("visibility","hidden");
+                            var responseArr=[];
+                            responseArr = response.split(" ");
+                            for(var i=0; i<responseArr.length;i++){
+                                var nameProject = [];
+                                nameProject = responseArr[i].split(",")
+                                var justName=nameProject[0];
+                                nameProject[0]='<span class="aui-icon aui-icon-small aui-iconfont-person" ></span>'+justName
+
+                                resourceOverloadforProjectTable.row.add(nameProject).draw(true)
+                            }
+                        }
+                    }
+                });
+                return value;
+            }
             function startDate(date){
                 var date=new Date(date)
                 date.setDate(date.getDate())
@@ -1088,8 +1181,13 @@ Released under the MIT license: http://jsbin.mit-license.org
         <div id="menu4" class="container tab-pane fade"><br>
             <form class="aui">
                 <div class="field-group" style="width:400px">
-                    <label for="projectKeyInput" id="projectKeyLabel" style="text-align: left">Bütçe <span class="aui-icon aui-icon-small aui-iconfont-new-edit" style="float: right"/></label>
-                    <input class="text" type="text" id="projectKeyInput" name="projectKey"/>
+                    <label for="projectKeyInput" id="projectKeyLabel" style="text-align: left; ">Proje anahtarı<span class="aui-icon icon-required"/>&nbsp;<span class="aui-icon aui-icon-small aui-iconfont-new-edit" style="float: right"/></label>
+                    <select id="projectKey-select2" data-placeholder="Proje eklemek için tıklayın" multiple>
+                        <option value=""></option>
+                        #foreach($pk in $projectKeysList)
+                            <option value="$pk">$pk</option>
+                        #end
+                    </select>
                 </div>
                 <div class="field-group" style="width:400px;">
                     <label for="projectBaslangicTarihiInput" id="projectBaslangicTarihiLabel" style="text-align: left">Başlangıç tarihi <span class="aui-icon aui-icon-small aui-iconfont-calendar" id="tarihIconBas" style="float: right"/></label>
@@ -1099,10 +1197,26 @@ Released under the MIT license: http://jsbin.mit-license.org
                 <div class="field-group" style="width: 400px;">
                     <label for="projectBitisTarihiInput" id="projectBitisTarihiLabe" style="text-align: left">Bitiş tarihi <span class="aui-icon aui-icon-small aui-iconfont-calendar" id="tarihIconBit" style="float: right"/></label>
                     <input class="text" type="text" id="projectBitisTarihiInput" name="projectBitisTarihiInput" class="aui-date-picker" id="demo-range-1" type="date" autocomplete="off"/>
-
-
                 </div>
             </form>
+            <div class="aui-group" id="buttons" >
+                <button class="aui-button" id="kaynakAsimforProjectPlanning" style="float:left;">Kaynak Aşımı</button>
+            </div>
+
+            <div class="aui-message aui-message-info" id="resourceOverloadInfo" style="visibility: hidden">
+                <p class="title">
+                    <strong>Kaynak Aşım Durumu</strong>
+                </p>
+                <p>Seçilen projeler için kaynak aşımı bulunmamaktadır.</p>
+            </div>
+            <table class="aui" id="resourceOverloadforProjectTable" style="visibility: hidden">
+                <thead>
+                <tr>
+                    <th id="basic-fname">Kaynak</th>
+                    <th id="basic-lname">Proje</th>
+                </tr>
+                </thead>
+            </table>
         </div>
 
     </div>
