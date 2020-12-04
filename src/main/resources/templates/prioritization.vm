@@ -17,15 +17,17 @@ Released under the MIT license: http://jsbin.mit-license.org
 -->
 <html>
 <head>
+
     <!-- Latest compiled and minified CSS-->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
-
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" />
+##    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"/>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
     <script src="https://cdn.jsdelivr.net/npm/table-to-json@0.13.0/lib/jquery.tabletojson.min.js" integrity="sha256-AqDz23QC5g2yyhRaZcEGhMMZwQnp8fC6sCZpf+e7pnw=" crossorigin="anonymous"></script>
     <script src="https://raw.githack.com/SortableJS/Sortable/master/Sortable.js"></script><script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
@@ -34,19 +36,11 @@ Released under the MIT license: http://jsbin.mit-license.org
 
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
-
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.22/datatables.min.css"/>
-
     <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.22/datatables.min.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/table-to-json@1.0.0/lib/jquery.tabletojson.min.js" integrity="sha256-H8xrCe0tZFi/C2CgxkmiGksqVaxhW0PFcUKZJZo1yNU=" crossorigin="anonymous"></script>
-
-    ##    <script type="text/javascript" src="../js/jquery.ganttChart.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-
-    ##    <script type="text/javascript" src="../css/PortfolioManagement.css"></script>
 
     <meta charset="utf-8">
     <title>Proje Önceliklendirme</title>
@@ -56,9 +50,8 @@ Released under the MIT license: http://jsbin.mit-license.org
     <link rel="stylesheet" href="../css/PortfolioManagement.css" />
 
     <script>
-        // create
         AJS.$(document).ready(function () {
-            window.onbeforeunload = null;
+
             let butceCFstring = "customfield_11000";
             let butceJSONstring = "Bütçe"
             let basTarihCFstring = "customfield_11102";
@@ -67,13 +60,8 @@ Released under the MIT license: http://jsbin.mit-license.org
             let bitTarihJSONstring = "BitisTarihi";
 
             var htmlButtonOneri=document.getElementById("kaynakKullaniciOnerisi");
-
             let butonHtmlElement = htmlButtonOneri.cloneNode(true);
             butonHtmlElement = outerHTML(butonHtmlElement)
-            console.log("!!!!!" ,butonHtmlElement)
-
-            // var userName = require('git-user-name');
-            // console.log("gitusername: ", userName());
 
             var filterAndIssueKeys = [];
             var defaultIssueList = [];
@@ -123,7 +111,6 @@ Released under the MIT license: http://jsbin.mit-license.org
                 hiddenColumns.push(i);
             }
 
-            /* def of DataTable */
             var dataTable = $("#auiTable").DataTable({
                 order: [[ 3, "asc" ]],
                 bLengthChange: false,
@@ -234,11 +221,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                     }
                 ]
             });
-
-
             var jsonDataTable = $('#auiTable').tableToJSON();
-
-            console.log("JsonDataTable: ",JSON.stringify(jsonDataTable))
 
             var butceCount = 0;
             var selectedButce = JSON.parse(JSON.stringify(butceCount))
@@ -249,9 +232,7 @@ Released under the MIT license: http://jsbin.mit-license.org
             var issueAndDates = []
 
             $('#auiTable tbody').on( 'click', 'td:not(:nth-child(8))', function () {
-                console.log("!!clikcked!!")
                 $(this).closest('tr').toggleClass('selected');
-                console.log($(this).closest('tr'))
                 selectedThisRows.push($(this).closest('tr'))
                 var selectKey = $(this).closest('tr').children().first().children().text();
 
@@ -267,7 +248,6 @@ Released under the MIT license: http://jsbin.mit-license.org
                                 butceCount = selectedButce
                                 alert("Lütfen Bütçe Alanını ekleyin")
                                 $(this).removeClass('selected');
-
                             } else {
                                 if (Object.keys(jsonDataTable[i]).includes("Başlangıç Tarihi")  ) {
                                     if (jsonDataTable[i]["Başlangıç Tarihi"] !== "-") {
@@ -299,29 +279,12 @@ Released under the MIT license: http://jsbin.mit-license.org
                                         }
                                     }
                                 }
-
-
                                 butceCount += parseInt(jsonDataTable[i]['Bütçe'])
                                 selectedButce = butceCount
                                 selectedRows.push(selectKey)
                             }
                         }
                     }
-                    if (baslangicTarihiBoolean){
-                        if (bitisTarihiBoolean) {
-                            $("#issueDurum").text("Olumlu");
-                            $("#issueDurum").css("color", "green")
-                        }
-                        else {
-                            $("#issueDurum").text("Olumsuz(Bitiş Tarihi Geçersiz)");
-                            $("#issueDurum").css("color", "red")
-                        }
-                    }
-                    else {
-                        $("#issueDurum").text("Olumsuz(Başlangıç Tarihi Geçersiz)");
-                        $("#issueDurum").css("color", "red")
-                    }
-
                 }
                 else {
                     var deselectIndex = selectedRows.indexOf(selectKey);
@@ -357,7 +320,6 @@ Released under the MIT license: http://jsbin.mit-license.org
 
             } );
 
-
             var baslangicDate;
             var bitisDate;
             updatePriorities("$restriction");
@@ -365,14 +327,13 @@ Released under the MIT license: http://jsbin.mit-license.org
             AJS.$("#favFilter-select2").auiSelect2({
                 allowClear: true
             });
-            AJS.$("#constraintList-select2").auiSelect2();
+            //AJS.$("#constraintList-select2").auiSelect2();
             AJS.$("#baslangicTarihiInput").datePicker({
                 overrideBrowserDefault:true,
                 dateFormat: "yy-mm-dd",
                 inline:true,
                 autoclose: true,
                 onSelect: function (date) {
-                    //datePickerChanged(date)
                     baslangicDate=startDate(date)
                     datePickerFilter(date)
                 }
@@ -383,7 +344,6 @@ Released under the MIT license: http://jsbin.mit-license.org
                 inline:true,
                 autoclose: true,
                 onSelect: function (date) {
-                    //datePickerChanged(date)
                     bitisDate=endDate(date)
                     datePickerFilter(date)
                 }
@@ -401,153 +361,19 @@ Released under the MIT license: http://jsbin.mit-license.org
             addCFVal("Başlangıç Tarihi", basTarihJSONstring, baslangicTarihiCFvalues);
             addCFVal("Bitiş Tarihi", bitTarihJSONstring, bitisTarihiCFvalues);
 
-
             var baslangicTarihiArray = baslangicTarihiCFvalues.split(",,,");
             var bitisTarihiArray = bitisTarihiCFvalues.split(",,,");
 
             google.charts.load('current', {'packages':['gantt']});
             google.charts.setOnLoadCallback(drawChart);
 
-            // Başlangıç Tarihi, basTarihCFstring
-            function addCFVal(CFValText, CFstring, CFarray){
-                var index;
-                dataTable.columns()[0].forEach(innerIndex => {
-                    if (dataTable.column(innerIndex).header().textContent === CFValText) {
-                        index = innerIndex
-                    }
-                })
-                var array = CFarray.split(",,,");
-
-                dataTable.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                    var rowData = this.data();
-
-                    rowData[index] = array[rowLoop]
-                    dataTable.row(rowIdx).data(rowData)
-                    jsonDataTable[rowLoop][CFstring] = array[rowLoop]
-
-                    this.invalidate()
-                });
-                dataTable.draw()
-                dataTable.column(index).visible(true)
-                dataTable.columns.adjust().draw(true);
-            }
-
-            function drawChart() {
-
-                var data = new google.visualization.DataTable();
-                data.addColumn('string', 'Task ID');
-                data.addColumn('string', 'Task Name');
-                data.addColumn('string', 'Issue Key');
-                data.addColumn('date', 'Start Date');
-                data.addColumn('date', 'End Date');
-                data.addColumn('number', 'Duration');
-                data.addColumn('number', 'Percent Complete');
-                data.addColumn('string', 'Dependencies');
-
-                console.log("jsonDataTable: ", jsonDataTable)
-
-                var baslangicDate, bitisDate;
-                var ganttRows = []
-                var ganttRow = []
-                var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-
-                for (var i=0; i<jsonDataTable.length; i++){
-                    var jsonRow = jsonDataTable[i];
-                    if (baslangicTarihiArray[i] !== "-"){
-                        baslangicTarihiArray[i] = baslangicTarihiArray[i].replaceAll("-", "/")
-                        baslangicTarihiArray[i] = baslangicTarihiArray[i].replaceAll(".0", "")
-                        baslangicDate = new Date(baslangicTarihiArray[i])
-                        baslangicDate = new Date(baslangicDate.getFullYear(), baslangicDate.getMonth(), baslangicDate.getDate())
-                    }
-                    if (baslangicTarihiArray[i] === "-") {
-                        baslangicDate = new Date(2020, 10, 1+Math.floor(Math.random() * 10))
-                        baslangicDate = new Date(baslangicDate.getFullYear(), baslangicDate.getMonth(), baslangicDate.getDate())
-                    }
-                    if (bitisTarihiArray[i] !== "-"){
-                        bitisTarihiArray[i] = bitisTarihiArray[i].replaceAll("-", "/")
-                        bitisTarihiArray[i] = bitisTarihiArray[i].replaceAll(".0", "")
-                        bitisDate = new Date(bitisTarihiArray[i])
-                        bitisDate = new Date(bitisDate.getFullYear(), bitisDate.getMonth(), bitisDate.getDate())
-                    }
-                    if (bitisTarihiArray[i] === "-") {
-                        bitisDate = new Date(2020, 10, 11+Math.floor(Math.random() * 19))
-                        bitisDate = new Date(bitisDate.getFullYear(), bitisDate.getMonth(), bitisDate.getDate())
-                    }
-                    // console.log(jsonRow['key'], baslangicDate, bitisDate)
-                    ganttRow = [jsonRow['key'], jsonRow['key'], jsonRow['key'], baslangicDate, bitisDate, null, 100, null]
-                    ganttRows.push(ganttRow)
-                }
-                data.addRows(ganttRows)
-                // data.addRows([
-                //     ['Spring 2014', 'Spring 2014', 'Spring 2014',
-                //         new Date(2014, 2, 22), new Date(2014, 5, 20), null, 100, null],
-                //     ['Summer 2014', 'Summer 2014', 'Summer 2014',
-                //         new Date(2014, 5, 21), new Date(2014, 8, 20), null, 100, null],
-                //     ['Autumn 2014', 'Autumn 2014', 'Autumn 2014',
-                //         new Date(2014, 8, 21), new Date(2014, 11, 20), null, 100, null],
-                //     ['Winter 2014', 'Winter 2014', 'Winter 2014',
-                //         new Date(2014, 11, 21), new Date(2015, 2, 21), null, 100, null],
-                //     ['Spring 2015', 'Spring 2015', 'Spring 2015',
-                //         new Date(2015, 2, 22), new Date(2015, 5, 20), null, 100, null]
-                // ]);
-
-                var options = {
-                    height: 400,
-                    gantt: {
-                        trackHeight: 30
-                    }
-                };
-
-                var chart = new google.visualization.Gantt(document.getElementById('gantt'));
-
-                chart.draw(data, options);
-            }
-            // var gant = $("#gantt")
-            // console.log("gantttt:", gant)
-            // AJS.$('#gantt').gantt({
-            //     source: demoSource,
-            //     navigate: "scroll",
-            //     scale: "weeks",
-            //     maxScale: "months",
-            //     minScale: "hours",
-            //     itemsPerPage: 10,
-            //     scrollToToday: false,
-            //     useCookie: true,
-            //     onItemClick: function(data) {
-            //         alert("Item clicked - show some details");
-            //     },
-            //     onAddClick: function(dt, rowId) {
-            //         alert("Empty space clicked - add an item!");
-            //     },
-            //     onRender: function() {
-            //         if (window.console && typeof console.log === "function") {
-            //             console.log("chart rendered");
-            //         }
-            //     }
-            // });
-            // AJS.$("#gantt").popover({
-            //     selector: ".bar",
-            //     title: function _getItemText() {
-            //         return this.textContent;
-            //     },
-            //     container: '.gantt',
-            //     content: "Here's some useful information.",
-            //     trigger: "hover",
-            //     placement: "auto right"
-            // });
 
             AJS.$('#kaydetButton').off().on("click", function (e) {
                 var params = new window.URLSearchParams(window.location.search);
                 updatePrioritiesInJIRA(params.get('restriction'));
                 e.preventDefault();
             });
-
             AJS.$('#onaylaButton').off().on("click", function (e) {
-
-                // let startDate = "2020-11-16";
-                // let endDate = "2020-11-18";
-                // let selectedRowKeys = ["APY-1", "APY-2"]
-                /* BITIS TARIHI, SECILEN TARIHTEN BIR GUN SONRASI OLARAK GIRILMELI */
                 let constraintData = {
                     "startDate" : baslangicDate.toString(),
                     "endDate" : bitisDate.toString(),
@@ -562,12 +388,10 @@ Released under the MIT license: http://jsbin.mit-license.org
                 html = outerHTML(html)
 
                 Swal.fire({
-                    //title: "<i>Kaynak Durumu</i>",
                     html: html,
                     confirmButtonText: "Kapat",
                     customClass: 'swal-wide'
                 }).then((result) => {
-                    /* Read more about isConfirmed, isDenied below */
                     if (result.isConfirmed) {
                         kaynakAsimTable.clear().draw();
                     }
@@ -578,9 +402,6 @@ Released under the MIT license: http://jsbin.mit-license.org
             AJS.$("#customFieldList-select2").on('select2-selecting', function (e) {
                 //Header'ı göster
                 AJS.$('#auiTable > thead  th[data-override*="'+e.val+'"]').show();
-
-                // AJS.$("tr").find("th:nth-child(8)").before('#auiTable > thead  th[data-override*="'+e.val+'"]').show();
-
 
                 var issueKeys =[];
                 jsonDataTable.forEach(cell => {
@@ -614,7 +435,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                     fieldNames.push($(dataTable.column(index).header()).text())
                 })
                 var index;
-                // dataTable.columns()[0].forEach(innerIndex => {
+
                 dataTable.rows().every( function ( rowIdx, tableLoop, innerIndex ) {
                     delete jsonDataTable[innerIndex][e.choice.text]
                 })
@@ -626,11 +447,9 @@ Released under the MIT license: http://jsbin.mit-license.org
 
                 dataTable.column(index).visible(false)
             });
-
             var k;
-
             AJS.$("#favFilter-select2").change(function (e) {
-
+                //seçilen filtreyi kaldırır
                 if(!this.value){
                     var tableBody = $('#tableBody tr');
                     var keys=[]
@@ -661,16 +480,46 @@ Released under the MIT license: http://jsbin.mit-license.org
                 }
 
             } );
-
             var beforeSelectedOption = ""
             AJS.$("#favFilter-select2").on('select2-selecting', function (e) {
                 var data = e.object.text;
-                if (e.object.text === "Filtre eklemek için tıklayın"){
-                    if (beforeSelectedOption !== "Filtre eklemek için tıklayın") {
+                beforeSelectedOption = e.object.text
+                jQuery.ajax({
+                    url: AJS.params.baseURL + "/rest/florestservice/1.2/rest/favFilterJQL",
+                    type: 'POST',
+                    data: {
+                        jqlQuery: e.object.text
+                    },
+                    async: false,
+                    success: function (response, status, jqXHR) {
+                        var filterBoolean = false;
                         filterAndIssueKeys.forEach(filterAndIssueKey => {
-                            if (filterAndIssueKey.filterName === beforeSelectedOption) {
+                            if (filterAndIssueKey.filterName === data)
+                                filterBoolean = true
+                        })
+                        if (!filterBoolean) {
+                            filterAndIssueKeys.push({
+                                "filterName": data,
+                                "issueKeys": response
+                            })
+                        }
+                        var j;
+                        var tableBody = $('#tableBody tr');
+
+                        var partialKeys = []
+                        dataTable.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                            var rowData = this.data();
+                            var subStringRowData = rowData[0].substring(0, rowData[0].length-1)
+                            var lastIndexSlash = subStringRowData.lastIndexOf(">");
+                            var lastIndexBackSlash = subStringRowData.lastIndexOf("<")
+                            var partialKey = subStringRowData.substring(lastIndexSlash+1, lastIndexBackSlash)
+                            partialKeys.push(partialKey)
+                        } );
+
+                        response.forEach(responseKey => {
+                            if (!partialKeys.includes(responseKey)){
                                 jsonDataTable.forEach(data => {
-                                    if (!filterAndIssueKey.issueKeys.includes(data.key)) {
+                                    if (data.key === responseKey){
                                         var rowArray = []
                                         rowArray.push('<a href="$baseUrl/browse/' + data.key + '" ' + 'class="issueKey">' + data.key + '</a>');
                                         rowArray.push(data.Summary)
@@ -681,217 +530,86 @@ Released under the MIT license: http://jsbin.mit-license.org
                                         rowArray.push(data.BitisTarihi)
                                         rowArray.push(butonHtmlElement)
                                         #foreach($cf in $customFieldsInProject)
-                                            console.log("custom field: "+"$cf")
                                             rowArray.push('<td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">'+ data["$cf.getName()"] +'</td>')
                                         #end
+
                                         dataTable.row.add(rowArray).draw(true)
                                     }
-                                });
-                            }
-                        })
-                        beforeSelectedOption = "Filtre eklemek için tıklayın"
-                    }
-                }
-                else {
-                    beforeSelectedOption = e.object.text
-                    jQuery.ajax({
-                        url: AJS.params.baseURL + "/rest/florestservice/1.2/rest/favFilterJQL",
-                        type: 'POST',
-                        data: {
-                            jqlQuery: e.object.text
-                        },
-                        async: false,
-                        success: function (response, status, jqXHR) {
-                            var filterBoolean = false;
-                            filterAndIssueKeys.forEach(filterAndIssueKey => {
-                                if (filterAndIssueKey.filterName === data)
-                                    filterBoolean = true
-                            })
-                            if (!filterBoolean) {
-                                filterAndIssueKeys.push({
-                                    "filterName": data,
-                                    "issueKeys": response
                                 })
                             }
-                            var j;
-                            var tableBody = $('#tableBody tr');
-
-                            var partialKeys = []
-                            dataTable.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
-                                var rowData = this.data();
-                                var subStringRowData = rowData[0].substring(0, rowData[0].length-1)
-                                var lastIndexSlash = subStringRowData.lastIndexOf(">");
-                                var lastIndexBackSlash = subStringRowData.lastIndexOf("<")
-                                var partialKey = subStringRowData.substring(lastIndexSlash+1, lastIndexBackSlash)
-                                partialKeys.push(partialKey)
-                            } );
-
-                            response.forEach(responseKey => {
-                                if (!partialKeys.includes(responseKey)){
-                                    jsonDataTable.forEach(data => {
-                                        if (data.key === responseKey){
-                                            var rowArray = []
-                                            rowArray.push('<a href="$baseUrl/browse/' + data.key + '" ' + 'class="issueKey">' + data.key + '</a>');
-                                            rowArray.push(data.Summary)
-                                            rowArray.push(data.Description)
-                                            rowArray.push(data.Priority)
-                                            rowArray.push(data.Bütçe)
-                                            rowArray.push(data.BaslangicTarihi)
-                                            rowArray.push(data.BitisTarihi)
-                                            rowArray.push(butonHtmlElement)
-                                            // rowArray.push(data.Created)
-                                            // rowArray.push(data.Due)
-                                            #foreach($cf in $customFieldsInProject)
-                                                rowArray.push('<td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">'+ data["$cf.getName()"] +'</td>')
-                                            #end
-
-                                            dataTable.row.add(rowArray).draw(true)
-                                        }
-                                    })
+                        })
+                        tableBody.each(function () {
+                            var cell = $(this)
+                            var issueKey = $(this).find("td .issueKey")
+                            var deleteBoolean = true;
+                            for (j = 0; j < response.length; j++) {
+                                if (response[j] === issueKey.text()) {
+                                    deleteBoolean = false;
+                                } else {
                                 }
-                            })
-                            tableBody.each(function () {
-                                var cell = $(this)
-                                var issueKey = $(this).find("td .issueKey")
-                                var deleteBoolean = true;
-                                for (j = 0; j < response.length; j++) {
-                                    if (response[j] === issueKey.text()) {
-                                        deleteBoolean = false;
-                                    } else {
-                                    }
-                                }
-                                if (deleteBoolean) {
-                                    dataTable.row(cell).remove().draw();
-                                }
-                            })
-
-                            partialKeys = []
-                            dataTable.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
-                                var rowData = this.data();
-                                var subStringRowData = rowData[0].substring(0, rowData[0].length-1)
-                                var lastIndexSlash = subStringRowData.lastIndexOf(">");
-                                var lastIndexBackSlash = subStringRowData.lastIndexOf("<")
-                                var partialKey = subStringRowData.substring(lastIndexSlash+1, lastIndexBackSlash)
-                                partialKeys.push(partialKey)
-                            } );
-                        },
-                        error: function (response) {
-                            console.log("errorjql: ", response)
-                        }
-                    })
-                }
-            });
-
-            AJS.$("#constraintList-select2").on('select2-selecting', function (e) {
-                if (e.object.text === "Bütçe"){
-                    $("#butceInput").css("visibility", "visible");
-                    $("#butceLabel").css("visibility", "visible");
-                }
-                else if (e.object.text === "Başlangıç Tarihi"){
-                    $("#baslangicTarihiInput").css("visibility", "visible");
-                    $("#baslangicTarihiLabel").css("visibility", "visible");
-                    $("#tarihIconBas").css("visibility", "visible");
-                }
-                else if (e.object.text === "Bitiş Tarihi"){
-                    $("#bitisTarihiInput").css("visibility", "visible");
-                    $("#bitisTarihiLabel").css("visibility", "visible");
-                    $("#tarihIconBit").css("visibility", "visible");
-                }
-            });
-
-            AJS.$("#constraintList-select2").on('select2-removing', function (e) {
-                if (e.choice.text === "Bütçe"){
-                    $("#butceInput").val("");
-                    $("#butceMiktari").css("color","black");
-                    $("#butceInput").css("visibility", "hidden");
-                    $("#butceLabel").css("visibility", "hidden");
-                }
-                else if (e.choice.text === "Başlangıç Tarihi"){
-                    $("#baslangicTarihiInput").css("visibility", "hidden");
-                    $("#baslangicTarihiLabel").css("visibility", "hidden");
-                    $("#tarihIconBas").css("visibility", "hidden");
-                }
-                else if (e.choice.text === "Bitiş Tarihi"){
-                    $("#bitisTarihiInput").css("visibility", "hidden");
-                    $("#bitisTarihiLabel").css("visibility", "hidden");
-                    $("#tarihIconBit").css("visibility", "hidden");
-                }
-            });
-
-
-            function datePickerChanged(date){
-                baslangicTarihiBoolean = true;
-                bitisTarihiBoolean = true;
-                selectedThisRows.forEach(selectedRow => {
-                    var selectKey = selectedRow.children().first().children().text();
-                    var baslangicKisit = $("#baslangicTarihiInput").val();
-                    var bitisKisit = $("#bitisTarihiInput").val();
-                    var baslangicKisitDate = Date.parse(baslangicKisit);
-                    var bitisKisitDate = Date.parse(bitisKisit);
-                    for (var i = 0; i < jsonDataTable.length; i++) {
-                        if (jsonDataTable[i]['key'] === selectKey) {
-                            if (isNaN(parseInt(jsonDataTable[i]['Bütçe']))) {
-                                butceCount = selectedButce
-                                alert("Lütfen Bütçe Alanını ekleyin")
-                                $(this).removeClass('selected');
-
-                            } else {
-                                if (Object.keys(jsonDataTable[i]).includes("Başlangıç Tarihi")  ) {
-                                    if (jsonDataTable[i]["Başlangıç Tarihi"] !== "-") {
-                                        var issueBaslangicTarihiString = jsonDataTable[i]["Başlangıç Tarihi"];
-                                        issueBaslangicTarihiString = issueBaslangicTarihiString.replaceAll("-", "/")
-                                        issueBaslangicTarihiString = issueBaslangicTarihiString.replaceAll(".0", "")
-                                        var issueBaslangicTarihiDate = Date.parse(issueBaslangicTarihiString);
-                                        if(!isNaN(baslangicKisitDate)){
-                                            if (issueBaslangicTarihiDate >= baslangicKisitDate) {
-                                            } else {
-                                                baslangicTarihiBoolean = false;
-                                            }
-                                        }
-                                    }
-                                }
-                                if (Object.keys(jsonDataTable[i]).includes("Bitiş Tarihi")  ) {
-                                    if (jsonDataTable[i]["Bitiş Tarihi"] !== "-") {
-                                        var issueBitisTarihiString = jsonDataTable[i]["Bitiş Tarihi"];
-                                        issueBitisTarihiString = issueBitisTarihiString.replaceAll("-", "/")
-                                        issueBitisTarihiString = issueBitisTarihiString.replaceAll(".0", "")
-                                        var issueBitisTarihiDate = Date.parse(issueBitisTarihiString);
-
-                                        if(!isNaN(bitisKisitDate)){
-                                            if (issueBitisTarihiDate < bitisKisitDate) {
-                                            } else {
-                                                bitisTarihiBoolean = false;
-                                            }
-                                        }
-                                    }
-                                }
-
-
-                                butceCount += parseInt(jsonDataTable[i]['Bütçe'])
-                                selectedButce = butceCount
-                                selectedRows.push(selectKey)
                             }
-                        }
-                    }
-                    if (baslangicTarihiBoolean){
-                        if (bitisTarihiBoolean) {
-                            $("#issueDurum").text("Olumlu");
-                            $("#issueDurum").css("color", "green")
-                        }
-                        else {
-                            $("#issueDurum").text("Olumsuz(Bitiş Tarihi Geçersiz)");
-                            $("#issueDurum").css("color", "red")
-                        }
-                    }
-                    else {
-                        $("#issueDurum").text("Olumsuz(Başlangıç Tarihi Geçersiz)");
-                        $("#issueDurum").css("color", "red")
+                            if (deleteBoolean) {
+                                dataTable.row(cell).remove().draw();
+                            }
+                        })
+
+                        partialKeys = []
+                        dataTable.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                            var rowData = this.data();
+                            var subStringRowData = rowData[0].substring(0, rowData[0].length-1)
+                            var lastIndexSlash = subStringRowData.lastIndexOf(">");
+                            var lastIndexBackSlash = subStringRowData.lastIndexOf("<")
+                            var partialKey = subStringRowData.substring(lastIndexSlash+1, lastIndexBackSlash)
+                            partialKeys.push(partialKey)
+                        } );
+                    },
+                    error: function (response) {
+                        console.log("errorjql: ", response)
                     }
                 })
+            });
+            AJS.$('#temizleButton').on( 'click', function () {
+                $("tr").removeClass("selected");
+                $("#butceMiktari").removeClass("blink");
+                selectedRows=[];
+                butceCount=0;
+
+                $("#butceMiktari").text(butceCount).css("color","black");
+                AJS.$("#kaynak").text("");
+            });
+            AJS.$('#auiTable tbody').on('click', '.kullaniciOnerButtonb', function (){
+                var hiddenHTML = document.getElementById("swAlert");
+                let html = hiddenHTML.cloneNode(true);
+                html.style.visibility = "visible";
+                html = outerHTML(html)
+
+                Swal.fire({
+                    title: "<i>Title</i>",
+                    html: html,
+                    confirmButtonText: "V <u>redu</u>",
+                });
+            })
+
+            $('#myTab a[href="#home"]').click(function(){
+                $('#tableDiv').css('visibility','visible');
+            });
+            $('#myTab a[href="#menu1"]').click(function(){
+                $('#tableDiv').css('visibility','visible');
+            });
+            $('#myTab a[href="#menu2"]').click(function(){
+                $('#tableDiv').css('visibility','visible');
+            });
+            $('#myTab a[href="#menu3"]').click(function(){
+                $('#tableDiv').css('visibility','visible');
+            });
+            $('#myTab a[href="#menu4"]').click(function(){
+                $('#tableDiv').css('visibility','hidden');
+            });
+
+            function outerHTML(node){
+                return node.outerHTML || new XMLSerializer().serializeToString(node);
             }
             function datePickerFilter(date){
-
-                console.log("-------datePickerFilter---------")
                 var baslangicKisit = $("#baslangicTarihiInput").val();
                 var bitisKisit = $("#bitisTarihiInput").val();
 
@@ -931,14 +649,12 @@ Released under the MIT license: http://jsbin.mit-license.org
                                 var flag=false;
                                 if (!keys.includes(jsonDataTable[i]["key"])){
                                     flag=true;
-                                    console.log("flag: "+flag)
+
                                 }
                                 if(flag){
-                                    console.log("flag true, push edilcek")
 
                                     jsonDataTable.forEach(data => {
                                         if (jsonDataTable[i]["key"]===(data.key)){
-                                            console.log("eklenecek satır jsondatatable da bulundu")
                                             var rowArray=[]
                                             rowArray.push('<a href="$baseUrl/browse/' + data.key + '" ' + 'class="issueKey">' + data.key + '</a>');
                                             rowArray.push(data.Summary)
@@ -960,7 +676,6 @@ Released under the MIT license: http://jsbin.mit-license.org
 
 
                             } else {
-                                console.log("else -- silinecek  "+ jsonDataTable[i]["key"])
                                 var tableBody = $('#tableBody tr');
                                 tableBody.each(function () {
                                     var cell = $(this)
@@ -1002,13 +717,11 @@ Released under the MIT license: http://jsbin.mit-license.org
                                     var flag=false;
                                     if (!keys.includes(jsonDataTable[i]["key"])){
                                         flag=true;
-                                        console.log("flag: "+flag)
                                     }
                                     if(flag){
 
                                         jsonDataTable.forEach(data => {
                                             if (jsonDataTable[i]["key"]===(data.key)){
-                                                console.log("eklenecek satır jsondatatable da bulundu")
                                                 var rowArray=[]
                                                 rowArray.push('<a href="$baseUrl/browse/' + data.key + '" ' + 'class="issueKey">' + data.key + '</a>');
                                                 rowArray.push(data.Summary)
@@ -1030,7 +743,6 @@ Released under the MIT license: http://jsbin.mit-license.org
 
                                 }
                                 else {
-                                    console.log("else -- silinecek  "+ jsonDataTable[i]["key"])
                                     var tableBody = $('#tableBody tr');
                                     tableBody.each(function () {
                                         var cell = $(this)
@@ -1046,7 +758,6 @@ Released under the MIT license: http://jsbin.mit-license.org
                                 if ( issueBitisTarihiDate <= bitisKisitDate) {
 
                                 }else{
-                                    console.log("else -- silinecek  "+ jsonDataTable[i]["key"])
                                     var tableBody = $('#tableBody tr');
                                     tableBody.each(function () {
                                         var cell = $(this)
@@ -1059,8 +770,6 @@ Released under the MIT license: http://jsbin.mit-license.org
                                     })
                                 }
                             }
-
-
                         }else{
                             console.log("date is not a number")
                         }
@@ -1070,130 +779,6 @@ Released under the MIT license: http://jsbin.mit-license.org
                 }
 
             }
-
-            function maxEndIssueDate(selectedRows){
-                console.log("-----------maxEndIssueDate----------")
-                endDates=[]
-
-                for(var i=0; i<selectedRows.length; i++){
-                    for (var j = 0; j < jsonDataTable.length; j++) {
-                        if (jsonDataTable[j]['key'] === selectedRows[i]) {
-
-                            var issueBitişTarihiString = jsonDataTable[j]["Bitiş Tarihi"];
-                            issueBitişTarihiString = issueBitişTarihiString.replaceAll("-", "/")
-                            issueBitişTarihiString = issueBitişTarihiString.replaceAll(".0", "")
-                            var issueBitişTarihiDate = Date.parse(issueBitişTarihiString)/1000;
-
-                            endDates.push(issueBitişTarihiDate);
-                        }
-                    }
-                }
-
-                var maxEndDate=Math.max(...endDates);
-
-                var justDate;
-                for (var j = 0; j < jsonDataTable.length; j++) {
-                    var issueBitişTarihiStringOrj = jsonDataTable[j]["Bitiş Tarihi"];
-                    var issueBitişTarihiString = jsonDataTable[j]["Bitiş Tarihi"];
-                    issueBitişTarihiString = issueBitişTarihiString.replaceAll("-", "/")
-                    issueBitişTarihiString = issueBitişTarihiString.replaceAll(".0", "")
-                    var issueBitişTarihiDate = Date.parse(issueBitişTarihiString)/1000;
-
-
-                    if(issueBitişTarihiDate === maxEndDate) {
-
-                        var date=new Date(Date.parse(issueBitişTarihiString))
-                        date.setDate(date.getDate()+1)
-
-                        var day=date.getDate()
-                        var month=date.getMonth()+1
-                        var year=date.getFullYear()
-                        var incrementedDate=year+"-"+month+"-"+day;
-
-                        justDate=incrementedDate;
-                    }
-                }
-
-                return justDate;
-            }
-            function minStartIssueDate(selectedRows){
-                startDates=[]
-
-                for(var i=0; i<selectedRows.length; i++){
-                    for (var j = 0; j < jsonDataTable.length; j++) {
-                        if (jsonDataTable[j]['key'] === selectedRows[i]) {
-
-                            var issueBaşlangıçTarihiString = jsonDataTable[j]["Başlangıç Tarihi"];
-                            issueBaşlangıçTarihiString = issueBaşlangıçTarihiString.replaceAll("-", "/")
-                            issueBaşlangıçTarihiString = issueBaşlangıçTarihiString.replaceAll(".0", "")
-                            var issueBaşlangıçTarihiDate = Date.parse(issueBaşlangıçTarihiString)/1000;
-
-
-                            startDates.push(issueBaşlangıçTarihiDate);
-                        }
-                    }
-                }
-                minStartDate=Math.min(...startDates)
-                var justDate;
-                for (var j = 0; j < jsonDataTable.length; j++) {
-
-                    var issueBaşlangıçTarihiStringOrj = jsonDataTable[j]["Başlangıç Tarihi"];
-                    var issueBaşlangıçTarihiString = jsonDataTable[j]["Başlangıç Tarihi"];
-                    issueBaşlangıçTarihiString = issueBaşlangıçTarihiString.replaceAll("-", "/")
-                    issueBaşlangıçTarihiString = issueBaşlangıçTarihiString.replaceAll(".0", "")
-                    var issueBaşlangıçTarihiDate = Date.parse(issueBaşlangıçTarihiString)/1000;
-
-                    if(issueBaşlangıçTarihiDate === minStartDate) {
-                        justDate = issueBaşlangıçTarihiStringOrj.split(" ")
-                    }
-                }
-
-                return justDate[0];
-            }
-
-
-            AJS.$('#temizleButton').on( 'click', function () {
-                $("tr").removeClass("selected");
-                $("#butceMiktari").removeClass("blink");
-                selectedRows=[];
-                butceCount=0;
-
-                $("#butceMiktari").text(butceCount).css("color","black");
-                $("#issueDurum").text("").css("color","black");
-
-                AJS.$("#kaynak").text("");
-            });
-
-
-            // AJS.$('.kullaniciOnerButtonb').on("click", function(){
-            //     var hiddenHTML = document.getElementById("swAlert");
-            //     let html = hiddenHTML.cloneNode(true);
-            //     html.style.visibility = "visible";
-            //     html = outerHTML(html)
-            //
-            //     Swal.fire({
-            //         title: "<i>Title</i>",
-            //         html: html,
-            //         confirmButtonText: "V <u>redu</u>",
-            //     });
-            // })
-            AJS.$('#auiTable tbody').on('click', '.kullaniciOnerButtonb', function (){
-                var hiddenHTML = document.getElementById("swAlert");
-                let html = hiddenHTML.cloneNode(true);
-                html.style.visibility = "visible";
-                html = outerHTML(html)
-
-                Swal.fire({
-                    title: "<i>Title</i>",
-                    html: html,
-                    confirmButtonText: "V <u>redu</u>",
-                });
-            })
-
-            function outerHTML(node){
-                return node.outerHTML || new XMLSerializer().serializeToString(node);
-            }
-
             function updatePrioritiesInJIRA(gmyOrBirim) {
                 var table = $('#auiTable').tableToJSON({
                     ignoreEmptyRows : true,
@@ -1260,11 +845,6 @@ Released under the MIT license: http://jsbin.mit-license.org
                 tableBody.each(function () {
                     if (restriction === "gmy") {
                         AJS.$(this).find(".gmyPriority").text(i + 1);
-                    } else if (restriction === "dp") {
-                        AJS.$(this).find(".birimOncelik").text(i + 1);
-                    }else {
-                        AJS.$(this).find(".birimOncelik").text(i + 1);
-                        AJS.$(this).find(".gmyPriority").text(i + 1);
                     }
                     i++;
                 });
@@ -1278,7 +858,6 @@ Released under the MIT license: http://jsbin.mit-license.org
                     data: constraintData,
                     async: false,
                     error : function (response) {
-                        console.log("resourceOverloadError: ", response)
                         value= "-";
                     },
                     success: function (response, status, jqXHR) {
@@ -1289,8 +868,6 @@ Released under the MIT license: http://jsbin.mit-license.org
                             AJS.$("#kaynakAsimTable").css("visibility","visible")
                             var responseArr=[];
                             responseArr = response.split(" ");
-                            console.log("!-! response: "+ response)
-                            console.log("!-! responseArr: "+responseArr);
                             for(var i=0; i<responseArr.length;i++){
                                 var nameProject = [];
                                 nameProject = responseArr[i].split(",")
@@ -1306,7 +883,6 @@ Released under the MIT license: http://jsbin.mit-license.org
                 return value;
             }
             function startDate(date){
-                console.log("Başlangıc date: "+date)
                 var date=new Date(date)
                 date.setDate(date.getDate())
 
@@ -1314,31 +890,92 @@ Released under the MIT license: http://jsbin.mit-license.org
                 var month=date.getMonth()+1
                 var year=date.getFullYear()
                 var startDateString=year+"-"+month+"-"+day;
-                console.log("startDateString: "+startDateString)
 
                 return startDateString;
             }
             function endDate(date){
-                console.log("Bitiş date: "+date)
                 var day = new Date(date);
-                console.log("day: "+day);
-                return date;
 
-                // var nextDay = new Date(day);
-                // nextDay.setDate(day.getDate()+1);
-                // var day=nextDay.getDate();
-                // var month = nextDay.getMonth()+1;
-                // var year= nextDay.getFullYear()
-                // console.log (year+"-"+month+"-"+day)
-                //
-                //
-                // var endDateString=year+"-"+month+"-"+day;
-                // console.log("endDateString: "+endDateString)
-                //
-                // return endDateString;
+                return date;
+            }
+            function addCFVal(CFValText, CFstring, CFarray){
+                var index;
+                dataTable.columns()[0].forEach(innerIndex => {
+                    if (dataTable.column(innerIndex).header().textContent === CFValText) {
+                        index = innerIndex
+                    }
+                })
+                var array = CFarray.split(",,,");
+
+                dataTable.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                    var rowData = this.data();
+
+                    rowData[index] = array[rowLoop]
+                    dataTable.row(rowIdx).data(rowData)
+                    jsonDataTable[rowLoop][CFstring] = array[rowLoop]
+
+                    this.invalidate()
+                });
+                dataTable.draw()
+                dataTable.column(index).visible(true)
+                dataTable.columns.adjust().draw(true);
+            }
+            function drawChart() {
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Task ID');
+                data.addColumn('string', 'Task Name');
+                data.addColumn('string', 'Issue Key');
+                data.addColumn('date', 'Start Date');
+                data.addColumn('date', 'End Date');
+                data.addColumn('number', 'Duration');
+                data.addColumn('number', 'Percent Complete');
+                data.addColumn('string', 'Dependencies');
+
+                var baslangicDate, bitisDate;
+                var ganttRows = []
+                var ganttRow = []
+                var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+                for (var i=0; i<jsonDataTable.length; i++){
+                    var jsonRow = jsonDataTable[i];
+                    if (baslangicTarihiArray[i] !== "-"){
+                        baslangicTarihiArray[i] = baslangicTarihiArray[i].replaceAll("-", "/")
+                        baslangicTarihiArray[i] = baslangicTarihiArray[i].replaceAll(".0", "")
+                        baslangicDate = new Date(baslangicTarihiArray[i])
+                        baslangicDate = new Date(baslangicDate.getFullYear(), baslangicDate.getMonth(), baslangicDate.getDate())
+                    }
+                    if (baslangicTarihiArray[i] === "-") {
+                        baslangicDate = new Date(2020, 10, 1+Math.floor(Math.random() * 10))
+                        baslangicDate = new Date(baslangicDate.getFullYear(), baslangicDate.getMonth(), baslangicDate.getDate())
+                    }
+                    if (bitisTarihiArray[i] !== "-"){
+                        bitisTarihiArray[i] = bitisTarihiArray[i].replaceAll("-", "/")
+                        bitisTarihiArray[i] = bitisTarihiArray[i].replaceAll(".0", "")
+                        bitisDate = new Date(bitisTarihiArray[i])
+                        bitisDate = new Date(bitisDate.getFullYear(), bitisDate.getMonth(), bitisDate.getDate())
+                    }
+                    if (bitisTarihiArray[i] === "-") {
+                        bitisDate = new Date(2020, 10, 11+Math.floor(Math.random() * 19))
+                        bitisDate = new Date(bitisDate.getFullYear(), bitisDate.getMonth(), bitisDate.getDate())
+                    }
+                    ganttRow = [jsonRow['key'], jsonRow['key'], jsonRow['key'], baslangicDate, bitisDate, null, 100, null]
+                    ganttRows.push(ganttRow)
+                }
+                data.addRows(ganttRows)
+                var options = {
+                    height: 400,
+                    gantt: {
+                        trackHeight: 30
+                    }
+                };
+
+                var chart = new google.visualization.Gantt(document.getElementById('gantt'));
+                chart.draw(data, options);
             }
 
         });
+
+        //Content-help read more
         function myFunction() {
             var dots = document.getElementById("dots");
             var moreText = document.getElementById("more");
@@ -1369,131 +1006,116 @@ Released under the MIT license: http://jsbin.mit-license.org
         </div>
     </div>
     #else
-    <div class="aui-group">
-        <div class="aui-help aui-help-empty-state">
-            <div class="aui-help-content">
-                <h1>Proje Önceliklendirme</h1>
-                <p style="font-size: small">Projeleri sürekle-bırak yöntemi ile istediğiniz sıraya taşıyınız. Önceliklendirme bittikten sonra kaydet tuşuna basınız.<span id="dots">...</span><span id="more">Bütçe veya tarih kısıtı belirlemek için öncelikle tabloya bu alanları ekleyin, sonrasında kısıt alanı ekleyerek belirlediğiniz değerleri girin.Tablodan proje seçebilmeniz için bütçe alanının tabloda bulunması gerekmektedir.</span></p>
 
-                <a style="font-size: small" onclick="myFunction()" id="myBtn">Daha fazla</a>
-            </div>
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist" style="margin-left: 15px;" id="myTab">
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#home" style="color: #6b778c; font-weight: bold;">Giriş</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#menu1" style="color: #6b778c;font-weight: bold;">Özel Alanlar</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#menu2" style="color: #6b778c;font-weight: bold;">Filtreler</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#menu3"style="color: #6b778c;font-weight: bold;">Kısıtlar</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#menu4"style="color: #6b778c;font-weight: bold;">Kaynak Aşımı</a>
+        </li>
+    </ul>
 
+    <!-- Tab panes -->
+    <div class="tab-content" style="float: left; height: 200px;">
+        <div id="home" class="container tab-pane active"><br>
+            <h5 id="logo" class="aui-header-logo aui-header-logo-PRODUCTNAME">Proje Önceliklendirme</h5>
+            <p style="font-size: small">Projeleri sürekle-bırak yöntemi ile istediğiniz sıraya taşıyınız. Önceliklendirme bittikten sonra "sıralamayı kaydet" butonuna basınız.<span id="dots">...</span><span id="more">Tabloya özel alan eklemek için "Özel Alanlar" sekmesini, filtre eklemek için "Filtreler" sekmesini kullanabilirsiniz. Bütçe veya tarih sınırlamasını "Kısıtlar" alanından belirleyebilirsiniz. Kaynak aşımını görmek için öncelikle tarih aralığının girilmesi, aşımın görülmesi istenen projenin seçilmesi ve ardından "Kaynak Aşım Durumu" butonunun tıklanması gerekmektedir.</span></p>
+
+            <a class="aui-button-link" style="font-size: small; color:darkblue" onclick="myFunction()" id="myBtn">Daha fazla</a>
         </div>
-
-    </div>
-
-
-    <div class="card row" style="margin-left: 15px;padding-left: 0px;margin-right: 20px;">
-        <div class="card-body" style="margin-left: -20px;">
-
-            <div>
-                <div>
-                    <div class="col-xs-6 col-md-2">
-                        <div class="aui-group">
-                            <div class="aui-item" id="#select2-customFields">
-                                <form class="aui">
-                                    <select id="customFieldList-select2" data-placeholder="Alan eklemek için tıklayın" multiple>
-                                        <option value=""></option>
-                                        #foreach($cf in $customFieldsInProject)
-                                            <option value="$cf.getId()">$cf.getName()</option>
-                                        #end
-                                        ##                                <option id="projectLeader" name="projectLeader" value="projectLeader">Proje Lideri</option>
-                                    </select>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xs-6 col-md-4">
-                        <div class="aui-group">
-                            <div class="aui-item" id="#select2-favFilters">
-                                <form class="aui">
-                                    <select id="favFilter-select2" data-placeholder="Filtre eklemek için tıklayın" size="1" >
-                                        <option value=""></option>
-                                        #foreach($favFilter in $favouriteFilters)
-                                            <option value="$favFilter">$favFilter <a href="#" id="remove-fav-filter-single-select" class="select2-search-choice-close" tabindex="-1"></a></option>
-                                        #end
-                                    </select>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xs-6 col-md-6">
-                        <div class="aui-group">
-                            <div class="aui-item" id="#select2-constraint">
-                                <form class="aui">
-                                    <select id="constraintList-select2" data-placeholder="Kısıt eklemek için tıklayın" multiple>
-                                        <option></option>
-                                        <option value="butce">Bütçe</option>
-                                        <option value="baslangicTarihi">Başlangıç Tarihi</option>
-                                        <option value="bitisTarihi">Bitiş Tarihi</option>
-                                    </select>
-                                    <form class="aui">
-                                        <div class="col-xs-6 col-md-4">
-                                            <label for="text-input" id="butceLabel" style="visibility: hidden;">Bütçe </label>
-                                            <input class="text" type="text" id="butceInput" name="butceInput" style="visibility: hidden;">
-                                        </div>
-                                        <div class="col-xs-6 col-md-4">
-                                            <label for="text-input" id="baslangicTarihiLabel" style="visibility: hidden;">Başlangıç tarihi <span class="aui-icon aui-icon-small aui-iconfont-calendar" id="tarihIconBas" style="visibility: hidden;"/></label>
-                                            <input class="text" type="text" id="baslangicTarihiInput" name="baslangicTarihiInput" class="aui-date-picker" id="demo-range-1" type="date" autocomplete="off" style="visibility: hidden;">
-
-                                        </div>
-                                        <div class="col-xs-6 col-md-4">
-                                            <label for="text-input" id="bitisTarihiLabel" style="visibility: hidden;">Bitiş tarihi <span class="aui-icon aui-icon-small aui-iconfont-calendar" id="tarihIconBit" style="visibility: hidden;"/></label>
-                                            <input class="text" type="text" id="bitisTarihiInput" name="bitisTarihiInput" class="aui-date-picker" id="demo-range-1" type="date" autocomplete="off" style="visibility: hidden;">
-
-                                        </div>
-                                    </form>
-                                </form>
-                            </div>
-                        </div>
+        <div id="menu1" class="container tab-pane fade"><br>
+            <div class="col-xs-4 col-md-4" style="padding: 0px; margin-top:20px;">
+                <div class="aui-group">
+                    <div class="aui-item" id="#select2-customFields">
+                        <form class="aui">
+                            <select id="customFieldList-select2" data-placeholder="Alan eklemek için tıklayın" multiple>
+                                <option value=""></option>
+                                #foreach($cf in $customFieldsInProject)
+                                    <option value="$cf.getId()">$cf.getName()</option>
+                                #end
+                            </select>
+                        </form>
                     </div>
                 </div>
             </div>
-            <div style="margin-left: 15px;">
-                <label style="display:inline">Toplam Bütçe</label>
-                &nbsp;
-                <aui-badge id="butceMiktari" style="font-size: 14px; display: inline;"></aui-badge>
+        </div>
+        <div id="menu2" class="container tab-pane fade"><br>
+            <div class="col-xs-4 col-md-4" style="padding: 0px; margin-top:20px;">
+                <div class="aui-group">
+                    <div class="aui-item" id="#select2-favFilters">
+                        <form class="aui">
+                            <select id="favFilter-select2" data-placeholder="Filtre eklemek için tıklayın" size="1" >
+                                <option value=""></option>
+                                #foreach($favFilter in $favouriteFilters)
+                                    <option value="$favFilter">$favFilter <a href="#" id="remove-fav-filter-single-select" class="select2-search-choice-close" tabindex="-1"></a></option>
+                                #end
+                            </select>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+        <div id="menu3" class="container tab-pane fade"><br>
+            <form class="aui">
+                <div class="field-group" style="width:400px">
+                    <label for="butceInput" id="butceLabel" style="text-align: left">Bütçe <span class="aui-icon aui-icon-small aui-iconfont-new-edit" style="float: right"/></label>
+                    <input class="text" type="text" id="butceInput" name="butceInput"/>
+                </div>
+                <div class="field-group" style="width:400px;">
+                    <label for="baslangicTarihiInput" id="baslangicTarihiLabel" style="text-align: left">Başlangıç tarihi <span class="aui-icon aui-icon-small aui-iconfont-calendar" id="tarihIconBas" style="float: right"/></label>
+                    <input class="text" type="text" id="baslangicTarihiInput" name="baslangicTarihiInput" class="aui-date-picker" id="demo-range-1" type="date" autocomplete="off">
+
+                </div>
+                <div class="field-group" style="width: 400px;">
+                    <label for="bitisTarihiInput" id="bitisTarihiLabel" style="text-align: left">Bitiş tarihi <span class="aui-icon aui-icon-small aui-iconfont-calendar" id="tarihIconBit" style="float: right"/></label>
+                    <input class="text" type="text" id="bitisTarihiInput" name="bitisTarihiInput" class="aui-date-picker" id="demo-range-1" type="date" autocomplete="off"/>
 
 
-    <div class="aui-group">
-        <div id="loading-spinner" class="custom-card-style">
-            <p>Loading results...</p>
-            <aui-spinner size="large"></aui-spinner>
+                </div>
+            </form>
         </div>
-    </div>
+        <div id="menu4" class="container tab-pane fade"><br>
+            <form class="aui">
+                <div class="field-group" style="width:400px">
+                    <label for="projectKeyInput" id="projectKeyLabel" style="text-align: left">Bütçe <span class="aui-icon aui-icon-small aui-iconfont-new-edit" style="float: right"/></label>
+                    <input class="text" type="text" id="projectKeyInput" name="projectKey"/>
+                </div>
+                <div class="field-group" style="width:400px;">
+                    <label for="projectBaslangicTarihiInput" id="projectBaslangicTarihiLabel" style="text-align: left">Başlangıç tarihi <span class="aui-icon aui-icon-small aui-iconfont-calendar" id="tarihIconBas" style="float: right"/></label>
+                    <input class="text" type="text" id="projectBaslangicTarihiInput" name="projectBaslangicTarihiInput" class="aui-date-picker" id="demo-range-1" type="date" autocomplete="off">
+
+                </div>
+                <div class="field-group" style="width: 400px;">
+                    <label for="projectBitisTarihiInput" id="projectBitisTarihiLabe" style="text-align: left">Bitiş tarihi <span class="aui-icon aui-icon-small aui-iconfont-calendar" id="tarihIconBit" style="float: right"/></label>
+                    <input class="text" type="text" id="projectBitisTarihiInput" name="projectBitisTarihiInput" class="aui-date-picker" id="demo-range-1" type="date" autocomplete="off"/>
 
 
-    <div class="row" style="margin-left:0px;">
-##        <div>
-##            <label style="float:left; display:inline">Toplam Bütçe</label>
-##            &nbsp;
-##            <!--<p id="butceMiktari" style="display:inline"></p>-->
-##            <aui-badge id="butceMiktari" style="font-size: 14px; display: inline;"></aui-badge>
-##        </div>
+                </div>
+            </form>
+        </div>
 
-        ##            <div style="float: right; padding-left: 20px; padding-right: 30px;">
-        ##                <label style="display: inline">Tarih Geçerlilik Durumu: </label>
-        ##                <!--<p id="issueDurum" style="display: inline"></p>-->
-        ##                <aui-badge id="issueDurum" style="font-size: 14px; display: inline;"></aui-badge>
-        ##            </div>
-        ##            <div style="float: right; padding-left: 60px; padding-right: 30px;">
-        ##                <label style="display: inline">Kaynak Durumu: </label>
-        ##                <aui-badge id="kaynak" style="font-size: 14px; display: inline;"></aui-badge>
-        ##            </div>            ##            <div style="float: right; padding-left: 20px; padding-right: 30px;">
-        ##            ##                <label style="display: inline">Tarih Geçerlilik Durumu: </label>
-        ##            ##                <!--<p id="issueDurum" style="display: inline"></p>-->
-        ##            ##                <aui-badge id="issueDurum" style="font-size: 14px; display: inline;"></aui-badge>
-        ##            ##            </div>
-        ####            <div style="float: right; padding-left: 60px; padding-right: 30px;">
-        ####                <label style="display: inline">Kaynak Durumu: </label>
-        ####                <aui-badge id="kaynak" style="font-size: 14px; display: inline;"></aui-badge>
-        ####            </div>
     </div>
 
     <div class="aui-group list-group" id="tableDiv">
+        <div style="margin-right: 15px;">
+            <label style="font-weight:600; float: right">Toplam Bütçe &nbsp;
+                <aui-badge id="butceMiktari" style="font-size: 14px; display: inline;"></aui-badge>
+            </label>
+            &nbsp;
+
+        </div>
+
         <table class="aui aui-table-list" id="auiTable" >
             <thead>
             <tr id="tableHeader">
@@ -1532,21 +1154,9 @@ Released under the MIT license: http://jsbin.mit-license.org
                             <button class="aui-button kullaniciOnerButtonb" >Kullanıcı Öner</button>
                         </div>
                     </td>
-                    ##                    <td id="issueCreated" name="issueCreated" class="might-overflow">$issue.getCreated()</td>
-                    ##                    <td id="issueDue" name="issueDue" class="might-overflow">
-                    ##                        #if ( !$issue.getDueDate() )
-                    ##                            -
-                    ##                        #else
-                    ##                            $issue.getDueDate()
-                    ##                        #end
-                    ##                    </td>
                     #foreach($cf in $customFieldsInProject)
-                        ##                        <td id="$cf.getId()" name="$cf.getId()"  style="display:none;" class="$cf.getId()">-</td>
                         <td id="$cf.getId()" name="$cf.getId()" class="$cf.getId()">-</td>
                     #end
-                    ##                    #foreach($lead in $projectLeadList)
-                    ##                        <td id="projectLeader" name="projectLeader">-</td>
-                    ##                    #end
 
                 </tr>
                 #end
@@ -1558,11 +1168,6 @@ Released under the MIT license: http://jsbin.mit-license.org
                 <button class="aui-button" id="onaylaButton" style="float:left;">Kaynak Aşım Durumu</button>
                 <button class="aui-button aui-button-primary" id="kaydetButton" style="float: right;">Sıralamayı Kaydet</button>
             </div>
-##            <div class="col-xs-6 col-md-1" style="padding-left:15px; float: left;">
-##                <div class="aui-group" id="buttons">
-##                    <button class="aui-button" id="temizleButton">Seçimi Temizle</button>
-##                </div>
-##            </div>
         </div>
     </div>
 
@@ -1604,18 +1209,10 @@ Released under the MIT license: http://jsbin.mit-license.org
                 <th id="basic-lname">Proje</th>
             </tr>
             </thead>
-##            <tbody>
-##            <tr>
-##                <td headers="basic-fname"><span class="aui-icon aui-icon-small aui-iconfont-person" ></span></td>
-##                <td headers="basic-lname"></td>
-##            </tr>
-##            </tbody>
         </table>
     </div>
 
     #end
-
-
 
 
 </body>
