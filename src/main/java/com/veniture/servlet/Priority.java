@@ -172,6 +172,8 @@ public class Priority extends HttpServlet {
 
 //            List<Team> teams = new TeamsWithAvailabilityTimes(logger, requestFactory).invoke();
             List<Allocation> allocations = new PersonalAvailabilityTimes(logger, requestFactory).invoke();
+//            List<String> projectKeysList = new ArrayList<>();
+//            projectKeysList.add("APY");
 
             ProjectManager projectKeys = ComponentAccessor.getProjectManager();
             List<Project> projectList = projectKeys.getProjects();
@@ -194,6 +196,7 @@ public class Priority extends HttpServlet {
             context.put("dueDateList", dueDateList);
             context.put("createdList", createdList);
             context.put("priorityList", priorityList);
+            context.put("projectKeysList", projectKeysList);
 
             resp.setContentType("text/html;charset=utf-8");
             templateRenderer.render(PRIORITIZATION_SCREEN_TEMPLATE, context, resp.getWriter());

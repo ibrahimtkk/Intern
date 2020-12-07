@@ -21,7 +21,11 @@ import com.thoughtworks.xstream.XStream;
 import model.DateAndHour;
 import model.UserWorkingHours;
 import model.UserWorkingStartAndEndDate;
+import model.pojo.*;
 import model.pojo.TempoPlanner.Allocation;
+import model.pojo.TempoTeams.Team;
+import model.pojo.TempoTeamMember.TeamMember;
+import model.pojo.UserAndRoleAndTeam;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -48,6 +52,9 @@ public class functions {
     private static boolean sameDate = false;
     private static boolean isOverload = false;
     private static boolean isSuggestable = true;
+    private static boolean projectBoolean = false;
+    private static boolean isProjectBoolean = false;
+    private static boolean suggestAvailable = false;
     private static String sugUser = "";
     private static final Gson GSON = new GsonBuilder().serializeNulls().create();
     private static final XStream XSTREAM = new XStream();
@@ -116,7 +123,8 @@ public class functions {
         return getResponseString(QUERY);
     }
     public static String getResponseByStartAndEndDateAndAssigneeKey(String startDate, String endDate,String assigneeKey) throws IOException {
-        String QUERY = QUERY_ALLOCATION_BY_DATE_ASSIGNEE_KEY.replace("SSS", startDate).replace("EEE", endDate).replace("AAA", assigneeKey);
+//        String QUERY = QUERY_ALLOCATION_BY_DATE_ASSIGNEE_KEY.replace("SSS", startDate).replace("EEE", endDate).replace("AAA", assigneeKey);
+        String QUERY = QUERY_ALLOCATION_BY_DATE_ASSIGNEE_KEY.replace("SSS", startDate).replace("EEE", endDate);
         return getResponseString(QUERY);
     }
 
@@ -172,6 +180,128 @@ public class functions {
 //        });
         List<String> holidaysList = holidays;
         return holidaysList;
+    }
+
+    public static List<Team> getAllTeams() throws IOException {
+        Type tempoTeamDataType = new TypeToken<List<Team>>() {}.getType();
+        List<Team> tempoTeamData = GSON.fromJson(getResponseString(QUERY_TEAM), tempoTeamDataType);
+        return tempoTeamData;
+    }
+
+    public static List<TeamMember> getTeamMembersByTeamId(String teamId) throws IOException {
+        Type tempoTeamDataType = new TypeToken<List<TeamMember>>() {}.getType();
+        String memberOfTeamsQuery = QUERY_TEAM_MEMBER.replace("xxx", teamId);
+        List<TeamMember> tempoTeamData = GSON.fromJson(getResponseString(memberOfTeamsQuery), tempoTeamDataType);
+        return tempoTeamData;
+    }
+
+    // TODO: tempoya proje ismi verilerek kullanicilar ve roller cekilecek     = [user, role]
+    // TODO: tempodaki allocation'dan her bir kullaniciyi ve projesini kaydet  = [user, project]
+    // TODO: 2.maddeden her bir projedeki yetkili olan role'leri bul           = [projects, roles]
+    // TODO: istenen proje için gerekli olan roller belirlenir                 = [wanted project, roles]
+    // TODO: belirlenen role'lere sahip kullanicilar belirlenir(1.maddeden)    = [roles, users]
+    public static List<String> getHaveAuthorizedUsers(){
+        return new ArrayList<>();
+    }
+
+
+    public static List<ProjectAndUsers> getProjectsAndUsersByRole(List<ProjectAndRole> wantedProjectsAndRoles, List<UserAndRoleAndTeam> usersRolesAndTeams){
+        List<ProjectAndUsers> projectAndUsersList = new ArrayList<>();
+
+        wantedProjectsAndRoles.forEach(wantedProjectAndRoles -> {
+            wantedProjectAndRoles.getRoles().forEach(wantedRole -> {
+                usersRolesAndTeams.forEach(userAndRoleAndTeam -> {
+                    if (wantedRole.equals(userAndRoleAndTeam.getRole())){
+                        isProjectBoolean = false;
+                        projectAndUsersList.forEach(projectAndUsers -> {
+                            if (projectAndUsers.getProjectKey().equals(wantedProjectAndRoles.getProjectKey())){
+                                isProjectBoolean = true;
+                                if (!projectAndUsers.getUsers().contains(userAndRoleAndTeam.getUsername()))
+                                    projectAndUsers.getUsers().add(userAndRoleAndTeam.getUsername());
+                            }
+                        });
+                        if (!isProjectBoolean){
+                            List<String> users = new ArrayList<>();
+                            users.add(userAndRoleAndTeam.getUsername());
+                            ProjectAndUsers projectAndUsers = new ProjectAndUsers(wantedProjectAndRoles.getProjectKey(), users);
+                            projectAndUsersList.add(projectAndUsers);
+                        }
+                    }
+                });
+            });
+        });
+        return projectAndUsersList;
+    }
+
+    public static List<ProjectAndRole> getWantedProjectAndRoles(List<String> wantedProjects, List<ProjectAndRole> allProjectAndRoles){
+        List<ProjectAndRole> wantedProjectAndRoles = new ArrayList<>();
+        allProjectAndRoles.forEach(allProjectAndRole -> {
+            wantedProjects.forEach(wantedProject -> {
+                if (allProjectAndRole.getProjectKey().equals(wantedProject)){
+                    wantedProjectAndRoles.add(allProjectAndRole);
+                }
+            });
+        });
+        return wantedProjectAndRoles;
+    }
+
+    public static List<ProjectAndRole> getProjectsAndRoles(List<UserAndProject> userAndProjects, List<UserAndRoleAndTeam> userAndRoleAndTeams){
+        List<ProjectAndRole> projectAndRoles = new ArrayList<>();
+        List<String> projects = new ArrayList<>();
+        userAndProjects.forEach(userAndProject -> {
+            userAndRoleAndTeams.forEach(userAndRoleAndTeam -> {
+                if (userAndProject.getUsername().equals(userAndRoleAndTeam.getUsername())){
+                    projectBoolean = false;
+                    projectAndRoles.forEach(projectAndRole -> {
+                        if (projectAndRole.getProjectKey().equals(userAndProject.getProjectKey())){
+                            projectBoolean = true;
+                            if (!projectAndRole.getRoles().contains(userAndRoleAndTeam.getRole()))
+                                projectAndRole.getRoles().add(userAndRoleAndTeam.getRole());
+                        }
+                    });
+                    if (!projectBoolean){
+                        List<String> roles = new ArrayList<>();
+                        roles.add(userAndRoleAndTeam.getRole());
+                        projectAndRoles.add(new ProjectAndRole(userAndProject.getProjectKey(), roles));
+                    }
+                }
+            });
+        });
+        return projectAndRoles;
+
+    }
+
+    // Todo: gelen planItem'in PROJECT oldugunu dogrula yoksa issue'lar da geliyor
+    public static List<UserAndProject> getUsersAndProjects(List<Allocation> allocations){
+        List<UserAndProject> userAndProjects = new ArrayList<>();
+        allocations.forEach(allocation -> {
+            if (allocation.getPlanItem().getType().equals("PROJECT"))
+                userAndProjects.add(new UserAndProject(allocation.getAssignee().getKey(), allocation.getPlanItem().getProjectKey()));
+        });
+        return userAndProjects;
+    }
+
+
+    public static List<UserAndRoleAndTeam> getUsersRolesAndTeams(List<String> projectKeys) throws IOException {
+        List<Team> allTeams = getAllTeams();
+        List<UserAndRoleAndTeam> usersRolesTeams = new ArrayList<>();
+        allTeams.forEach(team -> {
+            try {
+                List<TeamMember> teamMembers = getTeamMembersByTeamId(team.getId().toString());
+                teamMembers.forEach(teamMember -> {
+                    String username = teamMember.getMember().getName();
+                    String displayName = teamMember.getMember().getDisplayname();
+                    String role = teamMember.getMembership().getRole().getName();
+                    String teamName = team.getName();
+                    Integer teamId = team.getId();
+                    usersRolesTeams.add(new UserAndRoleAndTeam( username, role, teamName, teamId ));
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        return usersRolesTeams;
+
     }
 
     public static List<String> getHaveSameProjectUsers(List<String> issueKeys){
@@ -321,10 +451,13 @@ public class functions {
 
     public static List<UserWorkingStartAndEndDate> checkWorkingTimeAndSuggestAnotherUser(List<List<DateAndHour>> totalWorkingHoursOfUsers, List<UserWorkingStartAndEndDate> userWorkingStartAndEndDateList, List<String> suggestionUsernames, String issueKey){
         List<String> willSuggestUsernames = new ArrayList<>();
+        List<String> suggestableUsers = suggestionUsernames;
+        List<UserWorkingStartAndEndDate> suggestedWorkingList = new ArrayList<>();
+        List<Integer> suggestedIndex = new ArrayList<>();
         suggestedUsers = new ArrayList<>();
         innerDateAndHour = null;
         userWorkingStartAndEndDateList.forEach(userWorkingStartAndEndDate -> {
-            if (userWorkingStartAndEndDate.getIssueKey().equals(issueKey)){
+//            if (userWorkingStartAndEndDate.getIssueKey().equals(issueKey)){
                 Date startDate = userWorkingStartAndEndDate.getStartDate();
                 Date endDate = userWorkingStartAndEndDate.getEndDate();
                 totalWorkingHoursOfUsers.forEach(totalWorkingHoursOfUser -> {
@@ -333,28 +466,48 @@ public class functions {
                             if (startDate.before(innerTotal.getDate()) || endDate.after(innerTotal.getDate()) ||
                             startDate.getTime() == innerTotal.getDate().getTime() || endDate.getTime() == innerTotal.getDate().getTime()){
                                 if (innerTotal.getHour() > MAXWORKINGTIME){
+                                    suggestableUsers.remove(innerTotal.getUsername());
+//                                    suggestedWorkingList.forEach(suggestedWorking -> {
+//                                        if (suggestedWorking.getUsername().equals(innerTotal.getUsername())) {
+//                                            suggestedIndex.add(suggestedWorkingList.indexOf(suggestedWorking));
+//                                        }
+//                                    });
                                     isOverload = true;
                                     innerDateAndHour = new DateAndHour(innerTotal.getUsername(), innerTotal.getDate(), innerTotal.getHour());
                                 }
                             }
                         }
                     });
-                    if (isOverload){
-                        suggestedUsers = suggestNewUser(totalWorkingHoursOfUsers, userWorkingStartAndEndDateList, suggestionUsernames, issueKey, innerDateAndHour.getUsername(), startDate, endDate);
-                    }
+//                    if (isOverload){
+//                        suggestedUsers = suggestNewUser(totalWorkingHoursOfUsers, userWorkingStartAndEndDateList, suggestionUsernames, issueKey, innerDateAndHour.getUsername(), startDate, endDate);
+//                    }
                 });
-            }
+//            }
+        });
+        userWorkingStartAndEndDateList.forEach(userWorkingStartAndEndDate -> {
+            suggestableUsers.forEach(s -> {
+                if (userWorkingStartAndEndDate.getUsername().equals(s)){
+                    suggestAvailable = false;
+                    suggestedWorkingList.forEach(suggestedWork -> {
+                        if (suggestedWork.getUsername().equals(s))
+                            suggestAvailable = true;
+                    });
+                    if (!suggestAvailable)
+                        suggestedWorkingList.add(userWorkingStartAndEndDate);
+                }
+            });
         });
 
-        return suggestedUsers;
+        int a = 0;
+        return suggestedWorkingList;
     }
 
     public static List<UserWorkingStartAndEndDate> suggestNewUser(List<List<DateAndHour>> totalWorkingHoursOfUsers, List<UserWorkingStartAndEndDate> userWorkingStartAndEndDateList, List<String> suggestionUsernames, String issueKey, String bannedUsername, Date startDate, Date endDate){
         List<String> suggestedUsers = new ArrayList<>();
         List<UserWorkingStartAndEndDate> sendUserWorkingStartAndEndDateList = new ArrayList<>();
-        isSuggestable = true;
         sugUser = "";
         totalWorkingHoursOfUsers.forEach(totalWorkingHoursOfUser -> {
+            isSuggestable = true;
             totalWorkingHoursOfUser.forEach(innerTotal -> {
                 if (!innerTotal.getUsername().equals(bannedUsername)){
                     sugUser = innerTotal.getUsername();

@@ -37,13 +37,17 @@ public class Constants {
 
     public static final String schemeHTTP = "http://";
     public static final String schemeHTTPS = "https://";
+    // TODO: tempo ile ilgili id'ler(takim idleri) dinamik olacak yoksa calismaz
     public static final String QUERY_TEAM = "/rest/tempo-teams/2/team";
+    public static final String QUERY_TEAM_MEMBER = "/rest/tempo-teams/2/team/xxx/member/";
     public static final String QUERY_ALLOCATION = "/rest/tempo-planning/1/allocation";
     public static final String QUERY_WORKLOAD = "/rest/tempo-core/1/workloadscheme/1";
     //public static final String QUERY_AVAILABILITY = "/rest/tempo-planning/1/capacity/report/8?from=2019-11-19&to=2019-12-04&period=P1w";
     public static final String QUERY_AVAILABILITY_YEAR = "/rest/tempo-planning/1/capacity/report/XXX?from=YYY&to=ZZZ&period=P1w";
     public static final String QUERY_AVAILABILITY_YEAR_BY_DAY = "/rest/tempo-planning/1/capacity/report/XXX?from=YYY&to=ZZZ&period=P1d";
     public static final String QUERY_ALLOCATION_BY_DATE = "/rest/tempo-planning/1/allocation?startDate=SSS&endDate=EEE";
+//    public static final String QUERY_ALLOCATION_BY_DATE_ASSIGNEE_KEY = "/rest/tempo-planning/1/allocation?startDate=SSS&endDate=EEE&assigneeKeys=AAA";
+public static final String QUERY_ALLOCATION_BY_DATE_ASSIGNEE_KEY = "/rest/tempo-planning/1/allocation?startDate=SSS&endDate=EEE";
     public static final int MAXWORKINGTIME = 8;
     //Veniture Jira - Prod Yeni Ortam
     public static final String ProjectId = "APY";
