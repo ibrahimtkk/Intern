@@ -377,6 +377,8 @@ public class rest {
                     allocationStartDate = new SimpleDateFormat("yyyy-MM-dd").parse(allocation.getStart());
                     allocationEndDate = new SimpleDateFormat("yyyy-MM-dd").parse(allocation.getEnd());
 
+                    List<Allocation> allocationJustUser = getAllocationsByDateAndAssigneeKey(startDateString ,endDateString, allocation.getAssignee().getKey());
+                    String allProjectsUser = getUsersProjects(allocationJustUser);
                     List<Allocation> allocation2 = getAllocationsByDateAndAssigneeKey(allocation.getStart(), allocation.getEnd(), allocation.getAssignee().getKey());
                     allocation2.forEach(al2->{
                         Allocation all2 = al2;
@@ -389,10 +391,13 @@ public class rest {
                         fark = getWorkingDaysBetweenTwoDate(constraintStartDate, constraintEndDate, allocationStartDate, allocationEndDate);
                         resource += all2.getSecondsPerDay()/3600;
 
-
                         if(resource > constraintResource){
                             //kaynak aşımı oluştu
-                            userNames.add(all2.getAssignee().getKey() + ","+ allocation.getPlanItem().getKey() );
+                            userNames.add(all2.getAssignee().getKey() + ","+ allocation.getPlanItem().getKey()+","+allProjectsUser );
+//                            if(!userNames.contains(all2.getAssignee().getKey() +","+allProjectsUser)){
+//                                userNames.add(all2.getAssignee().getKey() +","+allProjectsUser);
+//                            }
+
                         }
                     });
                     resource=0;
@@ -403,10 +408,24 @@ public class rest {
             }
         });
 
-        String names = userNames.stream().collect(Collectors.joining(" "));
+        String names = userNames.stream().collect(Collectors.joining(",,,"));
         return names;
     }
 
+    public String getUsersProjects(List<Allocation> allocation){
+        List<String> projects = new ArrayList<>();
+        allocation.forEach(al->{
+            Allocation all2 = al;
+            try{
+                projects.add(al.getPlanItem().getKey());
+            }catch  (Exception e) {
+                e.printStackTrace();
+            }
+
+        });
+        String project = projects.stream().collect(Collectors.joining(" - "));
+        return project;
+    }
 
 
     @POST

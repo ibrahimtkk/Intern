@@ -14,6 +14,7 @@ import com.atlassian.jira.issue.search.SearchResults;
 import com.atlassian.jira.issue.util.DefaultIssueChangeHolder;
 import com.atlassian.jira.jql.parser.JqlQueryParser;
 import com.atlassian.jira.project.Project;
+import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.web.bean.PagerFilter;
@@ -158,7 +159,7 @@ public class Priority extends HttpServlet {
             List<CustomField> customFieldsInProject = new GetCustomFieldsInExcel().invoke();
             List<Issue> issueList = results.getResults();
 
-            String fullUrl = "http://localhost:8089/rest/tempo-teams/2/team";
+            String fullUrl = "http://localhost:8080/rest/tempo-teams/2/team";
 //            Request request = requestFactory.createRequest(Request.MethodType.GET, fullUrl);
 //            request.addBasicAuthentication("http://localhost:8089", "ibrahim.takak", "qwerty");
 //
@@ -172,7 +173,15 @@ public class Priority extends HttpServlet {
 //            List<Team> teams = new TeamsWithAvailabilityTimes(logger, requestFactory).invoke();
             List<Allocation> allocations = new PersonalAvailabilityTimes(logger, requestFactory).invoke();
 
+            ProjectManager projectKeys = ComponentAccessor.getProjectManager();
+            List<Project> projectList = projectKeys.getProjects();
+            List<String> projectKeysList = new ArrayList<>();
+            projectList.forEach(projectKey -> {
+                Project project = projectKey;
+                projectKeysList.add(project.getKey());
+            });
 
+            context.put("projectKeysList", projectKeysList);
             context.put("issues", results.getResults());
             context.put("issueList", results.getResults());
             context.put("restriction", restriction);

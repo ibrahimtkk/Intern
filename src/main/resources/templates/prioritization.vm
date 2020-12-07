@@ -241,6 +241,13 @@ Released under the MIT license: http://jsbin.mit-license.org
                             $(td).attr('headers', 'basic-lname');
                         }
                     }
+                    ,
+                    {
+                        'targets':2,
+                        'createdCell': function (td, cellData, rowData, row, col) {
+                            $(td).attr('headers', 'basic-pname');
+                        }
+                    }
                 ]
             });
             var jsonDataTable = $('#auiTable').tableToJSON();
@@ -958,17 +965,20 @@ Released under the MIT license: http://jsbin.mit-license.org
                             AJS.$("#resourceOverloadforProjectTable").css("visibility","hidden")
                             AJS.$("#resourceOverloadInfo").css("visibility","visible");
                         }else{
+                            console.log("response: "+response)
                             AJS.$("#resourceOverloadforProjectTable").css("visibility","visible")
                             AJS.$("#resourceOverloadInfo").css("visibility","hidden");
                             var responseArr=[];
-                            responseArr = response.split(" ");
+                            responseArr = response.split(",,,");
+
                             for(var i=0; i<responseArr.length;i++){
                                 var nameProject = [];
                                 nameProject = responseArr[i].split(",")
                                 var justName=nameProject[0];
                                 nameProject[0]='<span class="aui-icon aui-icon-small aui-iconfont-person" ></span>'+justName
 
-                                resourceOverloadforProjectTable.row.add(nameProject).draw(true)
+                                resourceOverloadforProjectTable.row.add(nameProject).draw(true);
+                                resourceOverloadforProjectTable.order([ 0, 'asc' ]).draw();
                             }
                         }
                     }
@@ -1123,7 +1133,7 @@ Released under the MIT license: http://jsbin.mit-license.org
     <div class="tab-content" style="float: left; height: 200px;">
         <div id="home" class="container tab-pane active"><br>
             <h5 id="logo" class="aui-header-logo aui-header-logo-PRODUCTNAME">Proje Önceliklendirme</h5>
-            <p style="font-size: small">Projeleri sürekle-bırak yöntemi ile istediğiniz sıraya taşıyınız. Önceliklendirme bittikten sonra "sıralamayı kaydet" butonuna basınız.<span id="dots">...</span><span id="more">Tabloya özel alan eklemek için "Özel Alanlar" sekmesini, filtre eklemek için "Filtreler" sekmesini kullanabilirsiniz. Bütçe veya tarih sınırlamasını "Kısıtlar" alanından belirleyebilirsiniz. Kaynak aşımını görmek için öncelikle tarih aralığının girilmesi, aşımın görülmesi istenen projenin seçilmesi ve ardından "Kaynak Aşım Durumu" butonunun tıklanması gerekmektedir.</span></p>
+            <p style="font-size: small">Projeleri sürekle-bırak yöntemi ile istediğiniz sıraya taşıyınız. Önceliklendirme bittikten sonra "sıralamayı kaydet" butonuna basınız.<span id="dots">...</span><span id="more">Tabloya özel alan eklemek için "Özel Alanlar" sekmesini, filtre eklemek için "Filtreler" sekmesini kullanabilirsiniz. Bütçe veya tarih sınırlamasını "Kısıtlar" alanından belirleyebilirsiniz. Proje kartı bazlı kaynak aşımını görmek için öncelikle tarih aralığının girilmesi, aşımın görülmesi istenen projenin seçilmesi ve ardından "Kaynak Aşım Durumu" butonunun tıklanması gerekmektedir. Proje bazlı kaynak aşımı için "Kaynak Aşımı" sekmesini kullanınız.</span></p>
 
             <a class="aui-button-link" style="font-size: small; color:darkblue" onclick="myFunction()" id="myBtn">Daha fazla</a>
         </div>
@@ -1181,7 +1191,9 @@ Released under the MIT license: http://jsbin.mit-license.org
         <div id="menu4" class="container tab-pane fade"><br>
             <form class="aui">
                 <div class="field-group" style="width:400px">
-                    <label for="projectKeyInput" id="projectKeyLabel" style="text-align: left; ">Proje anahtarı<span class="aui-icon icon-required"/>&nbsp;<span class="aui-icon aui-icon-small aui-iconfont-new-edit" style="float: right"/></label>
+                    <label for="projectKeyInput" id="projectKeyLabel" style="text-align: left; position: initial;">Proje anahtarı<span class="aui-icon icon-required" style="position: relative;left: 3px;top: -3px;"/>&nbsp;
+                        <span class="aui-icon aui-icon-small aui-iconfont-new-edit" style="position: relative;left: 23px;"/>
+                    </label>
                     <select id="projectKey-select2" data-placeholder="Proje eklemek için tıklayın" multiple>
                         <option value=""></option>
                         #foreach($pk in $projectKeysList)
@@ -1213,7 +1225,8 @@ Released under the MIT license: http://jsbin.mit-license.org
                 <thead>
                 <tr>
                     <th id="basic-fname">Kaynak</th>
-                    <th id="basic-lname">Proje</th>
+                    <th id="basic-lname">Aşıma Uğrayan Proje</th>
+                    <th id="basic-pname">Kaynağın Çalıştığı Projeler</th>
                 </tr>
                 </thead>
             </table>
