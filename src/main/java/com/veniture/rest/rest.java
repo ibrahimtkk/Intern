@@ -40,10 +40,7 @@ import com.veniture.util.tableRowBuilder;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
-import model.DateAndHour;
-import model.TableRow;
-import model.UserWorkingHours;
-import model.UserWorkingStartAndEndDate;
+import model.*;
 import model.pojo.ProjectAndRole;
 import model.pojo.ProjectAndUsers;
 import model.pojo.TempoPlanner.Allocation;
@@ -97,6 +94,8 @@ public class rest {
     OrganizationService organizationService;
 
     List<UserWorkingStartAndEndDate> availableUsers = null;
+    List<UserKeyAndDate> availableUsersAndDates = null;
+    List<List<UserKeyAndDate>> availableUsersAndDatesList = null;
     List<List<UserWorkingStartAndEndDate>> availableUserList = null;
     List<String> suggestionUserName = null;
 
@@ -172,6 +171,7 @@ public class rest {
         Date constraintEndDate = new SimpleDateFormat("yyyy-MM-dd").parse(endDateString);
 
         availableUserList = new ArrayList<>();
+        availableUsersAndDatesList = new ArrayList<>();
 
         List<Allocation> allocations = getAllocationsByDate(startDateString, endDateString);
         List<UserAndRoleAndTeam> usersRolesAndTeams = getUsersRolesAndTeams(projectList);
@@ -190,7 +190,8 @@ public class rest {
                 List<List<DateAndHour>> totalWorkingHoursOfUsers = getTotalWorkingHoursOfUsers(usersAndWorkingHour, suggestionUserName);
                 List<UserWorkingStartAndEndDate> userWorkingStartAndEndDateList = getUserWorkingStartAndEndDateList(usersAndWorkingHour);
                 logger.info("availableUser: ", availableUsers);
-                availableUsers = checkWorkingTimeAndSuggestAnotherUser(totalWorkingHoursOfUsers, userWorkingStartAndEndDateList, suggestionUserName, projectAndUsers.getProjectKey());
+                availableUsersAndDates = checkWorkingTimeAndSuggestAnotherUser(totalWorkingHoursOfUsers, userWorkingStartAndEndDateList, suggestionUserName, projectAndUsers.getProjectKey());
+                availableUsersAndDatesList.add(availableUsersAndDates);
                 availableUserList.add(availableUsers);
                 logger.info("111");
             } catch (IOException | URISyntaxException e) {
@@ -200,7 +201,7 @@ public class rest {
         for (String i:suggestionUserName){
             String name = i;
         }
-        String json = new Gson().toJson(availableUserList);
+        String json = new Gson().toJson(availableUsersAndDatesList);
 
 //        issueKeys.forEach(issueKey -> {
 //            try {
@@ -353,7 +354,7 @@ public class rest {
                 List<UserWorkingHours> usersAndWorkingHour = getWorkingHoursOfUsers(allocations, suggestionUserName);
                 List<List<DateAndHour>> totalWorkingHoursOfUsers = getTotalWorkingHoursOfUsers(usersAndWorkingHour, suggestionUserName);
                 List<UserWorkingStartAndEndDate> userWorkingStartAndEndDateList = getUserWorkingStartAndEndDateList(usersAndWorkingHour);
-                availableUsers = checkWorkingTimeAndSuggestAnotherUser(totalWorkingHoursOfUsers, userWorkingStartAndEndDateList, suggestionUserName, issueKey);
+                availableUsersAndDates = checkWorkingTimeAndSuggestAnotherUser(totalWorkingHoursOfUsers, userWorkingStartAndEndDateList, suggestionUserName, issueKey);
                 logger.info("111");
             } catch (IOException | URISyntaxException e) {
                 e.printStackTrace();
@@ -500,12 +501,13 @@ public class rest {
 
                     List<Allocation> allocationJustUser = getAllocationsByDateAndAssigneeKey(startDateString ,endDateString, allocation.getAssignee().getKey());
                     String allProjectsUser = getUsersProjects(allocationJustUser);
-                    List<Allocation> allocation3 = getAllocationsByDateAndAssigneeKey(allocation.getStart(), allocation.getEnd(), allocation.getAssignee().getKey());
-                    List<Allocation> allocation2 = new ArrayList<>();
-                    allocation3.forEach(allocation4 -> {
-                        if (allocation4.getAssignee().getKey().equals(allocation.getAssignee().getKey()))
-                            allocation2.add(allocation4);
-                    });
+                    // Todo: Allocation'in bitis tarihini bir gun artirman gerekebilir(ibrahim icin)
+                    List<Allocation> allocation2 = getAllocationsByDateAndAssigneeKey(allocation.getStart(), allocation.getEnd(), allocation.getAssignee().getKey());
+//                    List<Allocation> allocation2 = new ArrayList<>();
+//                    allocation3.forEach(allocation4 -> {
+//                        if (allocation4.getAssignee().getKey().equals(allocation.getAssignee().getKey()))
+//                            allocation2.add(allocation4);
+//                    });
                     allocation2.forEach(al2->{
                         Allocation all2 = al2;
                         try{

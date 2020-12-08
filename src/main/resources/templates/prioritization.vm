@@ -52,11 +52,11 @@ Released under the MIT license: http://jsbin.mit-license.org
     <script>
         AJS.$(document).ready(function () {
 
-            let butceCFstring = "customfield_11000";
+            let butceCFstring = "customfield_10600";
             let butceJSONstring = "Bütçe"
-            let basTarihCFstring = "customfield_11102";
+            let basTarihCFstring = "customfield_10703";
             let basTarihJSONstring = "BaslangicTarihi"
-            let bitTarihCFstring = "customfield_10900";
+            let bitTarihCFstring = "customfield_10704";
             let bitTarihJSONstring = "BitisTarihi";
 
             var htmlButtonOneri=document.getElementById("kaynakKullaniciOnerisi");
@@ -222,6 +222,36 @@ Released under the MIT license: http://jsbin.mit-license.org
                 ]
             });
             var resourceOverloadforProjectTable=$("#resourceOverloadforProjectTable").DataTable({
+                bLengthChange: false,
+                bPaginate: false,
+                bInfo: false,
+                bAutoWidth: false,
+                bFilter: false,
+                "ordering": false,
+                columnDefs: [
+                    {
+                        'targets':0,
+                        'createdCell': function (td, cellData, rowData, row, col) {
+                            $(td).attr('headers', 'basic-fname');
+                        }
+                    },
+                    {
+                        'targets':1,
+                        'createdCell': function (td, cellData, rowData, row, col) {
+                            $(td).attr('headers', 'basic-lname');
+                        }
+                    }
+                    ,
+                    {
+                        'targets':2,
+                        'createdCell': function (td, cellData, rowData, row, col) {
+                            $(td).attr('headers', 'basic-pname');
+                        }
+                    }
+                ]
+            });
+
+            var suggestUsersforProjectTable=$("#suggestUsersforProjectTable").DataTable({
                 bLengthChange: false,
                 bPaginate: false,
                 bInfo: false,
@@ -469,23 +499,11 @@ Released under the MIT license: http://jsbin.mit-license.org
             });
 
             AJS.$('#kaynakAsimOner').on('click', function () {
-                var projects = [];
-                // var basTarihPro = "2020-12-1";
-                // let bitTarihPro = "2020-12-18";
-
+                var projects = projectKeys;
+                suggestUsersforProjectTable.clear().draw();
                 let basTarihPro = baslangicDateforProjectPlanning
                 let bitTarihPro = bitisDateforProjectPlanning
                 console.log("---:", projects, basTarihPro, bitTarihPro);
-
-                resourceOverloadforProjectTable.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                    var rowData = this.data();
-                    projects.push(rowData[1]);
-                    console.log("resourceOverloadforProjectTable satır: ", rowData);
-                    // rowData[index] = array[rowLoop]
-                    // dataTable.row(rowIdx).data(rowData)
-                    // jsonDataTable[rowLoop][e.object.text] = array[rowLoop]
-                    // this.invalidate()
-                });
 
                 jQuery.ajax({
                     url: AJS.params.baseURL + "/rest/florestservice/1.2/rest/suggestUserFromProjects",
@@ -509,6 +527,25 @@ Released under the MIT license: http://jsbin.mit-license.org
                             behavior: 'smooth',
                         });
                         value= response;
+                        AJS.$("#suggestUsersforProjectTable").css("visibility","visible")
+                        let responseList = JSON.parse(value)
+                        console.log("response: ", response)
+                        for(var i=0; i<responseList.length;i++){
+                            let resp = responseList[i];
+                            for (var j=0; j<responseList[i].length; j++) {
+                                console.log("response[i]", response[i])
+                                let username = resp[j]["username"];
+                                let issueKey = resp[j]["issueKey"];
+                                let startDate = resp[j]["startDate"]
+                                let endDate = resp[j]["endDate"]
+                                let addRow = [username, issueKey, startDate, endDate]
+
+                                // nameProject[0]='<span class="aui-icon aui-icon-small aui-iconfont-person" ></span>'+justName
+
+                                suggestUsersforProjectTable.row.add(addRow).draw(true);
+                                suggestUsersforProjectTable.order([0, 'asc']).draw();
+                            }
+                        }
                     }
                 });
                 let resp = JSON.parse(value)
@@ -1266,7 +1303,7 @@ Released under the MIT license: http://jsbin.mit-license.org
             </div>
 
             <div class="aui-group" id="buttons">
-                <button class="aui-button" id="kaynakAsimOner">Kaynak Önerisi</button>
+                <button class="aui-button" id="kaynakAsimOner" style="float:left;">Kaynak Önerisi</button>
             </div>
 
             <div class="aui-message aui-message-info" id="resourceOverloadInfo" style="visibility: hidden">
@@ -1281,6 +1318,19 @@ Released under the MIT license: http://jsbin.mit-license.org
                     <th id="basic-fname">Kaynak</th>
                     <th id="basic-lname">Aşıma Uğrayan Proje</th>
                     <th id="basic-pname">Kaynağın Çalıştığı Projeler</th>
+                </tr>
+                </thead>
+            </table>
+            <br><br><br><br>
+            <h1>Öneri Tablosu</h1>
+            <br><br>
+            <table class="aui" id="suggestUsersforProjectTable" style="visibility: hidden">
+                <thead>
+                <tr>
+                    <th id="basic-fname">Müsait Kaynak</th>
+                    <th id="basic-pname">Proje</th>
+                    <th id="basic-lname">Başlangıç Tarihi</th>
+                    <th id="basic-pname">Bitiş Tarihi</th>
                 </tr>
                 </thead>
             </table>
@@ -1351,8 +1401,9 @@ Released under the MIT license: http://jsbin.mit-license.org
             </div>
         </div>
     </div>
+        <br><br><br><br><br><br><br>
 
-    <div class="gantt" name="gantt" id="gantt"></div>
+    <div class="gantt" name="gantt" id="gantt" style="margin-top:50px; visibility:hidden"></div>
     <div class="row" id="swAlert" style="margin-top:50px; visibility:hidden">
         <div class="col-xs-5 col-md-1" style="padding-left:15px">
             <form>

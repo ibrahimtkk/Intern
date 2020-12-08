@@ -19,6 +19,7 @@ import com.google.gson.reflect.TypeToken;
 import com.opensymphony.module.propertyset.PropertySet;
 import com.thoughtworks.xstream.XStream;
 import model.DateAndHour;
+import model.UserKeyAndDate;
 import model.UserWorkingHours;
 import model.UserWorkingStartAndEndDate;
 import model.pojo.*;
@@ -55,11 +56,14 @@ public class functions {
     private static boolean projectBoolean = false;
     private static boolean isProjectBoolean = false;
     private static boolean suggestAvailable = false;
+    private static boolean isSend = true;
     private static String sugUser = "";
     private static final Gson GSON = new GsonBuilder().serializeNulls().create();
     private static final XStream XSTREAM = new XStream();
     private static DateAndHour innerDateAndHour = null;
     private static List<UserWorkingStartAndEndDate> suggestedUsers = null;
+    private static List<String> suggestableUsers = null;
+    private static List<UserKeyAndDate> suggedtedUserAndDate = null;
 
     public static void updateCustomFieldValue(MutableIssue issue, Long cfId, Object value, ApplicationUser user) {
         CustomField cf = ComponentAccessor.getCustomFieldManager().getCustomFieldObject(cfId);
@@ -123,8 +127,8 @@ public class functions {
         return getResponseString(QUERY);
     }
     public static String getResponseByStartAndEndDateAndAssigneeKey(String startDate, String endDate,String assigneeKey) throws IOException {
-//        String QUERY = QUERY_ALLOCATION_BY_DATE_ASSIGNEE_KEY.replace("SSS", startDate).replace("EEE", endDate).replace("AAA", assigneeKey);
-        String QUERY = QUERY_ALLOCATION_BY_DATE_ASSIGNEE_KEY.replace("SSS", startDate).replace("EEE", endDate);
+        String QUERY = QUERY_ALLOCATION_BY_DATE_ASSIGNEE_KEY.replace("SSS", startDate).replace("EEE", endDate).replace("AAA", assigneeKey);
+//        String QUERY = QUERY_ALLOCATION_BY_DATE_ASSIGNEE_KEY.replace("SSS", startDate).replace("EEE", endDate);
         return getResponseString(QUERY);
     }
 
@@ -449,23 +453,37 @@ public class functions {
         return userWorkingStartAndEndDateList;
     }
 
-    public static List<UserWorkingStartAndEndDate> checkWorkingTimeAndSuggestAnotherUser(List<List<DateAndHour>> totalWorkingHoursOfUsers, List<UserWorkingStartAndEndDate> userWorkingStartAndEndDateList, List<String> suggestionUsernames, String issueKey){
+    public static List<UserKeyAndDate> checkWorkingTimeAndSuggestAnotherUser(List<List<DateAndHour>> totalWorkingHoursOfUsers, List<UserWorkingStartAndEndDate> userWorkingStartAndEndDateList, List<String> suggestionUsernames, String issueKey){
         List<String> willSuggestUsernames = new ArrayList<>();
-        List<String> suggestableUsers = suggestionUsernames;
+        suggestableUsers = suggestionUsernames;
+        List<List<String>> suggestableUserList = new ArrayList<>();
         List<UserWorkingStartAndEndDate> suggestedWorkingList = new ArrayList<>();
+        List<UserKeyAndDate> suggedtedUserAndDate = new ArrayList<>();
         List<Integer> suggestedIndex = new ArrayList<>();
         suggestedUsers = new ArrayList<>();
         innerDateAndHour = null;
         userWorkingStartAndEndDateList.forEach(userWorkingStartAndEndDate -> {
-//            if (userWorkingStartAndEndDate.getIssueKey().equals(issueKey)){
+            suggestableUsers = new ArrayList<>();
+            // Deep Copy
+            suggestionUsernames.forEach(s -> {
+                suggestableUsers.add(s);
+            });
+            if (userWorkingStartAndEndDate.getIssueKey().equals(issueKey)){
                 Date startDate = userWorkingStartAndEndDate.getStartDate();
                 Date endDate = userWorkingStartAndEndDate.getEndDate();
                 totalWorkingHoursOfUsers.forEach(totalWorkingHoursOfUser -> {
                     totalWorkingHoursOfUser.forEach(innerTotal -> {
-                        if (innerTotal.getUsername().equals(userWorkingStartAndEndDate.getUsername())){
-                            if (startDate.before(innerTotal.getDate()) || endDate.after(innerTotal.getDate()) ||
-                            startDate.getTime() == innerTotal.getDate().getTime() || endDate.getTime() == innerTotal.getDate().getTime()){
-                                if (innerTotal.getHour() > MAXWORKINGTIME){
+//                        if (innerTotal.getUsername().equals(userWorkingStartAndEndDate.getUsername())){
+                            if (
+                                    (startDate.before(innerTotal.getDate()) && endDate.after(innerTotal.getDate())) ||
+                                    (startDate.getTime() == innerTotal.getDate().getTime() && endDate.after(innerTotal.getDate()))  ||
+                                    ( endDate.getTime() == innerTotal.getDate().getTime()  && startDate.before(innerTotal.getDate()))
+                            ){
+                                double workingHours = innerTotal.getHour();
+                                if (!userWorkingStartAndEndDate.getUsername().equals(innerTotal.getUsername()))
+                                    workingHours = innerTotal.getHour() + userWorkingStartAndEndDate.getWorkingHours();
+                                double MAXWORKINGDOUBLE = MAXWORKINGTIME * WORKINGRATIO;
+                                if (workingHours > MAXWORKINGDOUBLE){
                                     suggestableUsers.remove(innerTotal.getUsername());
 //                                    suggestedWorkingList.forEach(suggestedWorking -> {
 //                                        if (suggestedWorking.getUsername().equals(innerTotal.getUsername())) {
@@ -476,30 +494,68 @@ public class functions {
                                     innerDateAndHour = new DateAndHour(innerTotal.getUsername(), innerTotal.getDate(), innerTotal.getHour());
                                 }
                             }
-                        }
+//                        }
                     });
 //                    if (isOverload){
 //                        suggestedUsers = suggestNewUser(totalWorkingHoursOfUsers, userWorkingStartAndEndDateList, suggestionUsernames, issueKey, innerDateAndHour.getUsername(), startDate, endDate);
 //                    }
                 });
-//            }
-        });
-        userWorkingStartAndEndDateList.forEach(userWorkingStartAndEndDate -> {
-            suggestableUsers.forEach(s -> {
-                if (userWorkingStartAndEndDate.getUsername().equals(s)){
-                    suggestAvailable = false;
-                    suggestedWorkingList.forEach(suggestedWork -> {
-                        if (suggestedWork.getUsername().equals(s))
-                            suggestAvailable = true;
+                suggestableUserList.add(suggestableUsers);
+                suggestableUserList.forEach(sugUserList -> {
+                    sugUserList.forEach(s -> {
+                        suggedtedUserAndDate.add(new UserKeyAndDate(s, userWorkingStartAndEndDate.getIssueKey(), startDate, endDate));
                     });
-                    if (!suggestAvailable)
-                        suggestedWorkingList.add(userWorkingStartAndEndDate);
+                });
+            }
+        });
+//        userWorkingStartAndEndDateList.forEach(userWorkingStartAndEndDate -> {
+//            suggestableUserList.forEach(sugUsers -> {
+//                sugUsers.forEach(s -> {
+//                    if (userWorkingStartAndEndDate.getUsername().equals(s)){
+//                        suggestAvailable = false;
+//                        suggestedWorkingList.forEach(suggestedWork -> {
+//                            if (suggestedWork.getUsername().equals(s))
+//                                suggestAvailable = true;
+//                        });
+//                        if (!suggestAvailable)
+//                            suggestedWorkingList.add(userWorkingStartAndEndDate);
+//                    }
+//                });
+//            });
+//        });
+
+        List<UserKeyAndDate> sendSuggedtedUserAndDate = new ArrayList<>();
+        suggedtedUserAndDate.forEach(sugUs ->{
+            isSend = true;
+            sendSuggedtedUserAndDate.forEach(send ->{
+                if (sugUs.getUsername().equals(send.getUsername()) &&
+                        (sugUs.getStartDate().getTime() == send.getStartDate().getTime()) &&
+                        (sugUs.getEndDate().getTime() == send.getEndDate().getTime())
+                ){
+                    isSend = false;
                 }
             });
-        });
+            if (isSend){
+                sendSuggedtedUserAndDate.add(sugUs);
+            }
+        } );
+
+//        for(int i=0; i<suggedtedUserAndDate.size()-1; i++){
+//            for (int j=i+1; j<suggedtedUserAndDate.size(); j++){
+//                if ( suggedtedUserAndDate.get(i).getUsername().equals(suggedtedUserAndDate.get(j).getUsername()) &&
+//                        suggedtedUserAndDate.get(i).getStartDate().getTime() == suggedtedUserAndDate.get(j).getStartDate().getTime() &&
+//                        suggedtedUserAndDate.get(i).getEndDate().getTime() == suggedtedUserAndDate.get(j).getEndDate().getTime()
+//                ){
+//                    isSend = false;
+//                } else {
+//                    sendSuggedtedUserAndDate.add(suggedtedUserAndDate.get(i));
+//                }
+//            }
+//        }
+
 
         int a = 0;
-        return suggestedWorkingList;
+        return sendSuggedtedUserAndDate;
     }
 
     public static List<UserWorkingStartAndEndDate> suggestNewUser(List<List<DateAndHour>> totalWorkingHoursOfUsers, List<UserWorkingStartAndEndDate> userWorkingStartAndEndDateList, List<String> suggestionUsernames, String issueKey, String bannedUsername, Date startDate, Date endDate){
@@ -651,4 +707,5 @@ public class functions {
 //
 //        return workDays;
 //    }
+
 }

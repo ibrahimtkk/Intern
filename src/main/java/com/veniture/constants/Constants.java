@@ -46,9 +46,10 @@ public class Constants {
     public static final String QUERY_AVAILABILITY_YEAR = "/rest/tempo-planning/1/capacity/report/XXX?from=YYY&to=ZZZ&period=P1w";
     public static final String QUERY_AVAILABILITY_YEAR_BY_DAY = "/rest/tempo-planning/1/capacity/report/XXX?from=YYY&to=ZZZ&period=P1d";
     public static final String QUERY_ALLOCATION_BY_DATE = "/rest/tempo-planning/1/allocation?startDate=SSS&endDate=EEE";
-//    public static final String QUERY_ALLOCATION_BY_DATE_ASSIGNEE_KEY = "/rest/tempo-planning/1/allocation?startDate=SSS&endDate=EEE&assigneeKeys=AAA";
-public static final String QUERY_ALLOCATION_BY_DATE_ASSIGNEE_KEY = "/rest/tempo-planning/1/allocation?startDate=SSS&endDate=EEE";
+    public static final String QUERY_ALLOCATION_BY_DATE_ASSIGNEE_KEY = "/rest/tempo-planning/1/allocation?startDate=SSS&endDate=EEE&assigneeKeys=AAA";
+//public static final String QUERY_ALLOCATION_BY_DATE_ASSIGNEE_KEY = "/rest/tempo-planning/1/allocation?startDate=SSS&endDate=EEE";
     public static final int MAXWORKINGTIME = 8;
+    public static final double WORKINGRATIO = 0.9;
     //Veniture Jira - Prod Yeni Ortam
     public static final String ProjectId = "APY";
     //public static final String departmanJQL ="project ="+ProjectId+" and cf[11507] =currentUser() and status=\"Departman Önceliklendirmesi\" ORDER BY \"Departman Önceliği\"";
