@@ -52,12 +52,12 @@ Released under the MIT license: http://jsbin.mit-license.org
     <script>
         AJS.$(document).ready(function () {
 
-            let butceCFstring = "customfield_10600";
+            let butceCFstring = "customfield_11000";
             let butceJSONstring = "Bütçe"
-            let basTarihCFstring = "customfield_10703";
+            let basTarihCFstring = "customfield_11102";
             let basTarihJSONstring = "BaslangicTarihi"
-            let bitTarihCFstring = "customfield_10704";
-            let bitTarihJSONstring = "BitisTarihi";
+            let bitTarihCFstring = "customfield_10900";
+            let bitTarihJSONstring = "BitisTarihi"
 
             var htmlButtonOneri=document.getElementById("kaynakKullaniciOnerisi");
             let butonHtmlElement = htmlButtonOneri.cloneNode(true);
@@ -210,13 +210,13 @@ Released under the MIT license: http://jsbin.mit-license.org
                     {
                         'targets':0,
                         'createdCell': function (td, cellData, rowData, row, col) {
-                            $(td).attr('headers', 'basic-fname');
+                            $(td).attr('id', 'basic-fname');
                         }
                     },
                     {
                         'targets':1,
                         'createdCell': function (td, cellData, rowData, row, col) {
-                            $(td).attr('headers', 'basic-lname');
+                            $(td).attr('id', 'basic-lname');
                         }
                     }
                 ]
@@ -232,20 +232,49 @@ Released under the MIT license: http://jsbin.mit-license.org
                     {
                         'targets':0,
                         'createdCell': function (td, cellData, rowData, row, col) {
-                            $(td).attr('headers', 'basic-fname');
+                            $(td).attr('id', 'basic-fname');
+                        }
+                    },
+                    // {
+                    //     'targets':1,
+                    //     'createdCell': function (td, cellData, rowData, row, col) {
+                    //         $(td).attr('id', 'basic-lname');
+                    //     }
+                    // }
+                    // ,
+                    {
+                        'targets':1,
+                        'createdCell': function (td, cellData, rowData, row, col) {
+                            $(td).attr('id', 'basic-pname');
+                        }
+                    }
+                ]
+            });
+            var resourceNumberforProjectTable=$("#resourceNumberforProjectTable").DataTable({
+                bLengthChange: false,
+                bPaginate: false,
+                bInfo: false,
+                bAutoWidth: false,
+                bFilter: false,
+                "ordering": false,
+                columnDefs: [
+                    {
+                        'targets':0,
+                        'createdCell': function (td, cellData, rowData, row, col) {
+                            $(td).attr('id', 'basic-projename');
                         }
                     },
                     {
                         'targets':1,
                         'createdCell': function (td, cellData, rowData, row, col) {
-                            $(td).attr('headers', 'basic-lname');
+                            $(td).attr('id', 'basic-kaynakname');
                         }
                     }
                     ,
                     {
                         'targets':2,
                         'createdCell': function (td, cellData, rowData, row, col) {
-                            $(td).attr('headers', 'basic-pname');
+                            $(td).attr('id', 'basic-sayi');
                         }
                     }
                 ]
@@ -387,6 +416,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                 allowClear: true
             });
             AJS.$("#projectKey-select2").auiSelect2();
+            AJS.$("#kaynakProjectKey-select2").auiSelect2();
             AJS.$("#baslangicTarihiInput").datePicker({
                 overrideBrowserDefault:true,
                 dateFormat: "yy-mm-dd",
@@ -425,9 +455,29 @@ Released under the MIT license: http://jsbin.mit-license.org
                     bitisDateforProjectPlanning=endDate(date)
                 }
             })
+            AJS.$("#kBaslangicTarihiInput").datePicker({
+                overrideBrowserDefault:true,
+                dateFormat: "yy-mm-dd",
+                inline:true,
+                autoclose: true,
+                onSelect: function (date) {
+                    baslangicDateforResourceNumber=endDate(date)
+                }
+            })
+            AJS.$("#kBitisTarihiInput").datePicker({
+                overrideBrowserDefault:true,
+                dateFormat: "yy-mm-dd",
+                inline:true,
+                autoclose: true,
+                onSelect: function (date) {
+                    bitisDateforResourceNumber=endDate(date)
+                }
+            })
+
 
 
             var issueKeys =[];
+
             jsonDataTable.forEach(cell => {
                 issueKeys.push(cell.key)
             })
@@ -444,8 +494,9 @@ Released under the MIT license: http://jsbin.mit-license.org
 
             google.charts.load('current', {'packages':['gantt']});
             google.charts.setOnLoadCallback(drawChart);
-
+            var projectKeysforResourceNumber=[];
             var projectKeys=[];
+
             AJS.$("#projectKey-select2").on('select2-selecting', function (e) {
                 projectKeys.push(e.val)
             })
@@ -453,6 +504,15 @@ Released under the MIT license: http://jsbin.mit-license.org
                 const index = projectKeys.indexOf(e.val);
                 if (index > -1) {
                     projectKeys.splice(index, 1);
+                }
+            })
+            AJS.$("#kaynakProjectKey-select2").on('select2-selecting', function (e) {
+                projectKeysforResourceNumber.push(e.val)
+            })
+            AJS.$("#kaynakProjectKey-select2").on('select2-removing', function (e) {
+                const index = projectKeysforResourceNumber.indexOf(e.val);
+                if (index > -1) {
+                    projectKeysforResourceNumber.splice(index, 1);
                 }
             })
             AJS.$('#kaydetButton').off().on("click", function (e) {
@@ -495,6 +555,21 @@ Released under the MIT license: http://jsbin.mit-license.org
                 }
                 let kaynakAsiminaUgrayanlar = resourceOverloadProjectPlanning(constraintDataa);
                 console.log("kaynakAsiminaUgrayanlar: ", kaynakAsiminaUgrayanlar)
+                e.preventDefault();
+            });
+            AJS.$('#resourceNumberOverloadinProject').off().on("click", function (e){
+                var kaynakNumberConstraint = $("#kaynakInput").val();
+                resourceNumberforProjectTable.clear().draw();
+                console.log("kaynakNumberConstraint : "+kaynakNumberConstraint)
+                let constraintDataa = {
+                    "startDate" : baslangicDateforResourceNumber.toString(),
+                    "endDate" : bitisDateforResourceNumber.toString(),
+                    "projectKey" : projectKeysforResourceNumber,
+                    "resource" :kaynakNumberConstraint.toString()
+                }
+                projeKaynakSayısıResponse = resourceNumberOverload(constraintDataa);
+
+                console.log("Projedeki Kaynak Sayısı Response: ", projeKaynakSayısıResponse)
                 e.preventDefault();
             });
 
@@ -746,18 +821,27 @@ Released under the MIT license: http://jsbin.mit-license.org
 
             $('#myTab a[href="#home"]').click(function(){
                 $('#tableDiv').css('visibility','visible');
+                $('#gantt').css('visibility','visible');
             });
             $('#myTab a[href="#menu1"]').click(function(){
                 $('#tableDiv').css('visibility','visible');
+                $('#gantt').css('visibility','visible');
             });
             $('#myTab a[href="#menu2"]').click(function(){
                 $('#tableDiv').css('visibility','visible');
+                $('#gantt').css('visibility','visible');
             });
             $('#myTab a[href="#menu3"]').click(function(){
                 $('#tableDiv').css('visibility','visible');
+                $('#gantt').css('visibility','visible');
             });
             $('#myTab a[href="#menu4"]').click(function(){
                 $('#tableDiv').css('visibility','hidden');
+                $('#gantt').css('visibility','hidden');
+            });
+            $('#myTab a[href="#menu5"]').click(function(){
+                $('#tableDiv').css('visibility','hidden');
+                $('#gantt').css('visibility','hidden');
             });
 
             function outerHTML(node){
@@ -1162,6 +1246,42 @@ Released under the MIT license: http://jsbin.mit-license.org
                 var chart = new google.visualization.Gantt(document.getElementById('gantt'));
                 chart.draw(data, options);
             }
+            function resourceNumberOverload(constraintData) {
+                var value="";
+                jQuery.ajax({
+                    url: AJS.params.baseURL + "/rest/florestservice/1.2/rest/resourceNumberOverload",
+                    type: 'POST',
+                    data: constraintData,
+                    async: false,
+                    error : function (response) {
+                        value= "-";
+                    },
+                    success: function (response, status, jqXHR) {
+                        value=response;
+                        console.log("response: "+response)
+                        AJS.$("#resourceNumberforProjectTable").css("visibility","visible")
+                        var kaynakNumberConstraint = $("#kaynakInput").val();
+
+                        var responseArr=[];
+                        responseArr = response.split(",,,");
+
+                        for(var i=0; i<responseArr.length;i++){
+                            var nameProject = [];
+                            nameProject = responseArr[i].split(",,")
+                            var sayi = nameProject[2];
+                            console.log("sayii: "+sayi)
+                            if(parseInt(nameProject[2]) > parseInt(kaynakNumberConstraint)){
+                                nameProject[2]='<span class="aui-icon aui-icon-small aui-iconfont-error"></span> '+sayi;
+                            }
+                            resourceNumberforProjectTable.row.add(nameProject).draw(true);
+                            resourceNumberforProjectTable.order([ 0, 'asc' ]).draw();
+                        }
+
+                    }
+                });
+
+                return value;
+            }
 
         });
 
@@ -1214,6 +1334,9 @@ Released under the MIT license: http://jsbin.mit-license.org
         <li class="nav-item">
             <a class="nav-link" data-toggle="tab" href="#menu4"style="color: #6b778c;font-weight: bold;">Kaynak Aşımı</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#menu5"style="color: #6b778c;font-weight: bold;">Projedeki Kaynak Sayısı</a>
+        </li>
     </ul>
 
     <!-- Tab panes -->
@@ -1225,6 +1348,9 @@ Released under the MIT license: http://jsbin.mit-license.org
             <a class="aui-button-link" style="font-size: small; color:darkblue" onclick="myFunction()" id="myBtn">Daha fazla</a>
         </div>
         <div id="menu1" class="container tab-pane fade"><br>
+            <div class="aui-message aui-message-change">
+                <p>Aşağıdan tabloda bulunmasını istediğiniz özel alanları seçebilirsiniz.</p>
+            </div>
             <div class="col-xs-4 col-md-4" style="padding: 0px; margin-top:20px;">
                 <div class="aui-group">
                     <div class="aui-item" id="#select2-customFields">
@@ -1241,6 +1367,9 @@ Released under the MIT license: http://jsbin.mit-license.org
             </div>
         </div>
         <div id="menu2" class="container tab-pane fade"><br>
+            <div class="aui-message aui-message-change">
+                <p>Aşağıdan favori filtre seçerek tabloyu filtreleyebilirsiniz.</p>
+            </div>
             <div class="col-xs-4 col-md-4" style="padding: 0px; margin-top:20px;">
                 <div class="aui-group">
                     <div class="aui-item" id="#select2-favFilters">
@@ -1257,6 +1386,9 @@ Released under the MIT license: http://jsbin.mit-license.org
             </div>
         </div>
         <div id="menu3" class="container tab-pane fade"><br>
+            <div class="aui-message aui-message-change">
+                <p>Tabloda bulunan proje kartlarını seçerek bütçe hesaplayabilir, "bütçe" alanına belirlediğiniz miktarı girerek bir sınır belirleyebilirsiniz.<br /> Tarihe göre proje kartlarını filtrelemek için tarih alanlarından seçim yapabilirsiniz.</p>
+            </div>
             <form class="aui">
                 <div class="field-group" style="width:400px">
                     <label for="butceInput" id="butceLabel" style="text-align: left">Bütçe <span class="aui-icon aui-icon-small aui-iconfont-new-edit" style="float: right"/></label>
@@ -1276,6 +1408,9 @@ Released under the MIT license: http://jsbin.mit-license.org
             </form>
         </div>
         <div id="menu4" class="container tab-pane fade"><br>
+            <div class="aui-message aui-message-change">
+                <p>Proje anahtarı alanından proje ismini seçerek, belirlediğiniz tarihlerde aşıma uğrayan kullanıcıları "Kaynak Aşımı" butonu ile listeleyebilirsiniz. <br/>Belirlediğiniz tarihlerdeki müsait kaynakları görmek için "Kaynak Önerisi" butonunu kullanabilirsiniz.</p>
+            </div>
             <form class="aui">
                 <div class="field-group" style="width:400px">
                     <label for="projectKeyInput" id="projectKeyLabel" style="text-align: left; position: initial;">Proje anahtarı<span class="aui-icon icon-required" style="position: relative;left: 3px;top: -3px;"/>&nbsp;
@@ -1316,7 +1451,7 @@ Released under the MIT license: http://jsbin.mit-license.org
                 <thead>
                 <tr>
                     <th id="basic-fname">Kaynak</th>
-                    <th id="basic-lname">Aşıma Uğrayan Proje</th>
+##                    <th id="basic-lname">Aşıma Uğrayan Proje</th>
                     <th id="basic-pname">Kaynağın Çalıştığı Projeler</th>
                 </tr>
                 </thead>
@@ -1331,6 +1466,49 @@ Released under the MIT license: http://jsbin.mit-license.org
                     <th id="basic-pname">Proje</th>
                     <th id="basic-lname">Başlangıç Tarihi</th>
                     <th id="basic-pname">Bitiş Tarihi</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+        <div id="menu5" class="container tab-pane fade"><br>
+            <div class="aui-message aui-message-change">
+                <p>"Proje Anahtarı" alanından girilen proje için belirlenen tarihlerde kaç kaynağın çalıştığını görebilirsiniz.<br/>Ayrıca "kaynak sayısı" girilerek, belirlenen kaynak kısıtını aşan projeleri görebilirsiniz.</p>
+            </div>
+            <form class="aui">
+                <div class="field-group" style="width:400px">
+                    <label for="projectKeyInput" id="projectKeyLabel" style="text-align: left; position: initial;">Proje anahtarı<span class="aui-icon icon-required" style="position: relative;left: 3px;top: -3px;"/>&nbsp;
+                        <span class="aui-icon aui-icon-small aui-iconfont-new-edit" style="position: relative;left: 23px;"/>
+                    </label>
+                    <select id="kaynakProjectKey-select2" data-placeholder="Proje eklemek için tıklayın" multiple>
+                        <option value=""></option>
+                        #foreach($pk in $projectKeysList)
+                            <option value="$pk">$pk</option>
+                        #end
+                    </select>
+                </div>
+                <div class="field-group" style="width:400px">
+                    <label for="kaynakInput" id="kaynakInputLabel" style="text-align: left">Kaynak sayısı <span class="aui-icon aui-icon-small aui-iconfont-person-circle" style="float: right"></span></label>
+                    <input class="text" type="text" id="kaynakInput" name="kaynakInput"/>
+                </div>
+                <div class="field-group" style="width:400px;">
+                    <label for="kBaslangicTarihiInput" id="kBaslangicTarihiLabel" style="text-align: left">Başlangıç tarihi <span class="aui-icon aui-icon-small aui-iconfont-calendar" id="tarihIconBas" style="float: right"/></label>
+                    <input class="text" type="text" id="kBaslangicTarihiInput" name="kBaslangicTarihiInput" class="aui-date-picker" id="demo-range-1" type="date" autocomplete="off">
+
+                </div>
+                <div class="field-group" style="width: 400px;">
+                    <label for="kBitisTarihiInput" id="kBitisTarihiLabel" style="text-align: left">Bitiş tarihi <span class="aui-icon aui-icon-small aui-iconfont-calendar" id="tarihIconBit" style="float: right"/></label>
+                    <input class="text" type="text" id="kBitisTarihiInput" name="kBitisTarihiInput" class="aui-date-picker" id="demo-range-1" type="date" autocomplete="off"/>
+                </div>
+            </form>
+            <div class="aui-group" id="buttons" >
+                <button class="aui-button" id="resourceNumberOverloadinProject" style="float:left;">Kaynak Aşımı</button>
+            </div>
+            <table class="aui" id="resourceNumberforProjectTable" style="visibility: hidden">
+                <thead>
+                <tr>
+                    <th id="basic-projename">Proje</th>
+                    <th id="basic-kaynakname">Çalışan Kaynaklar</th>
+                    <th id="basic-sayi">Kişi Sayısı</th>
                 </tr>
                 </thead>
             </table>
@@ -1404,6 +1582,7 @@ Released under the MIT license: http://jsbin.mit-license.org
         <br><br><br><br><br><br><br>
 
     <div class="gantt" name="gantt" id="gantt" style="margin-top:50px; visibility:hidden"></div>
+
     <div class="row" id="swAlert" style="margin-top:50px; visibility:hidden">
         <div class="col-xs-5 col-md-1" style="padding-left:15px">
             <form>

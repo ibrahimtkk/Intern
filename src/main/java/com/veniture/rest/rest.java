@@ -492,6 +492,7 @@ public class rest {
         resource = 0;
 
         List<String> userNames = new ArrayList<>();
+        List<String> justUserName=new ArrayList<>();
         allocations.forEach(allocation1 -> {
             Allocation allocation = allocation1;
             if ( issueKeys.contains( allocation.getPlanItem().getKey())){
@@ -520,8 +521,15 @@ public class rest {
                         resource += all2.getSecondsPerDay()/3600;
 
                         if(resource > constraintResource){
+                            if (!justUserName.contains(all2.getAssignee().getKey())){
+                                justUserName.add(all2.getAssignee().getKey());
+                                //userNames.add(all2.getAssignee().getKey() + ","+ allocation.getPlanItem().getKey()+","+allProjectsUser );
+                                userNames.add(all2.getAssignee().getKey() +","+allProjectsUser );
+                            }
+
                             //kaynak aşımı oluştu
-                            userNames.add(all2.getAssignee().getKey() + ","+ allocation.getPlanItem().getKey()+","+allProjectsUser );
+//                            userNames.add(all2.getAssignee().getKey() + ","+ allocation.getPlanItem().getKey()+","+allProjectsUser );
+
 //                            if(!userNames.contains(all2.getAssignee().getKey() +","+allProjectsUser)){
 //                                userNames.add(all2.getAssignee().getKey() +","+allProjectsUser);
 //                            }
@@ -569,7 +577,62 @@ public class rest {
         String project = projects.stream().collect(Collectors.joining(" - "));
         return project;
     }
+    @POST
+    @Path("/resourceNumberOverload")
+    public String resourceNumberOverload(@Context HttpServletRequest req, @Context HttpServletResponse resp) throws IOException, ParseException {
+        Map map = req.getParameterMap();
+        String[] issueKeysArray = req.getParameterValues("projectKey[]");
+        String startDateString = req.getParameterValues("startDate")[0];
+        String endDateString = req.getParameterValues("endDate")[0];
+        String resourceString = req.getParameterValues("resource")[0];
+        List<Allocation> allocations = getAllocationsByDate(startDateString, endDateString);
+        List<String> issueKeys = Arrays.asList(issueKeysArray);
+        int constraintResource = Integer.parseInt(resourceString);
 
+        String isOverload;
+
+        List<String> projectKeys = new ArrayList<>();
+        List<String> k = new ArrayList<>();
+        allocations.forEach(allocation1 -> {
+            Allocation allocation = allocation1;
+            if ( issueKeys.contains( allocation.getPlanItem().getKey())){
+                try {
+                    if(!projectKeys.contains(allocation.getPlanItem().getKey())){
+                        projectKeys.add(allocation.getPlanItem().getKey());
+                        List<String> userNames = new ArrayList<>();
+                        List<Allocation> allocation2 = getAllocationsByDateAndPlanItemId(startDateString, endDateString,allocation.getPlanItem().getId().toString());
+                        int numberOfResourceForProject = allocation2.size();
+                        String numberOfResourceForProjectString = Integer.toString(numberOfResourceForProject);
+                        allocation2.forEach(all2 -> {
+                            userNames.add(all2.getAssignee().getKey());
+                        });
+
+                        k.add(allocation.getPlanItem().getKey()+",,"+userNames+",,"+numberOfResourceForProjectString);
+                    }
+
+
+//                    if(!userNames.contains(allocation.getAssignee().getKey())){
+//                        userNames.add(allocation.getAssignee().getKey());
+//                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+//        int usersSize = userNames.size();
+//        if(usersSize > constraintResource ){
+//            isOverload = "!Kaynak sayısı aşılmış durumda! Seçilen proje için çalışan kaynak sayısı: "+usersSize;
+//        }else {
+//            isOverload = "Seçilen proje için çalışan kaynak sayısı: "+usersSize;
+//        }
+//
+//        return isOverload;
+        String names = k.stream().collect(Collectors.joining(",,,"));
+        return names;
+    }
 
     @POST
     @Path("/assignUserToTempo")
