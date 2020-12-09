@@ -116,6 +116,15 @@ public class functions {
         List<Allocation> tempoAllocationData = GSON.fromJson(getResponseByStartAndEndDate(startDate, endDate), tempoAllocationDataType);
         return tempoAllocationData;
     }
+    public static List<Allocation> getAllocationsByDateAndPlanItemId(String startDate, String endDate, String planItemId) throws IOException {
+        Type tempoAllocationDataType = new TypeToken<List<Allocation>>() {}.getType();
+        List<Allocation> tempoAllocationData = GSON.fromJson(getResponseByStartAndEndDateAndPlanItemKey(startDate, endDate, planItemId), tempoAllocationDataType);
+        return tempoAllocationData;
+    }
+    public static String getResponseByStartAndEndDateAndPlanItemKey(String startDate, String endDate,String planItemKey) throws IOException {
+        String QUERY = QUERY_ALLOCATION_BY_DATE_PLAN_ITEM_ID.replace("SSS", startDate).replace("EEE", endDate).replace("AAA", planItemKey);
+        return getResponseString(QUERY);
+    }
     public static List<Allocation> getAllocationsByDateAndAssigneeKey(String startDate, String endDate, String assigneeKey) throws IOException {
         Type tempoAllocationDataType = new TypeToken<List<Allocation>>() {}.getType();
         List<Allocation> tempoAllocationData = GSON.fromJson(getResponseByStartAndEndDateAndAssigneeKey(startDate, endDate, assigneeKey), tempoAllocationDataType);
