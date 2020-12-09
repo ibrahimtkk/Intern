@@ -559,6 +559,9 @@ Released under the MIT license: http://jsbin.mit-license.org
             });
             AJS.$('#resourceNumberOverloadinProject').off().on("click", function (e){
                 var kaynakNumberConstraint = $("#kaynakInput").val();
+                if(kaynakNumberConstraint===""){
+                    alert("Lütfen kaynak sayısı belirtin!")
+                }
                 resourceNumberforProjectTable.clear().draw();
                 console.log("kaynakNumberConstraint : "+kaynakNumberConstraint)
                 let constraintDataa = {
@@ -1433,13 +1436,15 @@ Released under the MIT license: http://jsbin.mit-license.org
                     <input class="text" type="text" id="projectBitisTarihiInput" name="projectBitisTarihiInput" class="aui-date-picker" id="demo-range-1" type="date" autocomplete="off"/>
                 </div>
             </form>
-            <div class="aui-group" id="buttons" >
-                <button class="aui-button" id="kaynakAsimforProjectPlanning" style="float:left;">Kaynak Aşımı</button>
+            <div class="row">
+                <div class="aui-group col-sm" id="buttons" >
+                    <button class="aui-button" id="kaynakAsimforProjectPlanning" style="float:left;">Kaynak Aşımı</button>
+                </div>
+                <div class="aui-group col-sm" id="buttons">
+                    <button class="aui-button" id="kaynakAsimOner" style="float:left;">Kaynak Önerisi</button>
+                </div>
             </div>
 
-            <div class="aui-group" id="buttons">
-                <button class="aui-button" id="kaynakAsimOner" style="float:left;">Kaynak Önerisi</button>
-            </div>
 
             <div class="aui-message aui-message-info" id="resourceOverloadInfo" style="visibility: hidden">
                 <p class="title">

@@ -125,6 +125,8 @@ label {
     color: #6b778c;
 }
 #tableDiv {
+    position: relative;
+    top: 80px;
     table-layout: auto;
     max-width: 10000px;
     margin-left: auto;

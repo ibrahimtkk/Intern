@@ -26,12 +26,23 @@ public class GetCustomFieldsInExcel {
         ArrayList<CustomField> cfArrayList= new ArrayList<>();
         CustomFieldManager customFieldManager=ComponentAccessor.getCustomFieldManager();
 //        cfArrayList.add(customFieldManager.getCustomFieldObject(10600L));//PriorityNumber
-//        cfArrayList.add(customFieldManager.getCustomFieldObject(10600L)); // Butce
-//        cfArrayList.add(customFieldManager.getCustomFieldObject(10703L)); // Baslangic Tarihi
-//        cfArrayList.add(customFieldManager.getCustomFieldObject(10704L)); // Bitis Tarihi
-        cfArrayList.add(customFieldManager.getCustomFieldObject(10700L)); // Proje Lideri
-        cfArrayList.add(customFieldManager.getCustomFieldObject(10701L)); // Proje Ismi
-        cfArrayList.add(customFieldManager.getCustomFieldObject(10709L)); // Kaynak
+//        cfArrayList.add(customFieldManager.getCustomFieldObject(11000L)); // Bütçe
+        cfArrayList.add(customFieldManager.getCustomFieldObject(11104L)); // ProjectLead
+        cfArrayList.add(customFieldManager.getCustomFieldObject(11101L)); // Proje Ismi
+//        cfArrayList.add(customFieldManager.getCustomFieldObject(11102L)); // Baslangic Tarihi
+//        cfArrayList.add(customFieldManager.getCustomFieldObject(10900L)); // Bitis Tarihi -> Due Date
+        cfArrayList.add(customFieldManager.getCustomFieldObject(11300L)); // Kaynak
+        cfArrayList.add(customFieldManager.getCustomFieldObject(11501L));//Proje insan gücü maliyeti-gerçekleşen
+        cfArrayList.add(customFieldManager.getCustomFieldObject(11502L));//Proje insan gücü maliyeti-kalan
+        cfArrayList.add(customFieldManager.getCustomFieldObject(11500L));//Proje insan gücü maliyeti-planlanan
+
+        cfArrayList.add(customFieldManager.getCustomFieldObject(11504L));//Proje harcama maliyetleri-gerçekleşen
+        cfArrayList.add(customFieldManager.getCustomFieldObject(11505L));//Proje harcama maliyetleri-kalan
+        cfArrayList.add(customFieldManager.getCustomFieldObject(11503L));//Proje harcama maliyetleri-planlanan
+
+        cfArrayList.add(customFieldManager.getCustomFieldObject(11510L));//Proje fikri haklar maliyetleri-gerçekleşen
+        cfArrayList.add(customFieldManager.getCustomFieldObject(11511L));//Proje fikri haklar maliyetleri-kalan
+        cfArrayList.add(customFieldManager.getCustomFieldObject(11509L));//Proje fikri haklar maliyetleri-planlanan
         return cfArrayList;
     }
 

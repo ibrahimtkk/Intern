@@ -12,8 +12,8 @@ public class Constants {
     public static final String SC_SORGUSU = "project = PF";
     public static final String JIRA_BASE_URL = ComponentAccessor.getApplicationProperties().getString("jira.baseurl");
 
-    public static final String adminUsername = "ibrahim.takak";
-    public static final String adminPassword = "qwerty";
+    public static final String adminUsername = "merve";
+    public static final String adminPassword = "merve";
     public static final String venitureHostname = "test.veniture.com.tr";
     public static final String floHostname = "test.veniture.com.tr";
 
@@ -47,6 +47,7 @@ public class Constants {
     public static final String QUERY_AVAILABILITY_YEAR_BY_DAY = "/rest/tempo-planning/1/capacity/report/XXX?from=YYY&to=ZZZ&period=P1d";
     public static final String QUERY_ALLOCATION_BY_DATE = "/rest/tempo-planning/1/allocation?startDate=SSS&endDate=EEE";
     public static final String QUERY_ALLOCATION_BY_DATE_ASSIGNEE_KEY = "/rest/tempo-planning/1/allocation?startDate=SSS&endDate=EEE&assigneeKeys=AAA";
+    public static final String QUERY_ALLOCATION_BY_DATE_PLAN_ITEM_ID="/rest/tempo-planning/1/allocation?startDate=SSS&endDate=EEE&planItemId=AAA";
 //public static final String QUERY_ALLOCATION_BY_DATE_ASSIGNEE_KEY = "/rest/tempo-planning/1/allocation?startDate=SSS&endDate=EEE";
     public static final int MAXWORKINGTIME = 8;
     public static final double WORKINGRATIO = 0.9;
@@ -73,16 +74,16 @@ public class Constants {
     public static final String BIRIM_ONCELIK_ID_STRING = "customfield_11403";
     public static final long GMY_ONCELIK_ID = 11501L;
     public static final String GMY_ONCELIK_STRING = "customfield_11501";
-    public static final long PriorityNumber = 10400L;
-    public static final String PriorityNumberString = "customfield_10400";
-    public static final long ProjeLideri = 10700L;
-    public static final String ProjeLideriString = "customfield_10700";
-    public static final long ProjeIsmi = 10701L;
-    public static final String ProjeIsmiString = "customfield_10701";
-    public static final long BaslangicTarihi = 10703L;
-    public static final String BaslangicTarihiString = "customfield_10703";
-    public static final long BitisTarihi = 10704L;
-    public static final String BitisTarihiString = "customfield_10704";
+    public static final long PriorityNumber = 10600L;
+    public static final String PriorityNumberString = "customfield_10600";
+    public static final long ProjeLideri = 11104L;
+    public static final String ProjeLideriString = "customfield_11104";
+    public static final long ProjeIsmi = 11101L;
+    public static final String ProjeIsmiString = "customfield_11101";
+    public static final long BaslangicTarihi = 11102L;
+    public static final String BaslangicTarihiString = "customfield_11102";
+    public static final long BitisTarihi = 10900L;
+    public static final String BitisTarihiString = "customfield_10900";
 
     //Veniture Jira eski Ortam
     public static final String WFA = "project = FP AND issuetype = \"Project Card\" AND status = \"Waiting for approval\"";
